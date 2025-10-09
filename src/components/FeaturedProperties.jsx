@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { propertiesData } from "../data/propertiesData";
-import { MapPin, Bed, Bath, Maximize } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const FeaturedProperties = () => {
   const navigate = useNavigate();
-  const featuredProperties = propertiesData.filter(p => p.featured).slice(0, 6);
+  const featuredProperties = propertiesData.filter((p) => p.featured);
+  const itemsPerPage = 6;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true });
+  }, []);
+
+  const totalPages = Math.ceil(featuredProperties.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = featuredProperties.slice(startIndex, startIndex + itemsPerPage);
 
   const formatPrice = (price) => {
     if (price >= 10000000) {
@@ -14,9 +26,18 @@ const FeaturedProperties = () => {
     return `₹${(price / 100000).toFixed(2)} Lac`;
   };
 
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
         <div className="text-center mb-4" data-aos="fade-up">
           <span className="inline-block bg-orange-50 text-orange-600 px-4 py-2 rounded-full font-medium text-sm uppercase tracking-wide">
             Featured
@@ -38,8 +59,9 @@ const FeaturedProperties = () => {
           Handpicked properties that offer exceptional value
         </p>
 
+        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProperties.map((property, idx) => (
+          {currentItems.map((property, idx) => (
             <article
               key={property.id}
               data-aos="fade-up"
@@ -47,23 +69,30 @@ const FeaturedProperties = () => {
               className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer group hover:shadow-2xl transition-shadow duration-300"
               onClick={() => navigate(`/property/${property.id}`)}
             >
+              {/* Image */}
               <div className="h-56 overflow-hidden">
                 <img
-                  src={property.mainImage}
+                  src={Array.isArray(property.mainImages) ? property.mainImages[0] : property.mainImages}
                   alt={property.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>
+
+              {/* Content */}
               <div className="p-6">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-xl font-bold text-[#003366] group-hover:text-orange-600 transition-colors">
                     {property.title}
                   </h3>
                 </div>
+
                 <div className="flex items-center gap-2 text-gray-600 mb-4">
                   <MapPin size={16} className="text-orange-500" />
-                  <span className="text-sm">{property.location}, {property.city}</span>
+                  <span className="text-sm">
+                    {property.location}, {property.city}
+                  </span>
                 </div>
+
                 <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
                   {property.bedrooms > 0 && (
                     <div className="flex items-center gap-1">
@@ -79,9 +108,12 @@ const FeaturedProperties = () => {
                   )}
                   <div className="flex items-center gap-1">
                     <Maximize size={16} className="text-[#003366]" />
-                    <span>{property.area} {property.areaUnit}</span>
+                    <span>
+                      {property.area} {property.areaUnit}
+                    </span>
                   </div>
                 </div>
+
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="text-2xl font-bold text-orange-600">
                     {formatPrice(property.price)}
@@ -93,6 +125,41 @@ const FeaturedProperties = () => {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* Pagination */}
+        <div
+          className="flex justify-center items-center gap-4 mt-12"
+          data-aos="fade-up"
+          data-aos-delay="300"
+        >
+          <button
+            onClick={handlePrev}
+            disabled={currentPage === 1}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+              currentPage === 1
+                ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
+            }`}
+          >
+            <ChevronLeft size={18} /> Previous
+          </button>
+
+          <span className="text-gray-600 font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+              currentPage === totalPages
+                ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
+            }`}
+          >
+            Next <ChevronRight size={18} />
+          </button>
         </div>
       </div>
     </section>

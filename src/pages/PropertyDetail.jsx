@@ -226,7 +226,7 @@ function PropertyDetail() {
                       className="bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                     >
                       <img
-                        src={prop.mainImage}
+                        src={prop.mainImages}
                         alt={prop.title}
                         className="w-full h-40 object-cover"
                       />

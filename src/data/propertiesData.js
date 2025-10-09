@@ -5,7 +5,8 @@ export const propertyCategories = [
     slug: "plots",
     count: "1,200+",
     description: "Premium residential plots for your dream home",
-    image: "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    image:
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
   {
     id: 2,
@@ -13,7 +14,8 @@ export const propertyCategories = [
     slug: "flats",
     count: "2,500+",
     description: "Comfortable apartments for urban living",
-    image: "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    image:
+      "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
   {
     id: 3,
@@ -21,7 +23,8 @@ export const propertyCategories = [
     slug: "lands",
     count: "900+",
     description: "Agricultural and commercial land opportunities",
-    image: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    image:
+      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
   {
     id: 4,
@@ -29,7 +32,8 @@ export const propertyCategories = [
     slug: "commercial",
     count: "700+",
     description: "Prime commercial spaces for your business",
-    image: "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    image:
+      "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
   {
     id: 5,
@@ -37,7 +41,8 @@ export const propertyCategories = [
     slug: "villas",
     count: "1,800+",
     description: "Luxurious independent villas with modern amenities",
-    image: "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    image:
+      "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
 ];
 
@@ -57,17 +62,30 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Residential Villa",
     status: "For Sale",
-    description: "Spacious 4BHK luxury villa with contemporary design, private garden, and premium finishes. Located in a gated community with 24/7 security and world-class amenities.",
-    amenities: ["Swimming Pool", "Garden", "Parking", "Security", "Power Backup", "Gym", "Club House"],
-    mainImage: "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
+    description:
+      "Spacious 4BHK luxury villa with contemporary design, private garden, and premium finishes. Located in a gated community with 24/7 security and world-class amenities.",
+    amenities: [
+      "Swimming Pool",
+      "Garden",
+      "Parking",
+      "Security",
+      "Power Backup",
+      "Gym",
+      "Club House",
+    ],
+    mainImages: [
       "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200",
       "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    galleryImages: [
       "https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200"
+      "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    videos: [
+      "https://www.w3schools.com/html/mov_bbb.mp4",
     ],
     featured: true,
-    postedDate: "2025-10-01"
+    postedDate: "2025-10-01",
   },
   {
     id: 2,
@@ -84,16 +102,30 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Residential Villa",
     status: "For Sale",
-    description: "Elegant 5BHK villa with spacious rooms, modern kitchen, and beautiful landscaping. Perfect for large families seeking luxury and comfort.",
-    amenities: ["Club House", "Swimming Pool", "Parking", "Security", "Children Play Area", "Gym", "Landscaped Garden", "Power Backup"],
-    mainImage: "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
+    description:
+      "Elegant 5BHK villa with spacious rooms, modern kitchen, and beautiful landscaping. Perfect for large families seeking luxury and comfort.",
+    amenities: [
+      "Club House",
+      "Swimming Pool",
+      "Parking",
+      "Security",
+      "Children Play Area",
+      "Gym",
+      "Landscaped Garden",
+      "Power Backup",
+    ],
+    mainImages: [
       "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
       "https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    galleryImages: [
+      "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    videos: [
+      "https://www.w3schools.com/html/movie.mp4",
     ],
     featured: true,
-    postedDate: "2025-10-03"
+    postedDate: "2025-10-03",
   },
   {
     id: 3,
@@ -110,16 +142,30 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Residential Villa",
     status: "For Sale",
-    description: "Stunning contemporary villa featuring a private swimming pool, home theater, and premium imported finishes throughout.",
-    amenities: ["Private Pool", "Home Theater", "Garden", "Parking", "Security", "Power Backup", "Gym", "Servant Quarter"],
-    mainImage: "https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
+    description:
+      "Stunning contemporary villa featuring a private swimming pool, home theater, and premium imported finishes throughout.",
+    amenities: [
+      "Private Pool",
+      "Home Theater",
+      "Garden",
+      "Parking",
+      "Security",
+      "Power Backup",
+      "Gym",
+      "Servant Quarter",
+    ],
+    mainImages: [
       "https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpeg?auto=compress&cs=tinysrgb&w=1200",
       "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    galleryImages: [
+      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    videos: [
+      "https://www.w3schools.com/html/mov_bbb.mp4",
     ],
     featured: false,
-    postedDate: "2025-09-28"
+    postedDate: "2025-09-28",
   },
   {
     id: 4,
@@ -136,15 +182,26 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Residential Villa",
     status: "For Sale",
-    description: "Beautifully designed 4BHK villa with large garden area, perfect for nature lovers. Modern amenities with traditional aesthetics.",
-    amenities: ["Large Garden", "Parking", "Security", "Power Backup", "Club House", "Children Play Area"],
-    mainImage: "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
+    description:
+      "Beautifully designed 4BHK villa with large garden area, perfect for nature lovers. Modern amenities with traditional aesthetics.",
+    amenities: [
+      "Large Garden",
+      "Parking",
+      "Security",
+      "Power Backup",
+      "Club House",
+      "Children Play Area",
+    ],
+    mainImages: [
       "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200"
+      "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    galleryImages: [],
+    videos: [
+      "https://www.w3schools.com/html/movie.mp4",
     ],
     featured: false,
-    postedDate: "2025-09-25"
+    postedDate: "2025-09-25",
   },
   {
     id: 5,
@@ -161,16 +218,29 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Residential Apartment",
     status: "For Sale",
-    description: "Well-ventilated 3BHK apartment with modern amenities in prime IT corridor location. Excellent connectivity and lifestyle facilities.",
-    amenities: ["Gym", "Power Backup", "Lift", "Security", "Parking", "Club House", "Swimming Pool"],
-    mainImage: "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
+    description:
+      "Well-ventilated 3BHK apartment with modern amenities in prime IT corridor location. Excellent connectivity and lifestyle facilities.",
+    amenities: [
+      "Gym",
+      "Power Backup",
+      "Lift",
+      "Security",
+      "Parking",
+      "Club House",
+      "Swimming Pool",
+    ],
+    mainImages: [
       "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200",
       "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/2724748/pexels-photo-2724748.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    galleryImages: [
+      "https://images.pexels.com/photos/2724748/pexels-photo-2724748.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    videos: [
+      "https://www.w3schools.com/html/movie.mp4",
     ],
     featured: true,
-    postedDate: "2025-10-02"
+    postedDate: "2025-10-02",
   },
   {
     id: 6,
@@ -187,15 +257,24 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Residential Apartment",
     status: "For Sale",
-    description: "Contemporary 2BHK apartment in premium high-rise building. Great investment opportunity with excellent rental yield.",
-    amenities: ["Gym", "Power Backup", "Lift", "Security", "Parking", "Children Play Area"],
-    mainImage: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
-      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    description:
+      "Contemporary 2BHK apartment in premium high-rise building. Great investment opportunity with excellent rental yield.",
+    amenities: [
+      "Gym",
+      "Power Backup",
+      "Lift",
+      "Security",
+      "Parking",
+      "Children Play Area",
     ],
+    mainImages: [
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    galleryImages: [],
+    videos: [],
     featured: false,
-    postedDate: "2025-09-30"
+    postedDate: "2025-09-30",
   },
   {
     id: 7,
@@ -212,15 +291,23 @@ export const propertiesData = [
     areaUnit: "sq yard",
     propertyType: "Residential Plot",
     status: "For Sale",
-    description: "HMDA approved residential plot in developing area with good connectivity. Clear title and ready for construction.",
-    amenities: ["Electricity", "Water Supply", "Gated Community", "Security", "Drainage"],
-    mainImage: "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
-      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    description:
+      "HMDA approved residential plot in developing area with good connectivity. Clear title and ready for construction.",
+    amenities: [
+      "Electricity",
+      "Water Supply",
+      "Gated Community",
+      "Security",
+      "Drainage",
     ],
+    mainImages: [
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    galleryImages: [],
+    videos: [],
     featured: false,
-    postedDate: "2025-09-27"
+    postedDate: "2025-09-27",
   },
   {
     id: 8,
@@ -237,15 +324,24 @@ export const propertiesData = [
     areaUnit: "sq yard",
     propertyType: "Residential Plot",
     status: "For Sale",
-    description: "Premium plot in gated villa community with all modern infrastructure. Ideal for building your dream villa.",
-    amenities: ["Electricity", "Water Supply", "Gated Community", "Security", "Park", "Club House Access"],
-    mainImage: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
-      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    description:
+      "Premium plot in gated villa community with all modern infrastructure. Ideal for building your dream villa.",
+    amenities: [
+      "Electricity",
+      "Water Supply",
+      "Gated Community",
+      "Security",
+      "Park",
+      "Club House Access",
     ],
+    mainImages: [
+      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    galleryImages: [],
+    videos: [],
     featured: false,
-    postedDate: "2025-10-04"
+    postedDate: "2025-10-04",
   },
   {
     id: 9,
@@ -262,15 +358,25 @@ export const propertiesData = [
     areaUnit: "sq ft",
     propertyType: "Commercial",
     status: "For Sale",
-    description: "Premium office space in prime IT hub. Fully furnished with modern infrastructure and excellent connectivity.",
-    amenities: ["Parking", "Power Backup", "Lift", "Security", "AC", "Cafeteria", "Conference Room"],
-    mainImage: "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
-      "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "https://images.pexels.com/photos/2451470/pexels-photo-2451470.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    description:
+      "Premium office space in prime IT hub. Fully furnished with modern infrastructure and excellent connectivity.",
+    amenities: [
+      "Parking",
+      "Power Backup",
+      "Lift",
+      "Security",
+      "AC",
+      "Cafeteria",
+      "Conference Room",
     ],
+    mainImages: [
+      "https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/2451470/pexels-photo-2451470.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    galleryImages: [],
+    videos: [],
     featured: false,
-    postedDate: "2025-09-29"
+    postedDate: "2025-09-29",
   },
   {
     id: 10,
@@ -287,13 +393,15 @@ export const propertiesData = [
     areaUnit: "acres",
     propertyType: "Agricultural Land",
     status: "For Sale",
-    description: "Fertile agricultural land with water facility. Perfect for farming or investment near Outer Ring Road.",
+    description:
+      "Fertile agricultural land with water facility. Perfect for farming or investment near Outer Ring Road.",
     amenities: ["Water Supply", "Electricity", "Road Access"],
-    mainImage: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    galleryImages: [
-      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    mainImages: [
+      "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200",
     ],
+    galleryImages: [],
+    videos: [],
     featured: false,
-    postedDate: "2025-09-26"
-  }
+    postedDate: "2025-09-26",
+  },
 ];

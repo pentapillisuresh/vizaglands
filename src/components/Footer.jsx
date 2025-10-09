@@ -27,11 +27,12 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div className="animate-fadeIn">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">V</span>
-              </div>
-              <span className="text-xl font-semibold text-white">Vizagland.com</span>
+              <div className="flex items-center mb-4">
+              <img
+                src="images/logo.jpg"
+                alt="Vizaglands Logo"
+                className="h-10 w-auto"
+              />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               We are committed to connect quality homes to quality buyers. Helping you find your dream property.

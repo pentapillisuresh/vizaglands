@@ -5,6 +5,8 @@ import SelectUserType from './pages/SelectUserType';
 import PostProperty from './pages/PostProperty';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          {/* <Route path="/about" element={<About />} /> */}
+          {/* <Route path="/contact" element={<Contact />} /> */}
           <Route path="/select-user-type" element={<SelectUserType />} />
           <Route path="/post-property" element={<PostProperty />} />
           <Route path="/properties/:categorySlug" element={<Properties />} />
