@@ -8,6 +8,7 @@ import Testimonials from "../components/Testimonials";
 import LocationsSection from "../components/LocationsSection";
 import Footer from "../components/Footer";
 import CommercialAdSection from "../components/CommercialAdSection";
+import ViewedProperties from "../components/ViewedProperties";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -21,6 +22,7 @@ function Home() {
     <div className="min-h-screen">
       {/* Header is already rendered in App.js, you can remove it here if duplicated */}
       <Hero />
+      <ViewedProperties />
       <PropertyCategories />
       <FeaturedProperties />
       <HowItWorks />
