@@ -98,11 +98,10 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               <button
                 key={option}
                 onClick={() => setFacing(option)}
-                className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
-                  facing === option
+                className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${facing === option
                     ? 'bg-orange-500 border-orange-500 text-white'
                     : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                }`}
+                  }`}
               >
                 {option}
               </button>
@@ -114,7 +113,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
       <button
         onClick={handleContinue}
         disabled={!plotArea || !facing}
-        className="bg-blue-700 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
       </button>

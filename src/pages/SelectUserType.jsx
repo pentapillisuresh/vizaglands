@@ -1,126 +1,143 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { Building2, User, Users } from 'lucide-react';
+
+import { useNavigate } from 'react-router-dom';
 
 const SelectUserType = () => {
   const [selectedType, setSelectedType] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, createUserProfile } = useAuth();
 
   const userTypes = [
-    {
-      id: 'owner',
-      title: 'Owner',
-      description: 'I own the property',
-      icon: User,
-    },
-    {
-      id: 'agent',
-      title: 'Agent',
-      description: 'I am a real estate agent',
-      icon: Users,
-    },
-    {
-      id: 'builder',
-      title: 'Builder',
-      description: 'I am a builder/developer',
-      icon: Building2,
-    },
+    { id: 'owner', title: 'Owner', description: 'I own the property', icon: User },
+    { id: 'agent', title: 'Agent', description: 'I am a real estate agent', icon: Users },
+    { id: 'builder', title: 'Builder', description: 'I am a builder/developer', icon: Building2 },
   ];
 
   const handleContinue = async () => {
     if (!selectedType) return;
-
     setLoading(true);
-    try {
-      const pendingData = JSON.parse(sessionStorage.getItem('pendingRegistration') || '{}');
 
-      await createUserProfile(
-        user.id,
-        user.email,
-        selectedType,
-        pendingData.fullName || user.fullName || '',
-        pendingData.phone || user.phone || ''
-      );
-
-      sessionStorage.removeItem('pendingRegistration');
-      navigate('/post-property');
-    } catch (error) {
-      console.error('Error creating profile:', error);
-    } finally {
+    setTimeout(() => {
+      console.log('Selected type:', selectedType);
       setLoading(false);
-    }
+      // Navigate to post-property page or next step
+      navigate('/post-property');
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="font-serif text-4xl font-bold text-blue-900 mb-4">
-            Tell us about yourself
-          </h1>
-          <p className="font-roboto text-xl text-gray-600">
-            Select your role to get started
-          </p>
-        </div>
+    <div className="flex flex-col min-h-screen">
+      {/* HEADER */}
+      {/* <Header /> */}
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {userTypes.map((type) => {
-            const Icon = type.icon;
-            return (
-              <button
-                key={type.id}
-                onClick={() => setSelectedType(type.id)}
-                className={`p-8 rounded-2xl border-2 transition-all duration-300 ${
-                  selectedType === type.id
-                    ? 'border-orange-500 bg-orange-50 shadow-lg scale-105'
-                    : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-md'
-                }`}
-              >
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <div
-                    className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                      selectedType === type.id
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-blue-100 text-blue-900'
-                    }`}
-                  >
-                    <Icon className="w-10 h-10" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif text-2xl font-bold text-blue-900 mb-2">
-                      {type.title}
-                    </h3>
-                    <p className="font-roboto text-gray-600">{type.description}</p>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="text-center">
-          <button
-            onClick={handleContinue}
-            disabled={!selectedType || loading}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-roboto font-medium px-12 py-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-          >
-            {loading ? 'Please wait...' : 'Continue'}
-          </button>
-        </div>
-
-        {selectedType && (
-          <div className="mt-8 text-center">
-            <div className="inline-block bg-blue-50 border border-blue-200 rounded-lg px-6 py-4">
-              <p className="font-roboto text-blue-900">
-                <span className="font-medium">Selected:</span> {userTypes.find(t => t.id === selectedType)?.title}
+      {/* MAIN CONTENT */}
+      <main className="flex-1 flex overflow-hidden">
+        {/* Left Column: Form Content */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-12 lg:px-16 xl:px-20 bg-white overflow-y-auto">
+          <div className="max-w-lg mx-auto w-full py-8">
+            {/* Page Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                Tell us about yourself
+              </h1>
+              <p className="text-base text-gray-600">
+                Select your role to get started
               </p>
             </div>
+
+            {/* User Type Cards */}
+            <div className="space-y-3 mb-6">
+              {userTypes.map((type) => {
+                const Icon = type.icon;
+                return (
+                  <button
+                    key={type.id}
+                    onClick={() => setSelectedType(type.id)}
+                    className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center space-x-3 ${
+                      selectedType === type.id
+                        ? 'border-orange-500 bg-orange-50 shadow-md'
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                    }`}
+                  >
+                    <div
+                      className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        selectedType === type.id
+                          ? 'bg-orange-500 text-white'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div className="text-left flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-0.5">
+                        {type.title}
+                      </h3>
+                      <p className="text-xs text-gray-600">{type.description}</p>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      selectedType === type.id
+                        ? 'border-orange-500 bg-orange-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {selectedType === type.id && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Continue Button */}
+            <button
+              onClick={handleContinue}
+              disabled={!selectedType || loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg hover:shadow-xl"
+            >
+              {loading ? 'Please wait...' : 'Continue'}
+            </button>
+
+            {/* Help Text */}
+            <p className="text-center text-xs text-gray-500 mt-4">
+              You can change your role later in settings
+            </p>
           </div>
-        )}
-      </div>
+        </div>
+
+        {/* Right Column: Full Image */}
+        <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 to-gray-900/80 z-10"></div>
+          <img
+            src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Modern Building"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 flex flex-col justify-center px-10 xl:px-14 text-white z-20">
+            <h2 className="text-3xl xl:text-4xl font-bold mb-4 leading-tight">
+              Start Your Real Estate Journey
+            </h2>
+            <p className="text-base xl:text-lg text-gray-200 leading-relaxed max-w-md">
+              Join thousands of property owners, agents, and builders who trust our platform to manage their real estate needs.
+            </p>
+            <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">
+              <div>
+                <div className="text-2xl xl:text-3xl font-bold mb-1">10K+</div>
+                <div className="text-xs text-gray-300">Active Users</div>
+              </div>
+              <div>
+                <div className="text-2xl xl:text-3xl font-bold mb-1">500+</div>
+                <div className="text-xs text-gray-300">Properties</div>
+              </div>
+              <div>
+                <div className="text-2xl xl:text-3xl font-bold mb-1">98%</div>
+                <div className="text-xs text-gray-300">Satisfaction</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* FOOTER */}
+      {/* <Footer /> */}
     </div>
   );
 };

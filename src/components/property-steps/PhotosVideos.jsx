@@ -67,9 +67,8 @@ const PhotosVideos = ({ data, updateData, onNext }) => {
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
-          dragActive ? 'border-orange-500 bg-orange-50' : 'border-gray-300 bg-gray-50'
-        }`}
+        className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${dragActive ? 'border-orange-500 bg-orange-50' : 'border-gray-300 bg-gray-50'
+          }`}
       >
         <input
           type="file"
@@ -135,7 +134,7 @@ const PhotosVideos = ({ data, updateData, onNext }) => {
 
       <button
         onClick={handleContinue}
-        className="bg-blue-700 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors"
+        className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors"
       >
         Continue
       </button>

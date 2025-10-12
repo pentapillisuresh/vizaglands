@@ -8,6 +8,7 @@ import PropertyProfile from '../components/property-steps/PropertyProfile';
 import PhotosVideos from '../components/property-steps/PhotosVideos';
 import PricingOthers from '../components/property-steps/PricingOthers';
 
+
 const PostProperty = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [propertyData, setPropertyData] = useState({
@@ -58,6 +59,7 @@ const PostProperty = () => {
   };
 
   const calculateScore = () => {
+    if (propertyData.property_score) return propertyData.property_score; // use 100 if set
     let score = 0;
     if (propertyData.listingType) score += 10;
     if (propertyData.propertyType) score += 10;
@@ -73,13 +75,11 @@ const PostProperty = () => {
   };
 
   return (
+    <>
+  {/* <Header /> */}
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-blue-900 text-white py-4 px-6 shadow-md">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="font-serif text-2xl font-bold">vizaglands</h1>
-        </div>
-      </div>
+     
 
       <div className="max-w-7xl mx-auto py-8 px-4">
         <div className="grid lg:grid-cols-[300px_1fr] gap-8">
@@ -173,6 +173,8 @@ const PostProperty = () => {
         </div>
       </div>
     </div>
+  {/* <Footer /> */}
+      </>
   );
 };
 

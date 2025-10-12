@@ -84,7 +84,7 @@ const LocationDetails = ({ data, updateData, onNext }) => {
       <button
         onClick={handleContinue}
         disabled={!city || !locality}
-        className="bg-blue-700 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
       </button>

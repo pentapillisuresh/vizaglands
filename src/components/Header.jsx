@@ -1,86 +1,85 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Header = ({ onGetStartedClick }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation(); // Current URL path
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsSearchOpen(false);
+        setIsMobileMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Check if a link is active
+  const isActive = (path) => location.pathname === path;
+
   return (
     <div ref={searchRef}>
       {/* HEADER */}
-      <header
-        className="shadow-sm"
-        style={{ backgroundColor: "rgb(244, 245, 249)" }}
-      >
+      <header className="shadow-sm bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
+            {/* LOGO */}
             <div className="flex items-center">
-              <img
-                src="images/logo.jpg"
-                alt="Vizaglands Logo"
-                className="h-10 w-auto"
-              />
+              <img src="images/logo.jpg" alt="Vizaglands Logo" className="h-10 w-auto" />
             </div>
 
-            {/* NAVIGATION */}
+            {/* DESKTOP NAVIGATION */}
             <nav className="hidden lg:flex items-center space-x-8">
               <a
-                href="#home"
-                className="text-orange-500 font-medium font-roboto hover:text-orange-600 transition-colors"
+                href="/"
+                className={`relative font-medium font-roboto transition-colors ${
+                  isActive("/") ? "text-orange-500" : "text-gray-700 hover:text-orange-500"
+                }`}
               >
                 Home
+                {isActive("/") && (
+                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
+                )}
               </a>
               <a
-                href="#properties"
-                className="text-gray-700 font-roboto hover:text-orange-500 transition-colors"
-              >
-                Properties
-              </a>
-              <a
-                href="#services"
-                className="text-gray-700 font-roboto hover:text-orange-500 transition-colors"
-              >
-                Services
-              </a>
-              <a
-                href="#about"
-                className="text-gray-700 font-roboto hover:text-orange-500 transition-colors"
+                href="/about"
+                className={`relative font-medium font-roboto transition-colors ${
+                  isActive("/about") ? "text-orange-500" : "text-gray-700 hover:text-orange-500"
+                }`}
               >
                 About
+                {isActive("/about") && (
+                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
+                )}
               </a>
               <a
-                href="#contact"
-                className="text-gray-700 font-roboto hover:text-orange-500 transition-colors"
+                href="/contact"
+                className={`relative font-medium font-roboto transition-colors ${
+                  isActive("/contact") ? "text-orange-500" : "text-gray-700 hover:text-orange-500"
+                }`}
               >
                 Contact
+                {isActive("/contact") && (
+                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
+                )}
               </a>
             </nav>
 
-            {/* ACTION BUTTONS */}
+            {/* DESKTOP ACTION BUTTONS */}
             <div className="hidden lg:flex items-center space-x-4">
-              {/* Property Search Button — Now Styled Like “Get Started” */}
+              {/* Property Search Button */}
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={`${
                   isSearchOpen ? "bg-orange-600" : "bg-orange-500"
                 } text-white font-roboto px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2`}
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -91,17 +90,23 @@ const Header = ({ onGetStartedClick }) => {
                 <span>Property Search</span>
               </button>
 
+              {/* Post Property Button */}
+              <button
+                onClick={() => navigate("/select-user-type")}
+                className="bg-orange-100 text-orange-600 font-roboto px-6 py-2.5 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Post Property</span>
+              </button>
+
               {/* Get Started Button */}
               <button
                 onClick={onGetStartedClick}
                 className="bg-orange-500 text-white font-roboto px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -114,24 +119,37 @@ const Header = ({ onGetStartedClick }) => {
             </div>
 
             {/* MOBILE MENU ICON */}
-            <button className="lg:hidden text-gray-700">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+            <button
+              className="lg:hidden text-gray-700"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
         </div>
       </header>
+
+      {/* MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-gray-50 shadow-md">
+          <nav className="flex flex-col space-y-2 p-4">
+            {["/", "/about", "/contact"].map((path) => (
+              <a
+                key={path}
+                href={path}
+                className={`relative font-medium font-roboto transition-colors py-2 px-4 rounded ${
+                  isActive(path) ? "text-orange-500 bg-orange-50" : "text-gray-700 hover:text-orange-500"
+                }`}
+              >
+                {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.substring(2)}
+                {isActive(path) && <span className="absolute left-0 bottom-0 w-full h-0.5 bg-orange-500 rounded-full" />}
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {/* PROPERTY SEARCH DROPDOWN */}
       {isSearchOpen && (

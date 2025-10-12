@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-// import { supabase } from '../../lib/supabase';
 
 const PricingOthers = ({ data, updateData }) => {
   const [price, setPrice] = useState(data.price || '');
@@ -9,6 +8,7 @@ const PricingOthers = ({ data, updateData }) => {
   const [description, setDescription] = useState(data.description || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false); // for popup
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -31,37 +31,29 @@ const PricingOthers = ({ data, updateData }) => {
   const handleSubmit = async (status) => {
     setLoading(true);
     setError('');
-
     try {
-      const propertyData = {
-        user_id: user.id,
-        listing_type: data.listingType,
-        property_type: data.propertyType,
-        property_subtype: data.propertySubtype,
-        city: data.city,
-        locality: data.locality,
-        sub_locality: data.subLocality || null,
-        apartment_society: data.apartmentSociety || null,
-        plot_area: parseFloat(data.plotArea) || null,
-        plot_area_unit: data.plotAreaUnit,
-        length: parseFloat(data.length) || null,
-        breadth: parseFloat(data.breadth) || null,
-        facing: data.facing,
+      const propertyDataToSave = {
+        ...data,
         price: parseFloat(price) || null,
         project_name: projectName || null,
         description: description || null,
-        photos: data.photos || [],
-        property_score: calculateScore(),
-        status: status,
+        property_score: 100, // mark complete
+        status,
       };
 
-      const { error: insertError } = await supabase
-        .from('properties')
-        .insert([propertyData]);
+      // Instead of saving to Supabase, just store locally or send to your backend later
+      console.log("Property saved (mock):", propertyDataToSave);
 
-      if (insertError) throw insertError;
+      // Update parent state so sidebar/step indicator shows 100%
+      updateData({ ...propertyDataToSave });
 
-      navigate('/');
+      // Show success popup
+      setSuccess(true);
+
+      // Auto-redirect after 2 seconds
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     } catch (err) {
       setError(err.message);
       console.error('Error saving property:', err);
@@ -70,8 +62,9 @@ const PricingOthers = ({ data, updateData }) => {
     }
   };
 
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
       <div>
         <h2 className="font-serif text-3xl font-bold text-blue-900 mb-2">
           Pricing & Others
@@ -84,6 +77,12 @@ const PricingOthers = ({ data, updateData }) => {
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-roboto text-sm">
           {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-4 bg-green-100 border border-green-300 text-green-800 px-6 py-4 rounded-lg shadow-lg font-roboto z-50">
+          🎉 Property posted successfully!
         </div>
       )}
 
@@ -154,7 +153,9 @@ const PricingOthers = ({ data, updateData }) => {
           </div>
           <div>
             <span className="text-gray-600">Property Score:</span>
-            <span className="ml-2 font-medium text-orange-500">{calculateScore()}%</span>
+            <span className="ml-2 font-medium text-orange-500">
+              {success ? 100 : calculateScore()}%
+            </span>
           </div>
         </div>
       </div>
@@ -170,7 +171,7 @@ const PricingOthers = ({ data, updateData }) => {
         <button
           onClick={() => handleSubmit('published')}
           disabled={loading || !price}
-          className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Publishing...' : 'Publish Property'}
         </button>

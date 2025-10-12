@@ -59,11 +59,10 @@ const BasicDetails = ({ data, updateData, onNext }) => {
             <button
               key={type}
               onClick={() => setListingType(type)}
-              className={`px-6 py-2.5 rounded-full border-2 font-roboto capitalize transition-all ${
-                listingType === type
+              className={`px-6 py-2.5 rounded-full border-2 font-roboto capitalize transition-all ${listingType === type
                   ? 'bg-orange-500 border-orange-500 text-white'
                   : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-              }`}
+                }`}
             >
               {type === 'pg' ? 'PG' : type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
@@ -113,11 +112,10 @@ const BasicDetails = ({ data, updateData, onNext }) => {
             <button
               key={subtype}
               onClick={() => setPropertySubtype(subtype)}
-              className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
-                propertySubtype === subtype
+              className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${propertySubtype === subtype
                   ? 'bg-orange-500 border-orange-500 text-white'
                   : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-              }`}
+                }`}
             >
               {subtype}
             </button>
@@ -128,7 +126,7 @@ const BasicDetails = ({ data, updateData, onNext }) => {
       <button
         onClick={handleContinue}
         disabled={!propertySubtype}
-        className="bg-blue-700 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
       </button>
