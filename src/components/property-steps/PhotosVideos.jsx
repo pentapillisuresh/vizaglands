@@ -1,25 +1,26 @@
 import { useState } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Video, Mic } from 'lucide-react';
+import watermark from 'watermarkjs'; // ✅ Add this import
 
 const PhotosVideos = ({ data, updateData, onNext }) => {
   const [photos, setPhotos] = useState(data.photos || []);
+  const [videos, setVideos] = useState(data.videos || []);
+  const [voiceOver, setVoiceOver] = useState(data.voiceOver || null);
+  const [videoUrl, setVideoUrl] = useState('');
   const [dragActive, setDragActive] = useState(false);
 
+  // --- DRAG & DROP HANDLERS ---
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
+    if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
+    else if (e.type === 'dragleave') setDragActive(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFiles(e.dataTransfer.files);
     }
@@ -27,110 +28,241 @@ const PhotosVideos = ({ data, updateData, onNext }) => {
 
   const handleChange = (e) => {
     e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      handleFiles(e.target.files);
-    }
+    if (e.target.files && e.target.files[0]) handleFiles(e.target.files);
   };
 
-  const handleFiles = (files) => {
-    const newPhotos = Array.from(files).map((file) => ({
+  // ✅ UPDATED: APPLY WATERMARK ON EACH IMAGE
+  // ✅ UPDATED: Apply watermark on each image properly
+const handleFiles = async (files) => {
+  const newPhotos = [];
+
+  for (const file of files) {
+    const fileUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = fileUrl;
+
+    await new Promise((res) => (img.onload = res));
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // Draw original image
+    ctx.drawImage(img, 0, 0);
+
+    // ✅ Add centered watermark text
+    const fontSize = Math.floor(canvas.width * 0.08); // 8% of image width
+    ctx.font = `${fontSize}px Arial`;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // white, semi-transparent
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "rgba(0,0,0,0.6)";
+    ctx.shadowBlur = 8;
+
+    const text = "vizaglands.com";
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const watermarked = canvas.toDataURL("image/jpeg", 0.9);
+
+    newPhotos.push({
       id: Date.now() + Math.random(),
       file,
-      preview: URL.createObjectURL(file),
-    }));
-    setPhotos([...photos, ...newPhotos]);
-  };
+      preview: watermarked,
+    });
+  }
+
+  setPhotos((prev) => [...prev, ...newPhotos]);
+};
+
+
 
   const removePhoto = (id) => {
     setPhotos(photos.filter((photo) => photo.id !== id));
   };
 
+  // --- VIDEO ---
+  const addVideoUrl = () => {
+    if (videoUrl.trim() === '') return;
+    setVideos([...videos, { id: Date.now(), url: videoUrl.trim() }]);
+    setVideoUrl('');
+  };
+
+  const removeVideo = (id) => {
+    setVideos(videos.filter((v) => v.id !== id));
+  };
+
+  // --- VOICE OVER ---
+  const handleVoiceOver = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setVoiceOver({
+        name: file.name,
+        preview: URL.createObjectURL(file),
+      });
+    }
+  };
+
+  const removeVoiceOver = () => {
+    setVoiceOver(null);
+  };
+
   const handleContinue = () => {
-    updateData({ photos });
+    updateData({ photos, videos, voiceOver });
     onNext();
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h2 className="font-serif text-3xl font-bold text-blue-900 mb-2">
           Photos, Videos & Voice-over
         </h2>
         <p className="font-roboto text-gray-600">
-          Add photos to make your property stand out
+          Add media to make your property stand out.
         </p>
       </div>
 
-      {/* Upload Area */}
-      <div
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${dragActive ? 'border-orange-500 bg-orange-50' : 'border-gray-300 bg-gray-50'
+      {/* Upload + Preview */}
+      <div className="flex flex-wrap gap-6">
+        <div
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+          className={`border-2 border-dashed rounded-xl p-10 w-60 h-60 flex flex-col justify-center items-center text-center transition-colors ${
+            dragActive
+              ? 'border-orange-500 bg-orange-50'
+              : 'border-gray-300 bg-gray-50'
           }`}
-      >
-        <input
-          type="file"
-          id="photo-upload"
-          multiple
-          accept="image/*"
-          onChange={handleChange}
-          className="hidden"
-        />
-        <label htmlFor="photo-upload" className="cursor-pointer">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-              <Upload className="w-8 h-8 text-orange-500" />
+        >
+          <input
+            type="file"
+            id="photo-upload"
+            multiple
+            accept="image/*"
+            onChange={handleChange}
+            className="hidden"
+          />
+          <label
+            htmlFor="photo-upload"
+            className="cursor-pointer flex flex-col items-center space-y-3"
+          >
+            <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
+              <Upload className="w-7 h-7 text-orange-500" />
             </div>
             <div>
-              <p className="font-roboto text-lg text-gray-700 mb-1">
-                <span className="text-orange-500 font-medium">Click to upload</span> or drag and drop
+              <p className="font-roboto text-sm text-gray-700">
+                <span className="text-orange-500 font-medium">Click</span> or drag
               </p>
-              <p className="font-roboto text-sm text-gray-500">
-                PNG, JPG or JPEG (max. 5MB each)
-              </p>
+              <p className="text-xs text-gray-500">PNG, JPG, JPEG</p>
             </div>
+          </label>
+        </div>
+
+        {/* Preview Photos */}
+        {photos.map((photo) => (
+          <div
+            key={photo.id}
+            className="relative group w-60 h-60 rounded-lg overflow-hidden bg-gray-100"
+          >
+            <img
+              src={photo.preview}
+              alt="Property"
+              className="w-full h-full object-cover"
+            />
+            <button
+              onClick={() => removePhoto(photo.id)}
+              className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-        </label>
+        ))}
       </div>
 
-      {/* Photo Grid */}
-      {photos.length > 0 && (
-        <div>
-          <h3 className="font-roboto text-lg font-medium text-gray-700 mb-4">
-            Uploaded Photos ({photos.length})
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            {photos.map((photo) => (
-              <div key={photo.id} className="relative group">
-                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                  <img
-                    src={photo.preview}
-                    alt="Property"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+      {/* --- Video URLs --- */}
+      <div>
+        <h3 className="font-roboto text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
+          <Video className="w-5 h-5 text-blue-600" /> Add Video URLs
+        </h3>
+        <div className="flex gap-3">
+          <input
+            type="url"
+            placeholder="Enter YouTube or video link"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+          <button
+            onClick={addVideoUrl}
+            className="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2 rounded-lg"
+          >
+            Add
+          </button>
+        </div>
+
+        {videos.length > 0 && (
+          <ul className="mt-4 space-y-2">
+            {videos.map((v) => (
+              <li
+                key={v.id}
+                className="flex items-center justify-between bg-blue-50 px-4 py-2 rounded-lg"
+              >
+                <a
+                  href={v.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-700 underline truncate"
+                >
+                  {v.url}
+                </a>
                 <button
-                  onClick={() => removePhoto(photo.id)}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => removeVideo(v.id)}
+                  className="text-red-500 hover:text-red-700"
                 >
                   <X className="w-4 h-4" />
                 </button>
-              </div>
+              </li>
             ))}
-          </div>
-        </div>
-      )}
+          </ul>
+        )}
+      </div>
 
-      {photos.length === 0 && (
-        <div className="flex items-center justify-center py-8 bg-blue-50 rounded-lg">
-          <div className="text-center">
-            <ImageIcon className="w-12 h-12 text-blue-300 mx-auto mb-3" />
-            <p className="font-roboto text-gray-600">No photos uploaded yet</p>
+      {/* --- Voice-over Upload --- */}
+      <div>
+        <h3 className="font-roboto text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
+          <Mic className="w-5 h-5 text-blue-600" /> Add Voice-over
+        </h3>
+
+        {!voiceOver ? (
+          <label className="flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-lg px-5 py-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+            <Upload className="w-5 h-5 text-orange-500" />
+            <span className="text-gray-700 font-medium">
+              Click to upload voice-over (MP3/WAV)
+            </span>
+            <input
+              type="file"
+              accept="audio/*"
+              className="hidden"
+              onChange={handleVoiceOver}
+            />
+          </label>
+        ) : (
+          <div className="flex items-center justify-between bg-blue-50 px-4 py-3 rounded-lg">
+            <div className="flex items-center gap-3">
+              <audio controls src={voiceOver.preview} className="w-64" />
+              <span className="text-gray-700">{voiceOver.name}</span>
+            </div>
+            <button
+              onClick={removeVoiceOver}
+              className="text-red-500 hover:text-red-700"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <button
         onClick={handleContinue}

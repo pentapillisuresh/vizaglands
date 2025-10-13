@@ -22,9 +22,10 @@ function Home() {
     <div className="min-h-screen">
       {/* Header is already rendered in App.js, you can remove it here if duplicated */}
       <Hero />
-      <ViewedProperties />
       <PropertyCategories />
       <FeaturedProperties />
+      <ViewedProperties />
+
       <HowItWorks />
       <CommercialAdSection />
       <Testimonials />

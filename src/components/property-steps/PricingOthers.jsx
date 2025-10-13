@@ -6,12 +6,39 @@ const PricingOthers = ({ data, updateData }) => {
   const [price, setPrice] = useState(data.price || '');
   const [projectName, setProjectName] = useState(data.projectName || '');
   const [description, setDescription] = useState(data.description || '');
+  const [approvedBy, setApprovedBy] = useState(data.approvedBy || []);
+  const [amenities, setAmenities] = useState(data.amenities || []);
+  const [roadFacing, setRoadFacing] = useState(data.roadFacing || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false); // for popup
+  const [success, setSuccess] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const approvedOptions = ['VMRDA', 'VUDA', 'DTC','RERA', 'Bank Loan'];
+  const amenitiesOptions = [
+    'Security',
+    'Maintenance Staff',
+    'Clubhouse',
+    'Park / Garden',
+    'Gym / Rooms',
+    'Swimming Pool',
+    'Wi-Fi',
+    'Restrooms',
+  ];
+
+  const handleApprovedChange = (value) => {
+    setApprovedBy((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
+  const handleAmenitiesChange = (value) => {
+    setAmenities((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
 
   const calculateScore = () => {
     let score = 0;
@@ -24,7 +51,7 @@ const PricingOthers = ({ data, updateData }) => {
     if (data.facing) score += 8;
     if (price) score += 12;
     if (description) score += 8;
-    if (data.photos.length > 0) score += 4;
+    if (data.photos?.length > 0) score += 4;
     return score;
   };
 
@@ -37,31 +64,24 @@ const PricingOthers = ({ data, updateData }) => {
         price: parseFloat(price) || null,
         project_name: projectName || null,
         description: description || null,
-        property_score: 100, // mark complete
+        approvedBy,
+        amenities,
+        roadFacing,
+        property_score: 100,
         status,
       };
 
-      // Instead of saving to Supabase, just store locally or send to your backend later
-      console.log("Property saved (mock):", propertyDataToSave);
+      console.log('Property saved (mock):', propertyDataToSave);
+      updateData(propertyDataToSave);
 
-      // Update parent state so sidebar/step indicator shows 100%
-      updateData({ ...propertyDataToSave });
-
-      // Show success popup
       setSuccess(true);
-
-      // Auto-redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      setTimeout(() => navigate('/'), 2000);
     } catch (err) {
       setError(err.message);
-      console.error('Error saving property:', err);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="space-y-8 relative">
@@ -86,6 +106,7 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       )}
 
+      {/* PRICE & DETAILS */}
       <div className="space-y-6">
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
@@ -127,8 +148,73 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       </div>
 
-      {/* Property Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+      {/* CONDITIONAL FIELDS */}
+      {data.propertySubtype === 'Flat/Apartment' && (
+        <div className="space-y-6 mt-8">
+          {/* Approved Section */}
+          <div>
+            <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
+              Approved By
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {approvedOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => handleApprovedChange(opt)}
+                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${
+                    approvedBy.includes(opt)
+                      ? 'bg-blue-900 border-blue-900 text-white'
+                      : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Amenities Section */}
+          <div>
+            <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
+              Amenities
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {amenitiesOptions.map((amenity) => (
+                <label
+                  key={amenity}
+                  className="flex items-center gap-2 text-gray-700 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={amenities.includes(amenity)}
+                    onChange={() => handleAmenitiesChange(amenity)}
+                    className="text-orange-500 focus:ring-orange-500"
+                  />
+                  {amenity}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {data.propertySubtype === 'Plot / Land' && (
+        <div className="mt-8">
+          <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
+            Road Facing
+          </h3>
+          <input
+            type="text"
+            value={roadFacing}
+            onChange={(e) => setRoadFacing(e.target.value)}
+            placeholder="Enter road facing (e.g. 40 ft road)"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+          />
+        </div>
+      )}
+
+      {/* SUMMARY */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-10">
         <h3 className="font-serif text-lg font-bold text-blue-900 mb-4">
           Property Summary
         </h3>
@@ -141,16 +227,28 @@ const PricingOthers = ({ data, updateData }) => {
             <span className="text-gray-600">Location:</span>
             <span className="ml-2 font-medium text-gray-900">{data.city}</span>
           </div>
-          <div>
-            <span className="text-gray-600">Area:</span>
-            <span className="ml-2 font-medium text-gray-900">
-              {data.plotArea} {data.plotAreaUnit}
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-600">Facing:</span>
-            <span className="ml-2 font-medium text-gray-900">{data.facing}</span>
-          </div>
+          {data.propertySubtype === 'Plot / Land' && (
+            <div>
+              <span className="text-gray-600">Road Facing:</span>
+              <span className="ml-2 font-medium text-gray-900">{roadFacing || 'N/A'}</span>
+            </div>
+          )}
+          {data.propertySubtype === 'Flat/Apartment' && (
+            <>
+              <div>
+                <span className="text-gray-600">Approved By:</span>
+                <span className="ml-2 font-medium text-gray-900">
+                  {approvedBy.join(', ') || 'N/A'}
+                </span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-gray-600">Amenities:</span>
+                <span className="ml-2 font-medium text-gray-900">
+                  {amenities.join(', ') || 'N/A'}
+                </span>
+              </div>
+            </>
+          )}
           <div>
             <span className="text-gray-600">Property Score:</span>
             <span className="ml-2 font-medium text-orange-500">
@@ -160,6 +258,7 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       </div>
 
+      {/* ACTION BUTTONS */}
       <div className="flex gap-4">
         <button
           onClick={() => handleSubmit('draft')}

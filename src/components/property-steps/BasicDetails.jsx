@@ -19,9 +19,7 @@ const BasicDetails = ({ data, updateData, onNext }) => {
   const residentialTypes = [
     'Flat/Apartment',
     'Independent House / Villa',
-    'Independent / Builder Floor',
     'Plot / Land',
-    '1 RK/ Studio Apartment',
     'Serviced Apartment',
     'Farmhouse',
     'Other',
@@ -55,16 +53,17 @@ const BasicDetails = ({ data, updateData, onNext }) => {
           I'm looking to
         </label>
         <div className="flex flex-wrap gap-3">
-          {['sell', 'rent', 'pg'].map((type) => (
+          {['sell', 'buy', 'rent'].map((type) => (
             <button
               key={type}
               onClick={() => setListingType(type)}
-              className={`px-6 py-2.5 rounded-full border-2 font-roboto capitalize transition-all ${listingType === type
+              className={`px-6 py-2.5 rounded-full border-2 font-roboto capitalize transition-all ${
+                listingType === type
                   ? 'bg-orange-500 border-orange-500 text-white'
                   : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                }`}
+              }`}
             >
-              {type === 'pg' ? 'PG' : type.charAt(0).toUpperCase() + type.slice(1)}
+              {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
@@ -112,10 +111,11 @@ const BasicDetails = ({ data, updateData, onNext }) => {
             <button
               key={subtype}
               onClick={() => setPropertySubtype(subtype)}
-              className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${propertySubtype === subtype
+              className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
+                propertySubtype === subtype
                   ? 'bg-orange-500 border-orange-500 text-white'
                   : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                }`}
+              }`}
             >
               {subtype}
             </button>

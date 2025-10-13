@@ -37,7 +37,7 @@ const PostProperty = () => {
     { number: 2, title: 'Location Details', subtitle: 'Step 2' },
     { number: 3, title: 'Property Profile', subtitle: 'Step 3' },
     { number: 4, title: 'Photos, Videos & Voice-over', subtitle: 'Step 4' },
-    { number: 5, title: 'Pricing & Others', subtitle: 'Step 5' },
+    { number: 5, title: 'Pricing & Amenities', subtitle: 'Step 5' },
   ];
 
   const updatePropertyData = (data) => {
