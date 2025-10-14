@@ -1,26 +1,33 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { LayoutDashboard, Home, BarChart3, User, LogOut } from "lucide-react";
 
 const Header = ({ onGetStartedClick }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVendorMenuOpen, setIsVendorMenuOpen] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
-  const location = useLocation(); // Current URL path
+  const location = useLocation();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsSearchOpen(false);
         setIsMobileMenuOpen(false);
+        setIsVendorMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Check if a link is active
   const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    localStorage.removeItem("vendorToken");
+    navigate("/");
+  };
 
   return (
     <div ref={searchRef}>
@@ -101,21 +108,79 @@ const Header = ({ onGetStartedClick }) => {
                 <span>Post Property</span>
               </button>
 
-              {/* Get Started Button */}
-              <button
-                onClick={onGetStartedClick}
-                className="bg-orange-500 text-white font-roboto px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span>Get Started</span>
-              </button>
+              {/* Vendor Dropdown Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsVendorMenuOpen(!isVendorMenuOpen)}
+                  className="bg-orange-500 text-white font-roboto px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Login</span>
+                  <svg
+                    className={`w-4 h-4 transform transition-transform ${
+                      isVendorMenuOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {isVendorMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                    <div className="py-2">
+                      <button
+                        onClick={() => navigate("/vendor/dashboard")}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        <span>Dashboard</span>
+                      </button>
+                      <button
+                        onClick={() => navigate("/vendor/manage-listings")}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                      >
+                        <Home className="w-4 h-4" />
+                        <span>Manage Listings</span>
+                      </button>
+                      <button
+                        onClick={() => navigate("/vendor/analytics")}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                        <span>Analytics</span>
+                      </button>
+                      <button
+                        onClick={() => navigate("/vendor/profile")}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>Profile</span>
+                      </button>
+
+                      {/* Login/Register Button with same orange style */}
+                      <button
+                        onClick={() => navigate("/login-register")}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-orange-600 hover:bg-orange-50"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>Login / Register</span>
+                      </button>
+
+                      <hr className="my-1 border-gray-200" />
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-red-500 hover:bg-red-50"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* MOBILE MENU ICON */}
@@ -144,7 +209,6 @@ const Header = ({ onGetStartedClick }) => {
                 }`}
               >
                 {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.substring(2)}
-                {isActive(path) && <span className="absolute left-0 bottom-0 w-full h-0.5 bg-orange-500 rounded-full" />}
               </a>
             ))}
           </nav>
