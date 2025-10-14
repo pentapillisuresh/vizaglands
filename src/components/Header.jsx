@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Home, BarChart3, User, LogOut } from "lucide-react";
+import { LayoutDashboard, Home, BarChart3, User, LogOut,Users } from "lucide-react";
 
 const Header = ({ onGetStartedClick }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -37,7 +37,7 @@ const Header = ({ onGetStartedClick }) => {
           <div className="flex items-center justify-between h-20">
             {/* LOGO */}
             <div className="flex items-center">
-              <img src="images/logo.jpg" alt="Vizaglands Logo" className="h-10 w-auto" />
+              <img src="/images/logo.jpg" alt="Vizaglands Logo" className="h-10 w-auto" />
             </div>
 
             {/* DESKTOP NAVIGATION */}
@@ -144,6 +144,13 @@ const Header = ({ onGetStartedClick }) => {
                       >
                         <Home className="w-4 h-4" />
                         <span>Manage Listings</span>
+                      </button>
+                         <button
+                        onClick={() => navigate("/vendor/leads")}
+                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                      >
+                        <Users className="w-4 h-4" />
+                        <span>Leads</span>
                       </button>
                       <button
                         onClick={() => navigate("/vendor/analytics")}

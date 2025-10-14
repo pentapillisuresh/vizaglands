@@ -17,8 +17,17 @@ const STATIC_USERS = [
     password: 'buyer123',
     fullName: 'Jane Buyer',
     phone: '9876543211',
-    userType: 'buyer'
+    userType: 'agent'
+  },
+  {
+    id: '3',
+    email: 'buyer@vizaglands.com',
+    password: 'buyer123',
+    fullName: 'Jane Buyer',
+    phone: '9876543211',
+    userType: 'builder'
   }
+
 ];
 
 export const useAuth = () => {

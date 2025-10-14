@@ -101,11 +101,10 @@ function PropertyDetail() {
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${
-                      selectedImage === idx
+                    className={`flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === idx
                         ? "border-orange-600 ring-2 ring-orange-200"
                         : "border-gray-300 hover:border-orange-400"
-                    }`}
+                      }`}
                   >
                     <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
                   </button>
@@ -204,15 +203,22 @@ function PropertyDetail() {
 
               <div className="mt-6">
                 <h2 className="text-2xl font-bold text-[#003366] mb-4">Amenities & Features</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {property.amenities.map((amenity, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                      <CheckCircle size={20} className="text-orange-600 flex-shrink-0" />
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg"
+                    >
+                      <CheckCircle
+                        size={20}
+                        className="text-orange-600 flex-shrink-0"
+                      />
                       <span className="text-[#003366] font-medium">{amenity}</span>
                     </div>
                   ))}
                 </div>
               </div>
+
             </div>
 
             {similarProperties.length > 0 && (

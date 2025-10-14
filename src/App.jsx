@@ -12,6 +12,11 @@ import Contact from './pages/Contact';
 import Footer from './components/Footer';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
+import Dashboard from './pages/vendor/Dashboard';
+import ManageListings from './pages/vendor/ManageListings';
+import Analytics from './pages/vendor/Analytics';
+import Profile from './pages/vendor/Profile';
+import Leads from './pages/vendor/Leads'; 
 
 function App() {
   
@@ -34,6 +39,11 @@ function App() {
           <Route path="/post-property" element={<PostProperty />} />
           <Route path="/properties/:categorySlug" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+                  <Route path="/vendor/dashboard" element={<Dashboard />} />
+        <Route path="/vendor/manage-listings" element={<ManageListings />} />
+        <Route path="/vendor/analytics" element={<Analytics />} />
+        <Route path="/vendor/profile" element={<Profile />} />
+                <Route path="/vendor/leads" element={<Leads />} />
         </Routes>
 
    

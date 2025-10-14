@@ -29,7 +29,7 @@ const Footer = () => {
           <div className="animate-fadeIn">
               <div className="flex items-center mb-4">
               <img
-                src="images/logo.jpg"
+                src="/images/logo.jpg"
                 alt="Vizaglands Logo"
                 className="h-10 w-auto"
               />
