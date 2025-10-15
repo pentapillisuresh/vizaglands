@@ -1,5 +1,17 @@
 import { useState } from 'react';
-import { User, Mail, Phone, MapPin, Building, Save, Camera, Lock, Bell } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Building,
+  Save,
+  Camera,
+  Lock,
+  Bell,
+  IdCard,
+  FileText
+} from 'lucide-react';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -13,7 +25,11 @@ const Profile = () => {
     address: 'Plot No. 45, Dwaraka Nagar',
     website: 'www.kumarproperties.com',
     bio: 'Experienced real estate professional with over 10 years in the Visakhapatnam market. Specializing in residential and commercial properties.',
-    profileImage: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200'
+    profileImage:
+      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
+    aadharNumber: '',
+    aadharProof: null,
+    secondaryIdProof: null
   });
 
   const [notifications, setNotifications] = useState({
@@ -27,11 +43,18 @@ const Profile = () => {
   });
 
   const handleInputChange = (field, value) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
+    setProfileData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileUpload = (field, file) => {
+    setProfileData((prev) => ({
+      ...prev,
+      [field]: URL.createObjectURL(file)
+    }));
   };
 
   const handleNotificationChange = (field) => {
-    setNotifications(prev => ({ ...prev, [field]: !prev[field] }));
+    setNotifications((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   const handleSave = () => {
@@ -47,10 +70,13 @@ const Profile = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-          <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
+          <p className="text-gray-600 mt-2">
+            Manage your account settings and preferences
+          </p>
         </div>
 
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          {/* Tabs */}
           <div className="border-b border-gray-200">
             <div className="flex">
               <button
@@ -89,9 +115,11 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* Tab Content */}
           <div className="p-6">
             {activeTab === 'profile' && (
               <div className="space-y-6">
+                {/* Profile Picture */}
                 <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
                   <div className="relative">
                     <img
@@ -104,11 +132,14 @@ const Profile = () => {
                     </button>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{profileData.name}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {profileData.name}
+                    </h3>
                     <p className="text-gray-600">{profileData.company}</p>
                   </div>
                 </div>
 
+                {/* Basic Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -119,7 +150,9 @@ const Profile = () => {
                       <input
                         type="text"
                         value={profileData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('name', e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -134,7 +167,9 @@ const Profile = () => {
                       <input
                         type="email"
                         value={profileData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('email', e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -149,7 +184,9 @@ const Profile = () => {
                       <input
                         type="tel"
                         value={profileData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('phone', e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -164,7 +201,9 @@ const Profile = () => {
                       <input
                         type="text"
                         value={profileData.company}
-                        onChange={(e) => handleInputChange('company', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('company', e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -179,7 +218,9 @@ const Profile = () => {
                       <input
                         type="text"
                         value={profileData.location}
-                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('location', e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -192,12 +233,15 @@ const Profile = () => {
                     <input
                       type="url"
                       value={profileData.website}
-                      onChange={(e) => handleInputChange('website', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('website', e.target.value)
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
                   </div>
                 </div>
 
+                {/* Address */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Address
@@ -205,12 +249,89 @@ const Profile = () => {
                   <input
                     type="text"
                     value={profileData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('address', e.target.value)
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                   />
                 </div>
 
-                <div>
+                {/* Aadhaar & ID Verification */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Aadhaar Number
+                    </label>
+                    <div className="relative">
+                      <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        maxLength={12}
+                        value={profileData.aadharNumber}
+                        onChange={(e) =>
+                          handleInputChange('aadharNumber', e.target.value)
+                        }
+                        placeholder="Enter your Aadhaar number"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Upload Aadhaar Proof
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={(e) =>
+                          handleFileUpload('aadharProof', e.target.files[0])
+                        }
+                        className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                    </div>
+                    {profileData.aadharProof && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 mb-1">Preview:</p>
+                        <img
+                          src={profileData.aadharProof}
+                          alt="Aadhaar Proof"
+                          className="w-40 h-24 object-cover border rounded-lg"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Upload Secondary ID Proof (e.g., PAN, Passport, DL)
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={(e) =>
+                          handleFileUpload('secondaryIdProof', e.target.files[0])
+                        }
+                        className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                    </div>
+                    {profileData.secondaryIdProof && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 mb-1">Preview:</p>
+                        <img
+                          src={profileData.secondaryIdProof}
+                          alt="Secondary ID Proof"
+                          className="w-40 h-24 object-cover border rounded-lg"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bio */}
+                <div className="pt-6 border-t border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Bio
                   </label>
@@ -224,17 +345,29 @@ const Profile = () => {
               </div>
             )}
 
+            {/* Other Tabs (unchanged) */}
             {activeTab === 'notifications' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Email Notifications</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Email Notifications
+                  </h3>
                   <div className="space-y-3">
                     {[
                       { key: 'emailNewInquiry', label: 'New inquiry received' },
-                      { key: 'emailPropertyViews', label: 'Daily property view summary' },
-                      { key: 'emailWeeklyReport', label: 'Weekly performance report' }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      {
+                        key: 'emailPropertyViews',
+                        label: 'Daily property view summary'
+                      },
+                      {
+                        key: 'emailWeeklyReport',
+                        label: 'Weekly performance report'
+                      }
+                    ].map((item) => (
+                      <label
+                        key={item.key}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      >
                         <span className="text-gray-700">{item.label}</span>
                         <input
                           type="checkbox"
@@ -248,13 +381,18 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">SMS Notifications</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    SMS Notifications
+                  </h3>
                   <div className="space-y-3">
                     {[
                       { key: 'smsNewInquiry', label: 'New inquiry received' },
                       { key: 'smsPropertySaved', label: 'Property saved by user' }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    ].map((item) => (
+                      <label
+                        key={item.key}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      >
                         <span className="text-gray-700">{item.label}</span>
                         <input
                           type="checkbox"
@@ -268,13 +406,21 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Push Notifications</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Push Notifications
+                  </h3>
                   <div className="space-y-3">
                     {[
                       { key: 'pushNewInquiry', label: 'New inquiry received' },
-                      { key: 'pushPropertyViews', label: 'Property view milestones' }
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      {
+                        key: 'pushPropertyViews',
+                        label: 'Property view milestones'
+                      }
+                    ].map((item) => (
+                      <label
+                        key={item.key}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      >
                         <span className="text-gray-700">{item.label}</span>
                         <input
                           type="checkbox"
@@ -292,7 +438,9 @@ const Profile = () => {
             {activeTab === 'security' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Change Password</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Change Password
+                  </h3>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -325,7 +473,9 @@ const Profile = () => {
                 </div>
 
                 <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 mb-2">Password Requirements:</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    Password Requirements:
+                  </h4>
                   <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
                     <li>At least 8 characters long</li>
                     <li>Contains uppercase and lowercase letters</li>
@@ -336,6 +486,7 @@ const Profile = () => {
               </div>
             )}
 
+            {/* Save/Cancel */}
             <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
               <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                 Cancel

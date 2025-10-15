@@ -117,7 +117,7 @@ const ManageListings = () => {
     navigate(`/post-property?edit=${listingId}`);
   };
 
-  // ✅ NEW: Mark as Sold or Rent
+  // ✅ Mark as Sold Only
   const handleStatusChange = (id, newStatus) => {
     const updatedListings = listings.map((listing) =>
       listing.id === id ? { ...listing, status: newStatus } : listing
@@ -168,7 +168,6 @@ const ManageListings = () => {
                 <option value="pending">Pending</option>
                 <option value="inactive">Inactive</option>
                 <option value="sold">Sold</option>
-                <option value="rented">Rented</option>
               </select>
             </div>
           </div>
@@ -217,8 +216,6 @@ const ManageListings = () => {
                             ? 'bg-yellow-100 text-yellow-700'
                             : listing.status === 'sold'
                             ? 'bg-red-100 text-red-700'
-                            : listing.status === 'rented'
-                            ? 'bg-purple-100 text-purple-700'
                             : 'bg-gray-100 text-gray-700'
                         }`}
                       >
@@ -280,28 +277,17 @@ const ManageListings = () => {
                         View Details
                       </button>
 
-                      {/* ✅ Mark as Sold / Rent Buttons */}
+                      {/* ✅ Mark as Sold Button Only */}
                       {listing.status === 'active' && (
-                        <>
-                          <button
-                            onClick={() =>
-                              handleStatusChange(listing.id, 'sold')
-                            }
-                            className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
-                          >
-                            <Tag className="w-4 h-4" />
-                            Mark as Sold
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleStatusChange(listing.id, 'rented')
-                            }
-                            className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium"
-                          >
-                            <Tag className="w-4 h-4" />
-                            Mark as Rented
-                          </button>
-                        </>
+                        <button
+                          onClick={() =>
+                            handleStatusChange(listing.id, 'sold')
+                          }
+                          className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                        >
+                          <Tag className="w-4 h-4" />
+                          Mark as Sold
+                        </button>
                       )}
                     </div>
                   </div>
