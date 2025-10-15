@@ -6,12 +6,13 @@ const BasicDetails = ({ data, updateData, onNext }) => {
   const [listingType, setListingType] = useState(data.listingType || 'sell');
   const [propertyType, setPropertyType] = useState(data.propertyType || 'residential');
   const [propertySubtype, setPropertySubtype] = useState(data.propertySubtype || '');
+  const [customSubtype, setCustomSubtype] = useState('');
 
   const handleContinue = () => {
     updateData({
       listingType,
       propertyType,
-      propertySubtype,
+      propertySubtype: propertySubtype === 'Other' ? customSubtype : propertySubtype,
     });
     onNext();
   };
@@ -21,7 +22,6 @@ const BasicDetails = ({ data, updateData, onNext }) => {
     'Independent House / Villa',
     'Plot',
     'Land',
-    'Serviced Apartment',
     'Farmhouse',
     'Other',
   ];
@@ -85,6 +85,7 @@ const BasicDetails = ({ data, updateData, onNext }) => {
               onChange={(e) => {
                 setPropertyType(e.target.value);
                 setPropertySubtype('');
+                setCustomSubtype('');
               }}
               className="w-5 h-5 text-orange-500 focus:ring-orange-500"
             />
@@ -99,6 +100,7 @@ const BasicDetails = ({ data, updateData, onNext }) => {
               onChange={(e) => {
                 setPropertyType(e.target.value);
                 setPropertySubtype('');
+                setCustomSubtype('');
               }}
               className="w-5 h-5 text-orange-500 focus:ring-orange-500"
             />
@@ -111,7 +113,10 @@ const BasicDetails = ({ data, updateData, onNext }) => {
           {subtypes.map((subtype) => (
             <button
               key={subtype}
-              onClick={() => setPropertySubtype(subtype)}
+              onClick={() => {
+                setPropertySubtype(subtype);
+                if (subtype !== 'Other') setCustomSubtype('');
+              }}
               className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
                 propertySubtype === subtype
                   ? 'bg-orange-500 border-orange-500 text-white'
@@ -122,11 +127,27 @@ const BasicDetails = ({ data, updateData, onNext }) => {
             </button>
           ))}
         </div>
+
+        {/* Custom "Other" input */}
+        {propertySubtype === 'Other' && (
+          <div className="mt-4">
+            <input
+              type="text"
+              placeholder="Please specify your property type"
+              value={customSubtype}
+              onChange={(e) => setCustomSubtype(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+          </div>
+        )}
       </div>
 
       <button
         onClick={handleContinue}
-        disabled={!propertySubtype}
+        disabled={
+          !propertySubtype ||
+          (propertySubtype === 'Other' && customSubtype.trim() === '')
+        }
         className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
