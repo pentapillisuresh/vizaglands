@@ -54,7 +54,7 @@ const BasicDetails = ({ data, updateData, onNext }) => {
           I'm looking to
         </label>
         <div className="flex flex-wrap gap-3">
-          {['sell', 'buy', 'rent'].map((type) => (
+          {['sell',  'rent'].map((type) => (
             <button
               key={type}
               onClick={() => setListingType(type)}

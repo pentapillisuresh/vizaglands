@@ -6,7 +6,6 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
     name: '',
     email: '',
     phoneNumber: '',
-    investmentBudget: '',
     city: '',
     location: '',
     sublocation: '',
@@ -124,22 +123,6 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
             />
           </div>
 
-          {/* Investment Budget */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Investment Budget <span className="text-orange-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="investmentBudget"
-              value={formData.investmentBudget}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-              placeholder="e.g., ₹1,00,00,000"
-            />
-          </div>
-
           {/* City */}
           <div>
             <label className="block text-gray-700 font-medium mb-2">
@@ -210,8 +193,8 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 {formData.propertyType === 'Plot'
-                  ? 'Enter Plot Size (sq.mt)'
-                  : 'Enter Land Area (sq.mt)'}{' '}
+                  ? 'Enter Plot Size (sq. yard)'
+                  : 'Enter Land Area (acres)'}{' '}
                 <span className="text-orange-500">*</span>
               </label>
               <input
@@ -221,7 +204,9 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
                 onChange={handleChange}
                 required
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                placeholder={`Enter ${formData.propertyType.toLowerCase()} area in sq.mt`}
+                placeholder={`Enter ${formData.propertyType.toLowerCase()} area in ${
+                  formData.propertyType === 'Plot' ? 'sq. yard' : 'acres'
+                }`}
               />
             </div>
           )}

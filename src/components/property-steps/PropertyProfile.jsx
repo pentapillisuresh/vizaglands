@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 const PropertyProfile = ({ data, updateData, onNext }) => {
-  // Common state
   const [propertySubtype] = useState(data.propertySubtype || '');
 
   // Plot/Land fields
@@ -10,6 +9,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
   const [length, setLength] = useState(data.length || '');
   const [breadth, setBreadth] = useState(data.breadth || '');
   const [facing, setFacing] = useState(data.facing || '');
+  const [frontage, setFrontage] = useState(data.frontage || ''); // ✅ New field for Land only
 
   // Apartment/Villa fields
   const [bedrooms, setBedrooms] = useState(data.bedrooms || '');
@@ -38,7 +38,18 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
     const payload = { propertySubtype };
 
     if (propertySubtype === 'Plot' || propertySubtype === 'Land') {
-      Object.assign(payload, { plotArea, plotAreaUnit, length, breadth, facing });
+      Object.assign(payload, {
+        plotArea,
+        plotAreaUnit,
+        length,
+        breadth,
+      });
+
+      if (propertySubtype === 'Land') {
+        payload.frontage = frontage; // ✅ include frontage for Land
+      } else {
+        payload.facing = facing; // ✅ keep facing for Plot
+      }
     } else {
       Object.assign(payload, {
         bedrooms,
@@ -58,6 +69,27 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
     onNext();
   };
 
+  const isPlotOrLand = propertySubtype === 'Plot' || propertySubtype === 'Land';
+  const isLand = propertySubtype === 'Land';
+
+  // Validation logic
+  const allPlotFieldsFilled =
+    plotArea && plotAreaUnit && length && breadth && (isLand ? frontage : facing);
+
+  const allApartmentFieldsFilled =
+    bedrooms &&
+    bathrooms &&
+    balconies !== '' &&
+    carpetArea &&
+    builtArea &&
+    superBuiltArea &&
+    areaUnit &&
+    parking &&
+    status &&
+    (status === 'Ready to Move' || (status === 'Under Construction' && possession));
+
+  const isFormComplete = isPlotOrLand ? allPlotFieldsFilled : allApartmentFieldsFilled;
+
   return (
     <div className="space-y-8">
       <div>
@@ -70,14 +102,14 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
       </div>
 
       {/* Conditional Rendering */}
-      {propertySubtype === 'Plot' || propertySubtype === 'Land' ? (
+      {isPlotOrLand ? (
         // ===== Plot / Land Fields =====
         <div className="space-y-6">
           {/* Land Area */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-                Land Area
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Land Area <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -88,14 +120,15 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               />
             </div>
             <div>
-              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-                Unit
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Unit <span className="text-red-500">*</span>
               </label>
               <select
                 value={plotAreaUnit}
                 onChange={(e) => setPlotAreaUnit(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-orange-500"
               >
+                <option value="">Select</option>
                 <option value="sq yards">Sq Yards</option>
                 <option value="sq ft">Sq Ft</option>
                 <option value="sq meters">Sq Meters</option>
@@ -108,8 +141,8 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           {/* Length & Breadth */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-                Length (ft)
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Length (ft) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -119,8 +152,8 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               />
             </div>
             <div>
-              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-                Breadth (ft)
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Breadth (ft) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -131,34 +164,51 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
           </div>
 
-          {/* Facing */}
-          <div>
-            <label className="block font-roboto text-sm font-medium text-gray-700 mb-3">
-              Facing
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {facingOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => setFacing(option)}
-                  className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
-                    facing === option
-                      ? 'bg-orange-500 border-orange-500 text-white'
-                      : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
+          {/* ✅ Show Facing only for Plot, Frontage only for Land */}
+          {!isLand ? (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Facing <span className="text-red-500">*</span>
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {facingOptions.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => setFacing(option)}
+                    className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
+                      facing === option
+                        ? 'bg-orange-500 border-orange-500 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Roadfacing (in ft) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={frontage}
+                onChange={(e) => setFrontage(e.target.value)}
+                placeholder="e.g., 100"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          )}
         </div>
       ) : (
         // ===== Apartment / Villa / Other Fields =====
         <div className="space-y-6">
           {/* Bedrooms */}
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Bedrooms</label>
+            <label className="block font-medium text-gray-700 mb-2">
+              Bedrooms <span className="text-red-500">*</span>
+            </label>
             <div className="flex flex-wrap gap-3">
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
@@ -178,7 +228,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
 
           {/* Bathrooms */}
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Bathrooms</label>
+            <label className="block font-medium text-gray-700 mb-2">
+              Bathrooms <span className="text-red-500">*</span>
+            </label>
             <div className="flex flex-wrap gap-3">
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
@@ -198,7 +250,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
 
           {/* Balconies */}
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Balconies</label>
+            <label className="block font-medium text-gray-700 mb-2">
+              Balconies <span className="text-red-500">*</span>
+            </label>
             <div className="flex flex-wrap gap-3">
               {[0, 1, 2, 3].map((num) => (
                 <button
@@ -220,7 +274,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Carpet Area
+                Carpet Area <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -231,7 +285,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Built Area
+                Built Area <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -242,7 +296,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Super Built-up Area
+                Super Built-up Area <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -253,13 +307,14 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Area Unit
+                Area Unit <span className="text-red-500">*</span>
               </label>
               <select
                 value={areaUnit}
                 onChange={(e) => setAreaUnit(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:ring-2 focus:ring-orange-500"
               >
+                <option value="">Select</option>
                 <option value="sqft">Sq Ft</option>
                 <option value="sqyd">Sq Yards</option>
                 <option value="sqm">Sq Meters</option>
@@ -270,7 +325,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           {/* Parking */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Parking
+              Parking <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -282,7 +337,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
 
           {/* Status */}
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Status</label>
+            <label className="block font-medium text-gray-700 mb-2">
+              Status <span className="text-red-500">*</span>
+            </label>
             <div className="flex gap-3">
               {['Ready to Move', 'Under Construction'].map((opt) => (
                 <button
@@ -304,7 +361,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           {status === 'Under Construction' && (
             <div>
               <label className="block font-medium text-gray-700 mb-2">
-                Possession (in months)
+                Possession (in months) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -317,15 +374,13 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
         </div>
       )}
 
-      {/* Continue Button */}
+      {/* Continue Button - always visible but disabled */}
       <button
         onClick={handleContinue}
-        disabled={
-          (propertySubtype === 'Plot' || propertySubtype === 'Land')
-            ? !plotArea || !facing
-            : !bedrooms
-        }
-        className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!isFormComplete}
+        className={`bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors ${
+          !isFormComplete ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
       >
         Continue
       </button>

@@ -9,20 +9,36 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
     investmentBudget: '',
     city: '',
     location: '',
+    propertyType: '',
+    areaSize: '',
+    areaUnit: '',
     remarks: ''
   });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
+    // Auto-set area unit based on property type
+    if (name === 'propertyType') {
+      if (value === 'Plot') {
+        setFormData((prev) => ({ ...prev, areaUnit: 'Sq. Yards', areaSize: '' }));
+      } else if (value === 'Land') {
+        setFormData((prev) => ({ ...prev, areaUnit: 'Acres', areaSize: '' }));
+      } else if (value === 'Flat' || value === 'Villa' || value === 'Commercial') {
+        setFormData((prev) => ({ ...prev, areaUnit: 'Sq. Ft', areaSize: '' }));
+      } else {
+        setFormData((prev) => ({ ...prev, areaUnit: '', areaSize: '' }));
+      }
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Buy Form Data:', formData, 'Property:', property);
-    // Add your form submission logic here
     alert('Form submitted successfully!');
     onClose();
   };
@@ -51,6 +67,60 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
+
+              {/* Property Type */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Property Type <span className="text-orange-500">*</span>
+              </label>
+              <select
+                name="propertyType"
+                value={formData.propertyType}
+                onChange={handleChange}
+                required
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white focus:ring-2 focus:ring-orange-500 outline-none"
+              >
+                <option value="">Select Property Type</option>
+                <option value="Plot">Plot</option>
+                <option value="Land">Land</option>
+                <option value="Flat">Flat</option>
+                <option value="Villa">Villa</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+
+            {/* Area Size & Unit - shown for all types */}
+            {formData.propertyType && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Area Size <span className="text-orange-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="areaSize"
+                    value={formData.areaSize}
+                    onChange={handleChange}
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
+                    placeholder={`Enter area in ${formData.areaUnit || 'units'}`}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Unit
+                  </label>
+                  <input
+                    type="text"
+                    name="areaUnit"
+                    value={formData.areaUnit}
+                    readOnly
+                    className="w-full border border-gray-300 bg-gray-100 rounded-lg px-4 py-2.5 text-gray-700"
+                  />
+                </div>
+              </div>
+            )}
             {/* Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
@@ -62,7 +132,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter your full name"
               />
             </div>
@@ -78,7 +148,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter your email"
               />
             </div>
@@ -94,7 +164,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter your phone number"
               />
             </div>
@@ -110,7 +180,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.investmentBudget}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="e.g., ₹50,00,000"
               />
             </div>
@@ -126,7 +196,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.city}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter city"
               />
             </div>
@@ -142,10 +212,12 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.location}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter preferred location"
               />
             </div>
+
+          
 
             {/* Remarks */}
             <div>
@@ -157,13 +229,13 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.remarks}
                 onChange={handleChange}
                 rows="4"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none resize-none"
                 placeholder="Any additional information or requirements..."
               />
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Buttons */}
           <div className="mt-6 flex gap-3">
             <button
               type="button"
