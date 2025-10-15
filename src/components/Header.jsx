@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Home, BarChart3, User, LogOut,Users } from "lucide-react";
+import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-react";
+import BuyFormModal from './BuyFormModal';
+import DevelopmentFormModal from './DevelopmentFormModal';
 
 const Header = ({ onGetStartedClick }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVendorMenuOpen, setIsVendorMenuOpen] = useState(false);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
+  const [isDevelopmentModalOpen, setIsDevelopmentModalOpen] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,62 +35,46 @@ const Header = ({ onGetStartedClick }) => {
 
   return (
     <div ref={searchRef}>
-      {/* HEADER */}
       <header className="shadow-sm bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* LOGO */}
             <div className="flex items-center">
               <img src="/images/logo.jpg" alt="Vizaglands Logo" className="h-10 w-auto" />
             </div>
 
-            {/* DESKTOP NAVIGATION */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
-              <a
-                href="/"
-                className={`relative font-medium font-roboto transition-colors ${
-                  isActive("/") ? "text-orange-500" : "text-gray-700 hover:text-orange-500"
-                }`}
-              >
-                Home
-                {isActive("/") && (
-                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
-                )}
-              </a>
-              <a
-                href="/about"
-                className={`relative font-medium font-roboto transition-colors ${
-                  isActive("/about") ? "text-orange-500" : "text-gray-700 hover:text-orange-500"
-                }`}
-              >
-                About
-                {isActive("/about") && (
-                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
-                )}
-              </a>
-              <a
-                href="/contact"
-                className={`relative font-medium font-roboto transition-colors ${
-                  isActive("/contact") ? "text-orange-500" : "text-gray-700 hover:text-orange-500"
-                }`}
-              >
-                Contact
-                {isActive("/contact") && (
-                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
-                )}
-              </a>
+              {[
+                { path: "/", label: "Home" },
+                { path: "/about", label: "About" },
+                { path: "/contact", label: "Contact" },
+              ].map(({ path, label }) => (
+                <a
+                  key={path}
+                  href={path}
+                  className={`relative font-medium font-roboto transition-colors ${
+                    isActive(path)
+                      ? "text-orange-500"
+                      : "text-gray-700 hover:text-orange-500"
+                  }`}
+                >
+                  {label}
+                  {isActive(path) && (
+                    <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
+                  )}
+                </a>
+              ))}
             </nav>
 
-            {/* DESKTOP ACTION BUTTONS */}
-            <div className="hidden lg:flex items-center space-x-4">
-              {/* Property Search Button */}
+            {/* Desktop Buttons */}
+            <div className="hidden lg:flex items-center space-x-3">
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={`${
                   isSearchOpen ? "bg-orange-600" : "bg-orange-500"
-                } text-white font-roboto px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2`}
+                } text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -97,22 +85,35 @@ const Header = ({ onGetStartedClick }) => {
                 <span>Property Search</span>
               </button>
 
-              {/* Post Property Button */}
               <button
                 onClick={() => navigate("/select-user-type")}
-                className="bg-orange-100 text-orange-600 font-roboto px-6 py-2.5 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400"
+                className="bg-orange-100 text-orange-600 font-roboto px-5 py-2 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Post Property</span>
+                <span>Sell Property</span>
               </button>
 
-              {/* Vendor Dropdown Menu */}
+              <button
+                onClick={() => setIsBuyModalOpen(true)}
+                className="bg-orange-500 text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300"
+              >
+                Buy
+              </button>
+
+              <button
+                onClick={() => setIsDevelopmentModalOpen(true)}
+                className="bg-orange-500 text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300"
+              >
+                Development
+              </button>
+
+              {/* Vendor Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setIsVendorMenuOpen(!isVendorMenuOpen)}
-                  className="bg-orange-500 text-white font-roboto px-6 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2"
+                  className="bg-orange-500 text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2"
                 >
                   <User className="w-4 h-4" />
                   <span>Login</span>
@@ -133,56 +134,46 @@ const Header = ({ onGetStartedClick }) => {
                     <div className="py-2">
                       <button
                         onClick={() => navigate("/vendor/dashboard")}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                        className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
-                        <LayoutDashboard className="w-4 h-4" />
-                        <span>Dashboard</span>
+                        <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
                       </button>
                       <button
                         onClick={() => navigate("/vendor/manage-listings")}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                        className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
-                        <Home className="w-4 h-4" />
-                        <span>Manage Listings</span>
+                        <Home className="w-4 h-4 mr-2" /> Manage Listings
                       </button>
-                         <button
+                      <button
                         onClick={() => navigate("/vendor/leads")}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                        className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
-                        <Users className="w-4 h-4" />
-                        <span>Leads</span>
+                        <Users className="w-4 h-4 mr-2" /> Leads
                       </button>
                       <button
                         onClick={() => navigate("/vendor/analytics")}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                        className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
-                        <BarChart3 className="w-4 h-4" />
-                        <span>Analytics</span>
+                        <BarChart3 className="w-4 h-4 mr-2" /> Analytics
                       </button>
                       <button
                         onClick={() => navigate("/vendor/profile")}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                        className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
-                        <User className="w-4 h-4" />
-                        <span>Profile</span>
+                        <User className="w-4 h-4 mr-2" /> Profile
                       </button>
-
-                      {/* Login/Register Button with same orange style */}
                       <button
                         onClick={() => navigate("/login-register")}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-orange-600 hover:bg-orange-50"
+                        className="w-full text-left px-4 py-2 flex items-center text-orange-600 hover:bg-orange-50"
                       >
-                        <User className="w-4 h-4" />
-                        <span>Login / Register</span>
+                        <User className="w-4 h-4 mr-2" /> Login / Register
                       </button>
-
                       <hr className="my-1 border-gray-200" />
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 flex items-center space-x-2 text-red-500 hover:bg-red-50"
+                        className="w-full text-left px-4 py-2 flex items-center text-red-500 hover:bg-red-50"
                       >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
+                        <LogOut className="w-4 h-4 mr-2" /> Logout
                       </button>
                     </div>
                   </div>
@@ -190,7 +181,7 @@ const Header = ({ onGetStartedClick }) => {
               </div>
             </div>
 
-            {/* MOBILE MENU ICON */}
+            {/* Mobile Menu Toggle */}
             <button
               className="lg:hidden text-gray-700"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -203,7 +194,7 @@ const Header = ({ onGetStartedClick }) => {
         </div>
       </header>
 
-      {/* MOBILE MENU */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-gray-50 shadow-md">
           <nav className="flex flex-col space-y-2 p-4">
@@ -218,24 +209,115 @@ const Header = ({ onGetStartedClick }) => {
                 {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.substring(2)}
               </a>
             ))}
+
+            <hr className="my-2 border-gray-200" />
+
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="w-full bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-all"
+            >
+              Property Search
+            </button>
+
+            <button
+              onClick={() => navigate("/select-user-type")}
+              className="w-full bg-orange-100 text-orange-600 px-4 py-2 rounded-full border border-orange-400 hover:bg-orange-200 transition-all"
+            >
+              Post Property
+            </button>
+
+            <button
+              onClick={() => setIsBuyModalOpen(true)}
+              className="w-full bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-all"
+            >
+              Buy
+            </button>
+
+            <button
+              onClick={() => setIsDevelopmentModalOpen(true)}
+              className="w-full bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-all"
+            >
+              Development
+            </button>
+
+            {/* Vendor Menu in Mobile */}
+            <div className="relative">
+              <button
+                onClick={() => setIsVendorMenuOpen(!isVendorMenuOpen)}
+                className="w-full bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-2">
+                  <User className="w-4 h-4" />
+                  <span>Login</span>
+                </div>
+                <svg
+                  className={`w-4 h-4 transform transition-transform ${
+                    isVendorMenuOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isVendorMenuOpen && (
+                <div className="mt-2 w-full bg-white shadow-md rounded-lg border border-gray-200 z-40">
+                  <div className="py-2">
+                    <button
+                      onClick={() => navigate("/vendor/dashboard")}
+                      className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    >
+                      <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
+                    </button>
+                    <button
+                      onClick={() => navigate("/vendor/manage-listings")}
+                      className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    >
+                      <Home className="w-4 h-4 mr-2" /> Manage Listings
+                    </button>
+                    <button
+                      onClick={() => navigate("/vendor/leads")}
+                      className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    >
+                      <Users className="w-4 h-4 mr-2" /> Leads
+                    </button>
+                    <button
+                      onClick={() => navigate("/vendor/analytics")}
+                      className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" /> Analytics
+                    </button>
+                    <button
+                      onClick={() => navigate("/vendor/profile")}
+                      className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    >
+                      <User className="w-4 h-4 mr-2" /> Profile
+                    </button>
+                    <hr className="my-1 border-gray-200" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 flex items-center text-red-500 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" /> Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       )}
 
-      {/* PROPERTY SEARCH DROPDOWN */}
+      {/* Search Bar */}
       {isSearchOpen && (
         <div className="border-t border-gray-300 shadow-lg bg-orange-500 text-white transition-all duration-300">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
             <div className="flex flex-wrap items-end gap-6">
-              {/* Location Input */}
               <div className="flex-1 min-w-[240px]">
-                <label className="flex items-center text-sm font-medium font-roboto text-white mb-2">
-                  <svg
-                    className="w-5 h-5 text-white mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                <label className="flex items-center text-sm font-medium text-white mb-2">
+                  <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -254,16 +336,13 @@ const Header = ({ onGetStartedClick }) => {
                 <input
                   type="text"
                   placeholder="Enter city, neighborhood, or address..."
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 font-roboto bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 focus:border-transparent outline-none"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none"
                 />
               </div>
 
-              {/* Property Type */}
               <div className="w-64 min-w-[200px]">
-                <label className="block text-sm font-medium font-roboto text-white mb-2">
-                  Property Type
-                </label>
-                <select className="w-full border border-gray-200 rounded-lg px-4 py-3 font-roboto bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 focus:border-transparent outline-none">
+                <label className="block text-sm font-medium text-white mb-2">Property Type</label>
+                <select className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none">
                   <option>All Types</option>
                   <option>Apartment</option>
                   <option>Villa</option>
@@ -272,12 +351,9 @@ const Header = ({ onGetStartedClick }) => {
                 </select>
               </div>
 
-              {/* Price Range */}
               <div className="w-64 min-w-[200px]">
-                <label className="block text-sm font-medium font-roboto text-white mb-2">
-                  Price Range
-                </label>
-                <select className="w-full border border-gray-200 rounded-lg px-4 py-3 font-roboto bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 focus:border-transparent outline-none">
+                <label className="block text-sm font-medium text-white mb-2">Price Range</label>
+                <select className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none">
                   <option>Any Price</option>
                   <option>Below ₹25L</option>
                   <option>₹25L - ₹50L</option>
@@ -286,14 +362,8 @@ const Header = ({ onGetStartedClick }) => {
                 </select>
               </div>
 
-              {/* Search Button */}
-              <button className="bg-white hover:bg-gray-100 text-orange-600 px-8 py-3 rounded-full flex items-center justify-center transition-colors font-semibold">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+              <button className="bg-white hover:bg-gray-100 text-orange-600 px-7 py-2.5 rounded-full flex items-center justify-center transition-colors font-semibold">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -307,6 +377,16 @@ const Header = ({ onGetStartedClick }) => {
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <BuyFormModal
+        isOpen={isBuyModalOpen}
+        onClose={() => setIsBuyModalOpen(false)}
+      />
+      <DevelopmentFormModal
+        isOpen={isDevelopmentModalOpen}
+        onClose={() => setIsDevelopmentModalOpen(false)}
+      />
     </div>
   );
 };

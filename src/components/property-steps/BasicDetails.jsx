@@ -19,7 +19,8 @@ const BasicDetails = ({ data, updateData, onNext }) => {
   const residentialTypes = [
     'Flat/Apartment',
     'Independent House / Villa',
-    'Plot / Land',
+    'Plot',
+    'Land',
     'Serviced Apartment',
     'Farmhouse',
     'Other',

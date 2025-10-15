@@ -23,12 +23,21 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
   const [status, setStatus] = useState(data.status || '');
   const [possession, setPossession] = useState(data.possession || '');
 
-  const facingOptions = ['East', 'West', 'North', 'South', 'North-East', 'North-West', 'South-East', 'South-West'];
+  const facingOptions = [
+    'East',
+    'West',
+    'North',
+    'South',
+    'North-East',
+    'North-West',
+    'South-East',
+    'South-West',
+  ];
 
   const handleContinue = () => {
     const payload = { propertySubtype };
 
-    if (propertySubtype === 'Plot / Land') {
+    if (propertySubtype === 'Plot' || propertySubtype === 'Land') {
       Object.assign(payload, { plotArea, plotAreaUnit, length, breadth, facing });
     } else {
       Object.assign(payload, {
@@ -61,13 +70,14 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
       </div>
 
       {/* Conditional Rendering */}
-      {propertySubtype === 'Plot / Land' ? (
+      {propertySubtype === 'Plot' || propertySubtype === 'Land' ? (
         // ===== Plot / Land Fields =====
         <div className="space-y-6">
+          {/* Land Area */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-                Plot Area
+                Land Area
               </label>
               <input
                 type="number"
@@ -90,13 +100,17 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                 <option value="sq ft">Sq Ft</option>
                 <option value="sq meters">Sq Meters</option>
                 <option value="acres">Acres</option>
+                <option value="cents">Cents</option>
               </select>
             </div>
           </div>
 
+          {/* Length & Breadth */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">Length (ft)</label>
+              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
+                Length (ft)
+              </label>
               <input
                 type="number"
                 value={length}
@@ -105,7 +119,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               />
             </div>
             <div>
-              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">Breadth (ft)</label>
+              <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
+                Breadth (ft)
+              </label>
               <input
                 type="number"
                 value={breadth}
@@ -115,8 +131,11 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
           </div>
 
+          {/* Facing */}
           <div>
-            <label className="block font-roboto text-sm font-medium text-gray-700 mb-3">Facing</label>
+            <label className="block font-roboto text-sm font-medium text-gray-700 mb-3">
+              Facing
+            </label>
             <div className="flex flex-wrap gap-3">
               {facingOptions.map((option) => (
                 <button
@@ -137,7 +156,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
       ) : (
         // ===== Apartment / Villa / Other Fields =====
         <div className="space-y-6">
-          {/* Bedrooms, Bathrooms, Balconies */}
+          {/* Bedrooms */}
           <div>
             <label className="block font-medium text-gray-700 mb-2">Bedrooms</label>
             <div className="flex flex-wrap gap-3">
@@ -146,7 +165,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   key={num}
                   onClick={() => setBedrooms(num)}
                   className={`px-4 py-2 rounded-full border-2 ${
-                    bedrooms === num ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-300'
+                    bedrooms === num
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'border-gray-300'
                   }`}
                 >
                   {num} BHK
@@ -155,6 +176,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
           </div>
 
+          {/* Bathrooms */}
           <div>
             <label className="block font-medium text-gray-700 mb-2">Bathrooms</label>
             <div className="flex flex-wrap gap-3">
@@ -163,7 +185,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   key={num}
                   onClick={() => setBathrooms(num)}
                   className={`px-4 py-2 rounded-full border-2 ${
-                    bathrooms === num ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-300'
+                    bathrooms === num
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'border-gray-300'
                   }`}
                 >
                   {num}
@@ -172,6 +196,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
           </div>
 
+          {/* Balconies */}
           <div>
             <label className="block font-medium text-gray-700 mb-2">Balconies</label>
             <div className="flex flex-wrap gap-3">
@@ -180,7 +205,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   key={num}
                   onClick={() => setBalconies(num)}
                   className={`px-4 py-2 rounded-full border-2 ${
-                    balconies === num ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-300'
+                    balconies === num
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'border-gray-300'
                   }`}
                 >
                   {num}
@@ -192,7 +219,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           {/* Area details */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Carpet Area</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Carpet Area
+              </label>
               <input
                 type="number"
                 value={carpetArea}
@@ -201,7 +230,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Built Area</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Built Area
+              </label>
               <input
                 type="number"
                 value={builtArea}
@@ -210,7 +241,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Super Built-up Area</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Super Built-up Area
+              </label>
               <input
                 type="number"
                 value={superBuiltArea}
@@ -219,7 +252,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Area Unit</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Area Unit
+              </label>
               <select
                 value={areaUnit}
                 onChange={(e) => setAreaUnit(e.target.value)}
@@ -234,7 +269,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
 
           {/* Parking */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Parking</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Parking
+            </label>
             <input
               type="number"
               value={parking}
@@ -252,7 +289,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   key={opt}
                   onClick={() => setStatus(opt)}
                   className={`px-5 py-2 rounded-full border-2 ${
-                    status === opt ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-300'
+                    status === opt
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'border-gray-300'
                   }`}
                 >
                   {opt}
@@ -264,7 +303,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           {/* Possession */}
           {status === 'Under Construction' && (
             <div>
-              <label className="block font-medium text-gray-700 mb-2">Possession (in months)</label>
+              <label className="block font-medium text-gray-700 mb-2">
+                Possession (in months)
+              </label>
               <input
                 type="number"
                 value={possession}
@@ -276,9 +317,14 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
         </div>
       )}
 
+      {/* Continue Button */}
       <button
         onClick={handleContinue}
-        disabled={propertySubtype === 'Plot / Land' ? !plotArea || !facing : !bedrooms}
+        disabled={
+          (propertySubtype === 'Plot' || propertySubtype === 'Land')
+            ? !plotArea || !facing
+            : !bedrooms
+        }
         className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
