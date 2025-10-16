@@ -34,14 +34,19 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
     "South-West",
   ];
 
-  // ✅ Only Plot, Land, Commercial Land act like land-type properties
+  // ✅ Extended to include Warehouse / Godown & Industrial Building
   const isPlotOrLand =
     propertySubtype === "Plot" ||
     propertySubtype === "Land" ||
-    propertySubtype === "Commercial Land";
+    propertySubtype === "Commercial Land" ||
+    propertySubtype === "Warehouse / Godown" ||
+    propertySubtype === "Industrial Building";
 
   const isLand =
-    propertySubtype === "Land" || propertySubtype === "Commercial Land";
+    propertySubtype === "Land" ||
+    propertySubtype === "Commercial Land" ||
+    propertySubtype === "Warehouse / Godown" ||
+    propertySubtype === "Industrial Building";
 
   const handleContinue = () => {
     const payload = { propertySubtype };
@@ -107,7 +112,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
 
       {/* ===== Conditional Rendering ===== */}
       {isPlotOrLand ? (
-        // ✅ Plot / Land / Commercial Land
+        // ✅ Plot / Land / Commercial Land / Warehouse / Industrial Building
         <div className="space-y-6">
           {/* Land Area */}
           <div className="grid grid-cols-2 gap-4">
@@ -206,7 +211,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           )}
         </div>
       ) : (
-        // ✅ Apartment / Villa / Commercial Plot / Office / etc.
+        // ✅ Apartment / Villa / Office etc.
         <div className="space-y-6">
           {/* Bedrooms */}
           <div>

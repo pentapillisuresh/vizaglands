@@ -7,11 +7,11 @@ const LocationDetails = ({ data, updateData, onNext }) => {
   const [apartmentSociety, setApartmentSociety] = useState(data.apartmentSociety || "");
   const [roadFacing, setRoadFacing] = useState(data.roadFacing || "");
 
-  // ✅ Initial advantages list with at least two default fields
+  // ✅ Initial advantages list (two default info fields)
   const [advantages, setAdvantages] = useState(
     data.advantages || [
-      { type: "Metro", name: "", distance: "Nearby" },
-      { type: "School", name: "", distance: "Nearby" },
+      { info: "", distance: "250 m" },
+      { info: "", distance: "250 m" },
     ]
   );
 
@@ -38,24 +38,24 @@ const LocationDetails = ({ data, updateData, onNext }) => {
     onNext();
   };
 
-  // ✅ Handle saving for each field
+  // ✅ Save advantages to parent
   const handleSave = () => {
     updateData({ advantages });
   };
 
-  // ✅ Handle field change dynamically
+  // ✅ Handle dynamic field change
   const handleAdvantageChange = (index, key, value) => {
     const updated = [...advantages];
     updated[index][key] = value;
     setAdvantages(updated);
   };
 
-  // ✅ Add more advantage fields
+  // ✅ Add new info field
   const handleAddMore = () => {
-    setAdvantages([...advantages, { type: "", name: "", distance: "Nearby" }]);
+    setAdvantages([...advantages, { info: "", distance: "250 m" }]);
   };
 
-  // ✅ Remove advantage
+  // ✅ Remove an info field
   const handleRemove = (index) => {
     const updated = advantages.filter((_, i) => i !== index);
     setAdvantages(updated);
@@ -156,13 +156,13 @@ const LocationDetails = ({ data, updateData, onNext }) => {
         </div>
       </div>
 
-      {/* ✅ New Section: Location Advantages */}
+      {/* ✅ Location Advantages Section */}
       <div className="pt-10 border-t border-gray-200">
         <h2 className="font-serif text-2xl font-bold text-blue-900 mb-2">
           Location Advantages
         </h2>
         <p className="font-roboto text-gray-600 mb-6">
-          Highlight the nearby landmarks
+          Add key nearby landmarks and distances
         </p>
 
         {advantages.map((item, index) => (
@@ -170,35 +170,29 @@ const LocationDetails = ({ data, updateData, onNext }) => {
             key={index}
             className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4"
           >
-            {/* Type */}
+            {/* Info field */}
             <input
               type="text"
-              value={item.type}
-              onChange={(e) => handleAdvantageChange(index, "type", e.target.value)}
-              placeholder="Type (e.g., Metro, School)"
+              value={item.info}
+              onChange={(e) => handleAdvantageChange(index, "info", e.target.value)}
+              placeholder="e.g., Near Hospital, Bus Stop, Airport"
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
                          focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
             />
 
-            {/* Name */}
-            <input
-              type="text"
-              value={item.name}
-              onChange={(e) => handleAdvantageChange(index, "name", e.target.value)}
-              placeholder={`Add ${item.type || "location"} name`}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
-                         focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
-            />
-
-            {/* Distance */}
+            {/* Distance dropdown */}
             <select
               value={item.distance}
-              onChange={(e) => handleAdvantageChange(index, "distance", e.target.value)}
+              onChange={(e) =>
+                handleAdvantageChange(index, "distance", e.target.value)
+              }
               className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             >
-              <option>Nearby</option>
-              <option>Within 1 km</option>
-              <option>Within 5 km</option>
+              <option>250 m</option>
+              <option>500 m</option>
+              <option>1 km</option>
+              <option>2 km</option>
+              <option>5 km</option>
             </select>
 
             {/* Remove Button */}
