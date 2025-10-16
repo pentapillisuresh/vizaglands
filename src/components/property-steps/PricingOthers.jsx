@@ -8,7 +8,6 @@ const PricingOthers = ({ data, updateData }) => {
   const [description, setDescription] = useState(data.description || '');
   const [approvedBy, setApprovedBy] = useState(data.approvedBy || []);
   const [amenities, setAmenities] = useState(data.amenities || []);
-  const [roadFacing, setRoadFacing] = useState(data.roadFacing || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -16,7 +15,7 @@ const PricingOthers = ({ data, updateData }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const approvedOptions = ['VMRDA', 'VUDA', 'DTC','RERA', 'Bank Loan'];
+  const approvedOptions = ['VMRDA', 'VUDA', 'DTCP', 'RERA', 'GVMC', 'Bank Loan'];
   const amenitiesOptions = [
     'Security',
     'Maintenance Staff',
@@ -66,7 +65,6 @@ const PricingOthers = ({ data, updateData }) => {
         description: description || null,
         approvedBy,
         amenities,
-        roadFacing,
         property_score: 100,
         status,
       };
@@ -148,7 +146,7 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       </div>
 
-      {/* CONDITIONAL FIELDS */}
+      {/* CONDITIONAL SECTIONS */}
       {data.propertySubtype === 'Flat/Apartment' && (
         <div className="space-y-6 mt-8">
           {/* Approved Section */}
@@ -198,18 +196,52 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       )}
 
-      {data.propertySubtype === 'Plot / Land' && (
-        <div className="mt-8">
-          <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
-            Road Facing
-          </h3>
-          <input
-            type="text"
-            value={roadFacing}
-            onChange={(e) => setRoadFacing(e.target.value)}
-            placeholder="Enter road facing (e.g. 40 ft road)"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-          />
+      {data.propertySubtype === 'Plot' && (
+        <div className="space-y-6 mt-8">
+          {/* Approved Section */}
+          <div>
+            <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
+              Approved By
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {approvedOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => handleApprovedChange(opt)}
+                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${
+                    approvedBy.includes(opt)
+                      ? 'bg-blue-900 border-blue-900 text-white'
+                      : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Amenities Section */}
+          <div>
+            <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
+              Amenities
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {amenitiesOptions.map((amenity) => (
+                <label
+                  key={amenity}
+                  className="flex items-center gap-2 text-gray-700 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={amenities.includes(amenity)}
+                    onChange={() => handleAmenitiesChange(amenity)}
+                    className="text-orange-500 focus:ring-orange-500"
+                  />
+                  {amenity}
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -227,13 +259,8 @@ const PricingOthers = ({ data, updateData }) => {
             <span className="text-gray-600">Location:</span>
             <span className="ml-2 font-medium text-gray-900">{data.city}</span>
           </div>
-          {data.propertySubtype === 'Plot / Land' && (
-            <div>
-              <span className="text-gray-600">Road Facing:</span>
-              <span className="ml-2 font-medium text-gray-900">{roadFacing || 'N/A'}</span>
-            </div>
-          )}
-          {data.propertySubtype === 'Flat/Apartment' && (
+
+          {(data.propertySubtype === 'Plot' || data.propertySubtype === 'Flat/Apartment') && (
             <>
               <div>
                 <span className="text-gray-600">Approved By:</span>
@@ -249,6 +276,7 @@ const PricingOthers = ({ data, updateData }) => {
               </div>
             </>
           )}
+
           <div>
             <span className="text-gray-600">Property Score:</span>
             <span className="ml-2 font-medium text-orange-500">

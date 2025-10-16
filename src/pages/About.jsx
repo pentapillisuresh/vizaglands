@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-// import Header from "../components/Header";
-// import Footer from "../components/Footer";
+import HowItWorks from "../components/HowItWorks";
+
 
 function About() {
   // ✅ Initialize AOS animation library
@@ -30,6 +30,7 @@ function About() {
     </div>
   </div>
 </section>
+
 
 
       {/* Who We Are */}
@@ -173,6 +174,9 @@ function About() {
         </div>
       </section>
 
+
+    <HowItWorks /> 
+
       {/* Stats Section */}
       <section className="py-20 bg-[#001F3F] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -250,7 +254,9 @@ function About() {
             </div>
           </div>
         </div>
+        
       </section>
+
     </div>
     {/* <Footer /> */}
      </>

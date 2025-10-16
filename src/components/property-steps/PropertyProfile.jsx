@@ -1,43 +1,52 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const PropertyProfile = ({ data, updateData, onNext }) => {
-  const [propertySubtype] = useState(data.propertySubtype || '');
+  const [propertySubtype] = useState(data.propertySubtype || "");
 
-  // Plot/Land fields
-  const [plotArea, setPlotArea] = useState(data.plotArea || '');
-  const [plotAreaUnit, setPlotAreaUnit] = useState(data.plotAreaUnit || 'sq yards');
-  const [length, setLength] = useState(data.length || '');
-  const [breadth, setBreadth] = useState(data.breadth || '');
-  const [facing, setFacing] = useState(data.facing || '');
-  const [frontage, setFrontage] = useState(data.frontage || ''); // ✅ New field for Land only
+  // Plot / Land fields
+  const [plotArea, setPlotArea] = useState(data.plotArea || "");
+  const [plotAreaUnit, setPlotAreaUnit] = useState(data.plotAreaUnit || "sq yards");
+  const [length, setLength] = useState(data.length || "");
+  const [breadth, setBreadth] = useState(data.breadth || "");
+  const [facing, setFacing] = useState(data.facing || "");
+  const [frontage, setFrontage] = useState(data.frontage || "");
 
-  // Apartment/Villa fields
-  const [bedrooms, setBedrooms] = useState(data.bedrooms || '');
-  const [bathrooms, setBathrooms] = useState(data.bathrooms || '');
-  const [balconies, setBalconies] = useState(data.balconies || '');
-  const [carpetArea, setCarpetArea] = useState(data.carpetArea || '');
-  const [builtArea, setBuiltArea] = useState(data.builtArea || '');
-  const [superBuiltArea, setSuperBuiltArea] = useState(data.superBuiltArea || '');
-  const [areaUnit, setAreaUnit] = useState(data.areaUnit || 'sqft');
-  const [parking, setParking] = useState(data.parking || '');
-  const [status, setStatus] = useState(data.status || '');
-  const [possession, setPossession] = useState(data.possession || '');
+  // Apartment / Villa / Other fields
+  const [bedrooms, setBedrooms] = useState(data.bedrooms || "");
+  const [bathrooms, setBathrooms] = useState(data.bathrooms || "");
+  const [balconies, setBalconies] = useState(data.balconies || "");
+  const [carpetArea, setCarpetArea] = useState(data.carpetArea || "");
+  const [builtArea, setBuiltArea] = useState(data.builtArea || "");
+  const [superBuiltArea, setSuperBuiltArea] = useState(data.superBuiltArea || "");
+  const [areaUnit, setAreaUnit] = useState(data.areaUnit || "sqft");
+  const [parking, setParking] = useState(data.parking || "");
+  const [status, setStatus] = useState(data.status || "");
+  const [possession, setPossession] = useState(data.possession || "");
 
   const facingOptions = [
-    'East',
-    'West',
-    'North',
-    'South',
-    'North-East',
-    'North-West',
-    'South-East',
-    'South-West',
+    "East",
+    "West",
+    "North",
+    "South",
+    "North-East",
+    "North-West",
+    "South-East",
+    "South-West",
   ];
+
+  // ✅ Only Plot, Land, Commercial Land act like land-type properties
+  const isPlotOrLand =
+    propertySubtype === "Plot" ||
+    propertySubtype === "Land" ||
+    propertySubtype === "Commercial Land";
+
+  const isLand =
+    propertySubtype === "Land" || propertySubtype === "Commercial Land";
 
   const handleContinue = () => {
     const payload = { propertySubtype };
 
-    if (propertySubtype === 'Plot' || propertySubtype === 'Land') {
+    if (isPlotOrLand) {
       Object.assign(payload, {
         plotArea,
         plotAreaUnit,
@@ -45,10 +54,10 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
         breadth,
       });
 
-      if (propertySubtype === 'Land') {
-        payload.frontage = frontage; // ✅ include frontage for Land
+      if (isLand) {
+        payload.frontage = frontage;
       } else {
-        payload.facing = facing; // ✅ keep facing for Plot
+        payload.facing = facing;
       }
     } else {
       Object.assign(payload, {
@@ -69,24 +78,19 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
     onNext();
   };
 
-  const isPlotOrLand = propertySubtype === 'Plot' || propertySubtype === 'Land';
-  const isLand = propertySubtype === 'Land';
-
-  // Validation logic
   const allPlotFieldsFilled =
     plotArea && plotAreaUnit && length && breadth && (isLand ? frontage : facing);
 
   const allApartmentFieldsFilled =
     bedrooms &&
     bathrooms &&
-    balconies !== '' &&
+    balconies !== "" &&
     carpetArea &&
-    builtArea &&
-    superBuiltArea &&
     areaUnit &&
     parking &&
     status &&
-    (status === 'Ready to Move' || (status === 'Under Construction' && possession));
+    (status === "Ready to Move" ||
+      (status === "Under Construction" && possession));
 
   const isFormComplete = isPlotOrLand ? allPlotFieldsFilled : allApartmentFieldsFilled;
 
@@ -101,9 +105,9 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
         </p>
       </div>
 
-      {/* Conditional Rendering */}
+      {/* ===== Conditional Rendering ===== */}
       {isPlotOrLand ? (
-        // ===== Plot / Land Fields =====
+        // ✅ Plot / Land / Commercial Land
         <div className="space-y-6">
           {/* Land Area */}
           <div className="grid grid-cols-2 gap-4">
@@ -164,7 +168,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
           </div>
 
-          {/* ✅ Show Facing only for Plot, Frontage only for Land */}
+          {/* Facing / Roadfacing */}
           {!isLand ? (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -177,8 +181,8 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                     onClick={() => setFacing(option)}
                     className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${
                       facing === option
-                        ? 'bg-orange-500 border-orange-500 text-white'
-                        : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
+                        ? "bg-orange-500 border-orange-500 text-white"
+                        : "bg-white border-gray-300 text-gray-700 hover:border-orange-300"
                     }`}
                   >
                     {option}
@@ -202,7 +206,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           )}
         </div>
       ) : (
-        // ===== Apartment / Villa / Other Fields =====
+        // ✅ Apartment / Villa / Commercial Plot / Office / etc.
         <div className="space-y-6">
           {/* Bedrooms */}
           <div>
@@ -216,8 +220,8 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   onClick={() => setBedrooms(num)}
                   className={`px-4 py-2 rounded-full border-2 ${
                     bedrooms === num
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'border-gray-300'
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-gray-300"
                   }`}
                 >
                   {num} BHK
@@ -238,8 +242,8 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   onClick={() => setBathrooms(num)}
                   className={`px-4 py-2 rounded-full border-2 ${
                     bathrooms === num
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'border-gray-300'
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-gray-300"
                   }`}
                 >
                   {num}
@@ -260,8 +264,8 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
                   onClick={() => setBalconies(num)}
                   className={`px-4 py-2 rounded-full border-2 ${
                     balconies === num
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'border-gray-300'
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-gray-300"
                   }`}
                 >
                   {num}
@@ -270,7 +274,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
           </div>
 
-          {/* Area details */}
+          {/* Area */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -285,7 +289,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Built Area <span className="text-red-500">*</span>
+                Built Area
               </label>
               <input
                 type="number"
@@ -296,7 +300,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Super Built-up Area <span className="text-red-500">*</span>
+                Super Built-up Area
               </label>
               <input
                 type="number"
@@ -341,14 +345,14 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
               Status <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-3">
-              {['Ready to Move', 'Under Construction'].map((opt) => (
+              {["Ready to Move", "Under Construction"].map((opt) => (
                 <button
                   key={opt}
                   onClick={() => setStatus(opt)}
                   className={`px-5 py-2 rounded-full border-2 ${
                     status === opt
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'border-gray-300'
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "border-gray-300"
                   }`}
                 >
                   {opt}
@@ -358,7 +362,7 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
           </div>
 
           {/* Possession */}
-          {status === 'Under Construction' && (
+          {status === "Under Construction" && (
             <div>
               <label className="block font-medium text-gray-700 mb-2">
                 Possession (in months) <span className="text-red-500">*</span>
@@ -374,12 +378,12 @@ const PropertyProfile = ({ data, updateData, onNext }) => {
         </div>
       )}
 
-      {/* Continue Button - always visible but disabled */}
+      {/* Continue Button */}
       <button
         onClick={handleContinue}
         disabled={!isFormComplete}
         className={`bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors ${
-          !isFormComplete ? 'opacity-50 cursor-not-allowed' : ''
+          !isFormComplete ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
         Continue

@@ -26,7 +26,7 @@ function Home() {
       <FeaturedProperties />
       <ViewedProperties />
 
-      <HowItWorks />
+      {/* <HowItWorks /> */}
       <CommercialAdSection />
       <Testimonials />
       <LocationsSection />

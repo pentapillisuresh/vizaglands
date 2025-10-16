@@ -4,12 +4,10 @@ import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-re
 import BuyFormModal from "./BuyFormModal";
 import DevelopmentFormModal from "./DevelopmentFormModal";
 
-const Header = ({ onGetStartedClick }) => {
+const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVendorMenuOpen, setIsVendorMenuOpen] = useState(false);
-  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
-  const [isDevelopmentModalOpen, setIsDevelopmentModalOpen] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,6 +36,7 @@ const Header = ({ onGetStartedClick }) => {
       <header className="shadow-sm bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
+            {/* Logo */}
             <div className="flex items-center">
               <img src="/images/logo.jpg" alt="Vizaglands Logo" className="h-10 w-auto" />
             </div>
@@ -62,25 +61,11 @@ const Header = ({ onGetStartedClick }) => {
                   )}
                 </a>
               ))}
-
-              {/* New Buy & Development Links beside Contact */}
-              <button
-                onClick={() => setIsBuyModalOpen(true)}
-                className="font-medium font-roboto text-gray-700 hover:text-orange-500 transition-colors"
-              >
-                Buy
-              </button>
-
-              <button
-                onClick={() => setIsDevelopmentModalOpen(true)}
-                className="font-medium font-roboto text-gray-700 hover:text-orange-500 transition-colors"
-              >
-                Development
-              </button>
             </nav>
 
             {/* Desktop Buttons */}
             <div className="hidden lg:flex items-center space-x-3">
+              {/* Search Button */}
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={`${
@@ -95,9 +80,10 @@ const Header = ({ onGetStartedClick }) => {
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-                <span>Property Search</span>
+                <span>Buy Property</span>
               </button>
 
+              {/* Sell Button */}
               <button
                 onClick={() => navigate("/select-user-type")}
                 className="bg-orange-100 text-orange-600 font-roboto px-5 py-2 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400"
@@ -193,56 +179,7 @@ const Header = ({ onGetStartedClick }) => {
         </div>
       </header>
 
-      {/* Mobile Menu (unchanged) */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-gray-50 shadow-md">
-          <nav className="flex flex-col space-y-2 p-4">
-            {["/", "/about", "/contact"].map((path) => (
-              <a
-                key={path}
-                href={path}
-                className={`relative font-medium font-roboto transition-colors py-2 px-4 rounded ${
-                  isActive(path) ? "text-orange-500 bg-orange-50" : "text-gray-700 hover:text-orange-500"
-                }`}
-              >
-                {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.substring(2)}
-              </a>
-            ))}
-
-            <button
-              onClick={() => setIsBuyModalOpen(true)}
-              className="w-full text-gray-700 hover:text-orange-500 transition-colors text-left px-4 py-2"
-            >
-              Buy
-            </button>
-
-            <button
-              onClick={() => setIsDevelopmentModalOpen(true)}
-              className="w-full text-gray-700 hover:text-orange-500 transition-colors text-left px-4 py-2"
-            >
-              Development
-            </button>
-
-            <hr className="my-2 border-gray-200" />
-
-            <button
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="w-full bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600 transition-all"
-            >
-              Property Search
-            </button>
-
-            <button
-              onClick={() => navigate("/select-user-type")}
-              className="w-full bg-orange-100 text-orange-600 px-4 py-2 rounded-full border border-orange-400 hover:bg-orange-200 transition-all"
-            >
-              Post Property
-            </button>
-          </nav>
-        </div>
-      )}
-
-      {/* Search Bar (unchanged) */}
+      {/* Search Bar */}
       {isSearchOpen && (
         <div className="border-t border-gray-300 shadow-lg bg-orange-500 text-white transition-all duration-300">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
@@ -250,18 +187,8 @@ const Header = ({ onGetStartedClick }) => {
               <div className="flex-1 min-w-[240px]">
                 <label className="flex items-center text-sm font-medium text-white mb-2">
                   <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   Location
                 </label>
@@ -279,7 +206,6 @@ const Header = ({ onGetStartedClick }) => {
                   <option>Apartment</option>
                   <option>Villa</option>
                   <option>Plot</option>
-                  <option>Commercial</option>
                 </select>
               </div>
 
@@ -296,12 +222,7 @@ const Header = ({ onGetStartedClick }) => {
 
               <button className="bg-white hover:bg-gray-100 text-orange-600 px-7 py-2.5 rounded-full flex items-center justify-center transition-colors font-semibold">
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 Search
               </button>
@@ -309,13 +230,6 @@ const Header = ({ onGetStartedClick }) => {
           </div>
         </div>
       )}
-
-      {/* Modals */}
-      <BuyFormModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
-      <DevelopmentFormModal
-        isOpen={isDevelopmentModalOpen}
-        onClose={() => setIsDevelopmentModalOpen(false)}
-      />
     </div>
   );
 };
