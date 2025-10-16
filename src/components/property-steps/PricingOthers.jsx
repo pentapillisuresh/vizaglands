@@ -6,6 +6,7 @@ const PricingOthers = ({ data, updateData }) => {
   const [price, setPrice] = useState(data.price || '');
   const [projectName, setProjectName] = useState(data.projectName || '');
   const [description, setDescription] = useState(data.description || '');
+  const [privateNotes, setPrivateNotes] = useState(data.privateNotes || '');
   const [approvedBy, setApprovedBy] = useState(data.approvedBy || []);
   const [amenities, setAmenities] = useState(data.amenities || []);
   const [loading, setLoading] = useState(false);
@@ -63,6 +64,7 @@ const PricingOthers = ({ data, updateData }) => {
         price: parseFloat(price) || null,
         project_name: projectName || null,
         description: description || null,
+        privateNotes: privateNotes || null, // ✅ include this
         approvedBy,
         amenities,
         property_score: 100,
@@ -106,6 +108,7 @@ const PricingOthers = ({ data, updateData }) => {
 
       {/* PRICE & DETAILS */}
       <div className="space-y-6">
+        {/* Price */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
             Price (₹)
@@ -119,6 +122,7 @@ const PricingOthers = ({ data, updateData }) => {
           />
         </div>
 
+        {/* Project Name */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
             Project Name (Optional)
@@ -132,6 +136,7 @@ const PricingOthers = ({ data, updateData }) => {
           />
         </div>
 
+        {/* Description */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
             Property Description
@@ -144,12 +149,28 @@ const PricingOthers = ({ data, updateData }) => {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none"
           />
         </div>
+
+        {/* ✅ Private Notes Field */}
+        <div>
+          <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
+            Private Notes
+          </label>
+          <textarea
+            value={privateNotes}
+            onChange={(e) => setPrivateNotes(e.target.value)}
+            placeholder="Enter private notes (visible only to owner)"
+            rows="3"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Private notes are only visible to owner. It won’t be shown on the frontend.
+          </p>
+        </div>
       </div>
 
       {/* CONDITIONAL SECTIONS */}
       {data.propertySubtype === 'Flat/Apartment' && (
         <div className="space-y-6 mt-8">
-          {/* Approved Section */}
           <div>
             <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
               Approved By
@@ -171,7 +192,6 @@ const PricingOthers = ({ data, updateData }) => {
             </div>
           </div>
 
-          {/* Amenities Section */}
           <div>
             <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
               Amenities
@@ -198,7 +218,6 @@ const PricingOthers = ({ data, updateData }) => {
 
       {data.propertySubtype === 'Plot' && (
         <div className="space-y-6 mt-8">
-          {/* Approved Section */}
           <div>
             <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
               Approved By
@@ -220,7 +239,6 @@ const PricingOthers = ({ data, updateData }) => {
             </div>
           </div>
 
-          {/* Amenities Section */}
           <div>
             <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
               Amenities

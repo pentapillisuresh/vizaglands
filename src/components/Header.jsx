@@ -45,7 +45,8 @@ const Header = () => {
             <nav className="hidden lg:flex items-center space-x-8">
               {[{ path: "/", label: "Home" },
                 { path: "/about", label: "About" },
-                { path: "/contact", label: "Contact" }].map(({ path, label }) => (
+                { path: "/contact", label: "Contact" },
+                { path: "/blog", label: "Blog" }].map(({ path, label }) => (
                 <a
                   key={path}
                   href={path}
