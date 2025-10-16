@@ -7,15 +7,12 @@ const LocationDetails = ({ data, updateData, onNext }) => {
   const [apartmentSociety, setApartmentSociety] = useState(data.apartmentSociety || "");
   const [roadFacing, setRoadFacing] = useState(data.roadFacing || "");
 
-  // ✅ Location Advantages state
+  // ✅ Initial advantages list with at least two default fields
   const [advantages, setAdvantages] = useState(
-    data.advantages || {
-      metro: "",
-      school: "",
-      hospital: "",
-      market: "",
-      landmark: "",
-    }
+    data.advantages || [
+      { type: "Metro", name: "", distance: "Nearby" },
+      { type: "School", name: "", distance: "Nearby" },
+    ]
   );
 
   // ✅ Normalize subtype safely and check for land-like types
@@ -36,14 +33,32 @@ const LocationDetails = ({ data, updateData, onNext }) => {
       subLocality,
       apartmentSociety: isLand ? "" : apartmentSociety,
       roadFacing,
-      advantages, // ✅ include new data
+      advantages,
     });
     onNext();
   };
 
   // ✅ Handle saving for each field
-  const handleSave = (key) => {
-    updateData({ advantages: { ...advantages } });
+  const handleSave = () => {
+    updateData({ advantages });
+  };
+
+  // ✅ Handle field change dynamically
+  const handleAdvantageChange = (index, key, value) => {
+    const updated = [...advantages];
+    updated[index][key] = value;
+    setAdvantages(updated);
+  };
+
+  // ✅ Add more advantage fields
+  const handleAddMore = () => {
+    setAdvantages([...advantages, { type: "", name: "", distance: "Nearby" }]);
+  };
+
+  // ✅ Remove advantage
+  const handleRemove = (index) => {
+    const updated = advantages.filter((_, i) => i !== index);
+    setAdvantages(updated);
   };
 
   return (
@@ -150,118 +165,69 @@ const LocationDetails = ({ data, updateData, onNext }) => {
           Highlight the nearby landmarks
         </p>
 
-        {/* Metro */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4">
-          <input
-            type="text"
-            value={advantages.metro}
-            onChange={(e) => setAdvantages({ ...advantages, metro: e.target.value })}
-            placeholder="Add the name of Metro"
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
-          />
-          <select className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-            <option>Nearby</option>
-            <option>Within 1 km</option>
-            <option>Within 5 km</option>
-          </select>
-          <button
-            onClick={() => handleSave("metro")}
-            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-5 py-3 rounded-lg ml-0 sm:ml-2"
+        {advantages.map((item, index) => (
+          <div
+            key={index}
+            className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4"
           >
-            Save
-          </button>
-        </div>
+            {/* Type */}
+            <input
+              type="text"
+              value={item.type}
+              onChange={(e) => handleAdvantageChange(index, "type", e.target.value)}
+              placeholder="Type (e.g., Metro, School)"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
+                         focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
+            />
 
-        {/* School */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4">
-          <input
-            type="text"
-            value={advantages.school}
-            onChange={(e) => setAdvantages({ ...advantages, school: e.target.value })}
-            placeholder="Add the name of School"
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
-          />
-          <select className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-            <option>Nearby</option>
-            <option>Within 1 km</option>
-            <option>Within 5 km</option>
-          </select>
-          <button
-            onClick={() => handleSave("school")}
-            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-5 py-3 rounded-lg ml-0 sm:ml-2"
-          >
-            Save
-          </button>
-        </div>
+            {/* Name */}
+            <input
+              type="text"
+              value={item.name}
+              onChange={(e) => handleAdvantageChange(index, "name", e.target.value)}
+              placeholder={`Add ${item.type || "location"} name`}
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
+                         focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
+            />
 
-        {/* Hospital */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4">
-          <input
-            type="text"
-            value={advantages.hospital}
-            onChange={(e) => setAdvantages({ ...advantages, hospital: e.target.value })}
-            placeholder="Add the name of Hospital"
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
-          />
-          <select className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-            <option>Nearby</option>
-            <option>Within 1 km</option>
-            <option>Within 5 km</option>
-          </select>
-          <button
-            onClick={() => handleSave("hospital")}
-            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-5 py-3 rounded-lg ml-0 sm:ml-2"
-          >
-            Save
-          </button>
-        </div>
+            {/* Distance */}
+            <select
+              value={item.distance}
+              onChange={(e) => handleAdvantageChange(index, "distance", e.target.value)}
+              className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            >
+              <option>Nearby</option>
+              <option>Within 1 km</option>
+              <option>Within 5 km</option>
+            </select>
 
-        {/* Market */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4">
-          <input
-            type="text"
-            value={advantages.market}
-            onChange={(e) => setAdvantages({ ...advantages, market: e.target.value })}
-            placeholder="Add the name of Market"
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
-          />
-          <select className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-            <option>Nearby</option>
-            <option>Within 1 km</option>
-            <option>Within 5 km</option>
-          </select>
-          <button
-            onClick={() => handleSave("market")}
-            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-5 py-3 rounded-lg ml-0 sm:ml-2"
-          >
-            Save
-          </button>
-        </div>
+            {/* Remove Button */}
+            {advantages.length > 2 && (
+              <button
+                onClick={() => handleRemove(index)}
+                className="bg-red-600 hover:bg-red-500 text-white font-medium px-4 py-3 rounded-lg ml-0 sm:ml-2"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
 
-        {/* Landmark */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4">
-          <input
-            type="text"
-            value={advantages.landmark}
-            onChange={(e) => setAdvantages({ ...advantages, landmark: e.target.value })}
-            placeholder="Add the name of the Landmark"
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg 
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
-          />
-          <select className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-            <option>Nearby</option>
-            <option>Within 1 km</option>
-            <option>Within 5 km</option>
-          </select>
+        {/* Add More Button */}
+        <button
+          onClick={handleAddMore}
+          className="text-blue-900 font-medium mt-4 border border-blue-900 px-6 py-2 rounded-lg hover:bg-blue-900 hover:text-white transition"
+        >
+          + Add More
+        </button>
+
+        {/* Save Button */}
+        <div className="mt-6">
           <button
-            onClick={() => handleSave("landmark")}
-            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-5 py-3 rounded-lg ml-0 sm:ml-2"
+            onClick={handleSave}
+            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-8 py-3 rounded-lg"
           >
-            Save
+            Save Advantages
           </button>
         </div>
       </div>
