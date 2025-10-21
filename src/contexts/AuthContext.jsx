@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import ApiService from '../hooks/ApiService';
 
 const AuthContext = createContext({});
 
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
+    const storedUser = localStorage.getItem('clientDetails');
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setUser(userData);
@@ -53,63 +54,76 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const signUp = async (email, password, fullName, phone) => {
-    const existingUser = STATIC_USERS.find(u => u.email === email);
-    if (existingUser) {
-      return {
-        data: null,
-        error: { message: 'User already exists' }
-      };
+  const signUp = async (email, password, fullName, phoneNumber, role) => {
+    console.log("email::", email);
+    console.log("password::", password);
+    console.log("fullName::", fullName);
+    console.log("phoneNumber::", phoneNumber);
+    console.log("role::", role);
+  
+    try {
+      const response = await ApiService.post(
+        `/auth/register`,
+        { fullName, phoneNumber, email, password, role },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+  
+      const { data } = response;
+      console.log("Registration response:", data);
+  
+      if (data?.token && data?.user) {
+        // Save user/token to state/localStorage
+        setUser(data.user);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('clientDetails', JSON.stringify(data.user));
+  
+        return { data, error: null };
+      } else {
+        return { data: null, error: { message: 'Invalid response from server' } };
+      }
+    } catch (err) {
+      console.error('Registration failed:', err);
+      const message =
+        err.response?.data?.message || 'Registration failed. Please try again.';
+      return { data: null, error: { message } };
     }
-
-    const newUser = {
-      id: String(STATIC_USERS.length + 1),
-      email,
-      password,
-      fullName,
-      phone,
-      userType: null
-    };
-
-    STATIC_USERS.push(newUser);
-
-    return {
-      data: { user: { id: newUser.id, email: newUser.email } },
-      error: null
-    };
   };
-
+  
   const signIn = async (email, password) => {
-    const user = STATIC_USERS.find(
-      u => u.email === email && u.password === password
-    );
-
-    if (!user) {
-      return {
-        data: null,
-        error: { message: 'Invalid email or password' }
-      };
+    try {
+      const response = await ApiService.post(
+        `/auth/login/client`,
+        { email, password },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+  
+      const { data } = response;
+      console.log('Login success:', data);
+  
+      if (data?.token && data?.user) {
+        // Store token and user
+        setUser(data.user);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('clientDetails', JSON.stringify(data.user));
+  
+        return { data, error: null };
+      } else {
+        return { data: null, error: { message: 'Invalid response from server' } };
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+  
+      const message =
+        err.response?.data?.message || 'Login failed. Please try again.';
+  
+      return { data: null, error: { message } };
     }
-
-    const userData = {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      phone: user.phone,
-      userType: user.userType
-    };
-
-    setUser(userData);
-    setUserProfile(userData);
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-
-    return { data: { user: userData }, error: null };
   };
-
+    
   const signOut = async () => {
     setUser(null);
     setUserProfile(null);
-    localStorage.removeItem('currentUser');
+    localStorage.clear();
     return { error: null };
   };
 
@@ -125,7 +139,7 @@ export const AuthProvider = ({ children }) => {
     setUserProfile(updatedProfile);
     const userData = { ...user, ...updatedProfile };
     setUser(userData);
-    localStorage.setItem('currentUser', JSON.stringify(userData));
+    localStorage.setItem('clientDetails', JSON.stringify(userData));
 
     return { data: updatedProfile, error: null };
   };

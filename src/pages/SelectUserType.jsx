@@ -19,10 +19,9 @@ const SelectUserType = () => {
     setLoading(true);
 
     setTimeout(() => {
-      console.log('Selected type:', selectedType);
       setLoading(false);
       // Navigate to post-property page or next step
-      navigate('/post-property');
+      navigate('/register', { state: { selectedType } });
     }, 1000);
   };
 

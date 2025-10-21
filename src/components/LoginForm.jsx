@@ -17,7 +17,7 @@ const LoginForm = ({ onClose }) => {
     setLoading(true);
 
     try {
-      const { data, error } = await signIn(email, password); // ✅ destructure both data & error
+      const { data, error } = await signIn(email, password);
 
       if (error) {
         setError(error.message);
@@ -67,12 +67,6 @@ const LoginForm = ({ onClose }) => {
               {error}
             </div>
           )}
-
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm">
-            <p className="font-semibold mb-2">Demo Credentials:</p>
-            <p>Owner: owner@vizaglands.com / owner123</p>
-            <p>Buyer: buyer@vizaglands.com / buyer123</p>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -137,7 +131,7 @@ const LoginForm = ({ onClose }) => {
           <p className="text-center text-gray-600">
             Don't have an account?{' '}
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/select-user-type')}
               className="text-orange-500 hover:text-orange-600 font-medium"
             >
               Register now

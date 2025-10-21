@@ -4,12 +4,15 @@ import { propertiesData } from "../data/propertiesData";
 import { MapPin, Bed, Bath, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ApiService from "../hooks/ApiService";
 
 const FeaturedProperties = () => {
   const navigate = useNavigate();
   const featuredProperties = propertiesData.filter((p) => p.featured);
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [properties, setProperties] = useState(false);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -33,6 +36,26 @@ const FeaturedProperties = () => {
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
+
+  const getPropertiesData = async (e) => {
+    setLoading(true);
+
+    try {
+      const response = await ApiService.get(`/dashboard?limit=5&page=${currentPage}`);
+      console.log("properties response:", response.status);
+      const propertyData = response.data
+      setProperties(propertyData?.mostViewedProperties?.properties);
+    } catch (err) {
+      console.error("Properties error:", err);
+      
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPropertiesData()
+  }, [currentPage])
 
   return (
     <section className="py-20 bg-white">
@@ -136,11 +159,10 @@ const FeaturedProperties = () => {
           <button
             onClick={handlePrev}
             disabled={currentPage === 1}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
-              currentPage === 1
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${currentPage === 1
                 ? "text-gray-400 border-gray-200 cursor-not-allowed"
                 : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
-            }`}
+              }`}
           >
             <ChevronLeft size={18} /> Previous
           </button>
@@ -152,11 +174,10 @@ const FeaturedProperties = () => {
           <button
             onClick={handleNext}
             disabled={currentPage === totalPages}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
-              currentPage === totalPages
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${currentPage === totalPages
                 ? "text-gray-400 border-gray-200 cursor-not-allowed"
                 : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
-            }`}
+              }`}
           >
             Next <ChevronRight size={18} />
           </button>

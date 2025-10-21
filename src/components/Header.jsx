@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-react";
 import BuyFormModal from "./BuyFormModal";
 import DevelopmentFormModal from "./DevelopmentFormModal";
+import SearchBar from "../hooks/searchBar";
 
 const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -11,6 +12,7 @@ const Header = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,6 +33,16 @@ const Header = () => {
     navigate("/");
   };
 
+  const clientDashboards=()=>{
+    const isLogin=localStorage.getItem("isLogin");
+    if (isLogin) {
+      const clientData=localStorage.getItem("clientData");
+      navigate('/post-property');
+    } else{
+      navigate("/login-register")
+    }
+  }
+
   return (
     <div ref={searchRef}>
       <header className="shadow-sm bg-gray-50">
@@ -44,17 +56,16 @@ const Header = () => {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
               {[{ path: "/", label: "Home" },
-                { path: "/about", label: "About" },
-                { path: "/contact", label: "Contact" },
-                { path: "/blog", label: "Blog" }].map(({ path, label }) => (
+              { path: "/about", label: "About" },
+              { path: "/contact", label: "Contact" },
+              { path: "/blog", label: "Blog" }].map(({ path, label }) => (
                 <a
                   key={path}
                   href={path}
-                  className={`relative font-medium font-roboto transition-colors ${
-                    isActive(path)
+                  className={`relative font-medium font-roboto transition-colors ${isActive(path)
                       ? "text-orange-500"
                       : "text-gray-700 hover:text-orange-500"
-                  }`}
+                    }`}
                 >
                   {label}
                   {isActive(path) && (
@@ -69,9 +80,8 @@ const Header = () => {
               {/* Search Button */}
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className={`${
-                  isSearchOpen ? "bg-orange-600" : "bg-orange-500"
-                } text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2`}
+                className={`${isSearchOpen ? "bg-orange-600" : "bg-orange-500"
+                  } text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -86,7 +96,7 @@ const Header = () => {
 
               {/* Sell Button */}
               <button
-                onClick={() => navigate("/select-user-type")}
+                onClick={clientDashboards}
                 className="bg-orange-100 text-orange-600 font-roboto px-5 py-2 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,9 +114,8 @@ const Header = () => {
                   <User className="w-4 h-4" />
                   <span>Login</span>
                   <svg
-                    className={`w-4 h-4 transform transition-transform ${
-                      isVendorMenuOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transform transition-transform ${isVendorMenuOpen ? "rotate-180" : ""
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -181,81 +190,19 @@ const Header = () => {
       </header>
 
       {/* Search Bar */}
-        {isSearchOpen && (
-  <div className="border-t border-gray-300 shadow-lg bg-orange-500 text-white transition-all duration-300">
-    <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
-      <div className="flex items-end justify-between gap-4 flex-wrap lg:flex-nowrap">
-
-        {/* District */}
-        <div className="flex-1 min-w-[160px]">
-          <label className="flex items-center text-sm font-medium text-white mb-2">
-            <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.341A8 8 0 014.572 15.34C5.71 12.201 8.64 10 12 10s6.29 2.201 7.428 5.341z" />
-            </svg>
-            District
-          </label>
-          <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none text-sm">
-            <option>Select District</option>
-            <option>Visakhapatnam</option>
-            <option>Vizianagaram</option>
-            <option>Srikakulam</option>
-          </select>
+      {isSearchOpen && (
+        <div>
+          <SearchBar setResults={setSearchResults} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {searchResults.map((property) => (
+              <div key={property.id} className="bg-white shadow rounded-lg p-4">
+                <h3 className="font-bold text-lg mb-2">{property.propertyName}</h3>
+                <p>{property?.address?.city}, {property?.address?.locality}</p>
+                <p>₹{property.price}</p>
+              </div>
+            ))}
+          </div>
         </div>
-
-        {/* Location */}
-        <div className="flex-1 min-w-[160px]">
-          <label className="flex items-center text-sm font-medium text-white mb-2">
-            <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Location
-          </label>
-          <input
-            type="text"
-            placeholder="Enter city, neighborhood, or address..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none text-sm"
-          />
-        </div>
-
-        {/* Property Type */}
-        <div className="flex-1 min-w-[160px]">
-          <label className="block text-sm font-medium text-white mb-2">Property Type</label>
-          <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none text-sm">
-            <option>All Types</option>
-            <option>Apartment</option>
-            <option>Villa</option>
-            <option>Plot</option>
-            <option>Flats</option>
-
-            <option>Commercial</option>
-
-          </select>
-        </div>
-
-        {/* Price Range */}
-        <div className="flex-1 min-w-[160px]">
-          <label className="block text-sm font-medium text-white mb-2">Price Range</label>
-          <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-800 focus:ring-2 focus:ring-orange-700 outline-none text-sm">
-            <option>Any Price</option>
-            <option>Below ₹25L</option>
-            <option>₹25L - ₹50L</option>
-            <option>₹50L - ₹1Cr</option>
-            <option>Above ₹1Cr</option>
-          </select>
-        </div>
-
-        {/* Search Button */}
-        <button className="bg-white hover:bg-gray-100 text-orange-600 px-6 py-3 rounded-full flex items-center justify-center transition-colors font-semibold whitespace-nowrap">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          Search
-        </button>
-      </div>
-    </div>
-  </div>
 )}
 
 

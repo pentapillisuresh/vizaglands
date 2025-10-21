@@ -16,11 +16,11 @@ import Dashboard from './pages/vendor/Dashboard';
 import ManageListings from './pages/vendor/ManageListings';
 import Analytics from './pages/vendor/Analytics';
 import Profile from './pages/vendor/Profile';
-import Leads from './pages/vendor/Leads'; 
+import Leads from './pages/vendor/Leads';
 import Blog from './pages/Blog';
 
 function App() {
-  
+
 
   return (
     <AuthProvider>
@@ -33,23 +33,20 @@ function App() {
           <Route path="/login-register" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
 
-         
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path='/blog' element={<Blog/>}/>
+          <Route path='/blog' element={<Blog />} />
           <Route path="/select-user-type" element={<SelectUserType />} />
           <Route path="/post-property" element={<PostProperty />} />
           <Route path="/properties/:categorySlug" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
-                  <Route path="/vendor/dashboard" element={<Dashboard />} />
-        <Route path="/vendor/manage-listings" element={<ManageListings />} />
-        <Route path="/vendor/analytics" element={<Analytics />} />
-        <Route path="/vendor/profile" element={<Profile />} />
-                <Route path="/vendor/leads" element={<Leads />} />
+          <Route path="/vendor/dashboard" element={<Dashboard />} />
+          <Route path="/vendor/manage-listings" element={<ManageListings />} />
+          <Route path="/vendor/analytics" element={<Analytics />} />
+          <Route path="/vendor/profile" element={<Profile />} />
+          <Route path="/vendor/leads" element={<Leads />} />
 
         </Routes>
-
-   
         <Footer />
       </Router>
     </AuthProvider>

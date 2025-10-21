@@ -3,7 +3,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { Home, Users, Handshake } from "lucide-react";
 
-const LocationsSection = () => {
+const LocationsSection = ({cityLocalities}) => {
   const locations = [
     {
       id: 1,
@@ -63,7 +63,7 @@ const LocationsSection = () => {
           data-aos="fade-up"
           data-aos-delay="200"
         >
-          {locations.map((location) => (
+          {cityLocalities.map((location) => (
             <div key={location.id} className="space-y-4">
               <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 {location.name}

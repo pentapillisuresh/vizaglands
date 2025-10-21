@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { propertyCategories } from "../data/propertiesData";
 
-const PropertyCategories = () => {
+const PropertyCategories = ({categories}) => {
   const navigate = useNavigate();
 
   return (
@@ -30,7 +30,7 @@ const PropertyCategories = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-          {propertyCategories.map((cat, idx) => (
+          {categories.map((cat, idx) => (
             <article
               key={cat.id}
               data-aos="zoom-in"

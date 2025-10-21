@@ -1,15 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const RegisterForm = () => {
+  const location = useLocation();
+  const selectedType = location.state?.selectedType;
+
   const [formData, setFormData] = useState({
-    userType: '',
+    role: '',
     fullName: '',
     email: '',
-    phone: '',
+    phoneNumber: '',
     password: ''
   });
+
+  useEffect(() => {
+    console.log("role::", selectedType)
+    setFormData({
+      ...formData,
+      role: selectedType
+    });
+  }, [selectedType])
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
@@ -22,36 +34,33 @@ const RegisterForm = () => {
     });
   };
 
-  const handleUserTypeChange = (e) => {
-    setFormData({
-      ...formData,
-      userType: e.target.value
-    });
-  };
+  // const handleUserTypeChange = (e) => {
+
+  //   setFormData({
+  //     ...formData,
+  //     role: e.target.value
+  //   });
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!formData.userType) {
+    if (!formData.role) {
       setError('Please select your role (Owner/Agent/Builder)');
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await signUp(
-        formData.email,
-        formData.password,
-        formData.fullName,
-        formData.phone,
-        formData.userType
-      );
+      const { data, error } = await signUp(email, password, fullName, phoneNumber, role);
 
-      if (error) throw error;
-
-      // ✅ Navigate to login after successful signup
-      navigate('/login-register');
+      if (error) {
+        setError(error.message);
+      } else if (data?.user) {
+        // ✅ Navigate to login after successful signup
+        navigate('/login-register');
+      }
     } catch (error) {
       setError(error.message);
     } finally {
@@ -97,23 +106,23 @@ const RegisterForm = () => {
             {/* I am Section */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                I am
+                I am <span style={{ textTransform: 'capitalize' }}>{selectedType}</span>
               </label>
-              <div className="flex items-center gap-6">
+              {/* <div className="flex items-center gap-6">
                 {['Owner', 'Agent', 'Builder'].map((type) => (
                   <label key={type} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="userType"
+                      name="role"
                       value={type}
-                      checked={formData.userType === type}
+                      checked={formData.role === type}
                       onChange={handleUserTypeChange}
                       className="w-4 h-4 text-orange-500 focus:ring-orange-500 border-gray-300"
                     />
                     <span className="text-gray-700 text-sm">{type}</span>
                   </label>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             {/* Full Name */}
@@ -155,8 +164,8 @@ const RegisterForm = () => {
               </label>
               <input
                 type="tel"
-                name="phone"
-                value={formData.phone}
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
