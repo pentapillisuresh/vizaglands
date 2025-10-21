@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   User,
   Mail,
@@ -10,12 +10,15 @@ import {
   Lock,
   Bell,
   IdCard,
-  FileText
+  FileText,
+  Edit,
+  X
 } from 'lucide-react';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     name: 'Rajesh Kumar',
     email: 'rajesh.kumar@example.com',
@@ -23,7 +26,7 @@ const Profile = () => {
     company: 'Kumar Properties',
     location: 'Visakhapatnam, Andhra Pradesh',
     address: 'Plot No. 45, Dwaraka Nagar',
-    website: 'www.kumarproperties.com',
+    dealArea: 'MVP Colony, Gajuwaka, Gopalapatnam',
     bio: 'Experienced real estate professional with over 10 years in the Visakhapatnam market. Specializing in residential and commercial properties.',
     profileImage:
       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
@@ -32,6 +35,7 @@ const Profile = () => {
     secondaryIdProof: null
   });
 
+  const [originalData, setOriginalData] = useState({ ...profileData });
   const [notifications, setNotifications] = useState({
     emailNewInquiry: true,
     emailPropertyViews: false,
@@ -42,37 +46,92 @@ const Profile = () => {
     pushPropertyViews: true
   });
 
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+
   const handleInputChange = (field, value) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleFileUpload = (field, file) => {
-    setProfileData((prev) => ({
-      ...prev,
-      [field]: URL.createObjectURL(file)
-    }));
+    if (file) {
+      setProfileData((prev) => ({
+        ...prev,
+        [field]: URL.createObjectURL(file)
+      }));
+    }
   };
 
   const handleNotificationChange = (field) => {
     setNotifications((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Cancel editing - revert to original data
+      setProfileData({ ...originalData });
+    } else {
+      // Start editing - save current state as original
+      setOriginalData({ ...profileData });
+    }
+    setIsEditing(!isEditing);
+  };
+
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => {
       setIsSaving(false);
+      setIsEditing(false);
+      setOriginalData({ ...profileData });
       alert('Profile updated successfully!');
     }, 1000);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
+  const triggerCameraInput = () => {
+    cameraInputRef.current?.click();
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      handleFileUpload('profileImage', file);
+    }
+  };
+
+  const handleCameraCapture = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      handleFileUpload('profileImage', file);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your account settings and preferences
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
+            <p className="text-gray-600 mt-2">
+              Manage your account settings and preferences
+            </p>
+          </div>
+          {activeTab === 'profile' && (
+            <button
+              onClick={handleEditToggle}
+              className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${
+                isEditing
+                  ? 'bg-red-500 text-white hover:bg-red-600'
+                  : 'bg-orange-500 text-white hover:bg-orange-600'
+              }`}
+            >
+              {isEditing ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+              {isEditing ? 'Cancel' : 'Edit Profile'}
+            </button>
+          )}
         </div>
 
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
@@ -127,16 +186,53 @@ const Profile = () => {
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
                     />
-                    <button className="absolute bottom-0 right-0 bg-orange-500 text-white p-2 rounded-full hover:bg-orange-600 transition-colors">
-                      <Camera className="w-4 h-4" />
-                    </button>
+                    {isEditing && (
+                      <div className="absolute bottom-0 right-0 flex gap-1">
+                        <button 
+                          onClick={triggerFileInput}
+                          className="bg-orange-500 text-white p-2 rounded-full hover:bg-orange-600 transition-colors"
+                          title="Upload from device"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={triggerCameraInput}
+                          className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+                          title="Take photo"
+                        >
+                          <Camera className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">
                       {profileData.name}
                     </h3>
                     <p className="text-gray-600">{profileData.company}</p>
+                    {isEditing && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Click buttons to upload or take a photo
+                      </p>
+                    )}
                   </div>
+
+                  {/* Hidden file inputs */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <input
+                    type="file"
+                    ref={cameraInputRef}
+                    onChange={handleCameraCapture}
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                  />
                 </div>
 
                 {/* Basic Details */}
@@ -153,7 +249,10 @@ const Profile = () => {
                         onChange={(e) =>
                           handleInputChange('name', e.target.value)
                         }
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                        disabled={!isEditing}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                        }`}
                       />
                     </div>
                   </div>
@@ -170,7 +269,10 @@ const Profile = () => {
                         onChange={(e) =>
                           handleInputChange('email', e.target.value)
                         }
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                        disabled={!isEditing}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                        }`}
                       />
                     </div>
                   </div>
@@ -187,7 +289,10 @@ const Profile = () => {
                         onChange={(e) =>
                           handleInputChange('phone', e.target.value)
                         }
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                        disabled={!isEditing}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                        }`}
                       />
                     </div>
                   </div>
@@ -204,7 +309,10 @@ const Profile = () => {
                         onChange={(e) =>
                           handleInputChange('company', e.target.value)
                         }
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                        disabled={!isEditing}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                        }`}
                       />
                     </div>
                   </div>
@@ -221,22 +329,30 @@ const Profile = () => {
                         onChange={(e) =>
                           handleInputChange('location', e.target.value)
                         }
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                        disabled={!isEditing}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                        }`}
                       />
                     </div>
                   </div>
 
+                  {/* Deal With Area */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Website
+                      Deal With Area
                     </label>
                     <input
-                      type="url"
-                      value={profileData.website}
+                      type="text"
+                      value={profileData.dealArea}
                       onChange={(e) =>
-                        handleInputChange('website', e.target.value)
+                        handleInputChange('dealArea', e.target.value)
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      disabled={!isEditing}
+                      placeholder="Enter areas you deal in (e.g. Gajuwaka, MVP, Vizianagaram)"
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                        !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                      }`}
                     />
                   </div>
                 </div>
@@ -252,83 +368,88 @@ const Profile = () => {
                     onChange={(e) =>
                       handleInputChange('address', e.target.value)
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                    disabled={!isEditing}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
+                      !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                    }`}
                   />
                 </div>
 
                 {/* Aadhaar & ID Verification */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Aadhaar Number
-                    </label>
-                    <div className="relative">
-                      <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <input
-                        type="text"
-                        maxLength={12}
-                        value={profileData.aadharNumber}
-                        onChange={(e) =>
-                          handleInputChange('aadharNumber', e.target.value)
-                        }
-                        placeholder="Enter your Aadhaar number"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Upload Aadhaar Proof
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="file"
-                        accept="image/*,application/pdf"
-                        onChange={(e) =>
-                          handleFileUpload('aadharProof', e.target.files[0])
-                        }
-                        className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      />
-                    </div>
-                    {profileData.aadharProof && (
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-600 mb-1">Preview:</p>
-                        <img
-                          src={profileData.aadharProof}
-                          alt="Aadhaar Proof"
-                          className="w-40 h-24 object-cover border rounded-lg"
+                {isEditing && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Aadhaar Number
+                      </label>
+                      <div className="relative">
+                        <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input
+                          type="text"
+                          maxLength={12}
+                          value={profileData.aadharNumber}
+                          onChange={(e) =>
+                            handleInputChange('aadharNumber', e.target.value)
+                          }
+                          placeholder="Enter your Aadhaar number"
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                         />
                       </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Upload Secondary ID Proof (e.g., PAN, Passport, DL)
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="file"
-                        accept="image/*,application/pdf"
-                        onChange={(e) =>
-                          handleFileUpload('secondaryIdProof', e.target.files[0])
-                        }
-                        className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      />
                     </div>
-                    {profileData.secondaryIdProof && (
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-600 mb-1">Preview:</p>
-                        <img
-                          src={profileData.secondaryIdProof}
-                          alt="Secondary ID Proof"
-                          className="w-40 h-24 object-cover border rounded-lg"
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Upload Aadhaar Proof
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={(e) =>
+                            handleFileUpload('aadharProof', e.target.files[0])
+                          }
+                          className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                       </div>
-                    )}
+                      {profileData.aadharProof && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-600 mb-1">Preview:</p>
+                          <img
+                            src={profileData.aadharProof}
+                            alt="Aadhaar Proof"
+                            className="w-40 h-24 object-cover border rounded-lg"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Upload Secondary ID Proof (e.g., PAN, Passport, DL)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={(e) =>
+                            handleFileUpload('secondaryIdProof', e.target.files[0])
+                          }
+                          className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        />
+                      </div>
+                      {profileData.secondaryIdProof && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-600 mb-1">Preview:</p>
+                          <img
+                            src={profileData.secondaryIdProof}
+                            alt="Secondary ID Proof"
+                            className="w-40 h-24 object-cover border rounded-lg"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Bio */}
                 <div className="pt-6 border-t border-gray-200">
@@ -338,14 +459,17 @@ const Profile = () => {
                   <textarea
                     value={profileData.bio}
                     onChange={(e) => handleInputChange('bio', e.target.value)}
+                    disabled={!isEditing}
                     rows="4"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none transition-colors ${
+                      !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                    }`}
                   />
                 </div>
               </div>
             )}
 
-            {/* Other Tabs (unchanged) */}
+            {/* Notifications Tab */}
             {activeTab === 'notifications' && (
               <div className="space-y-6">
                 <div>
@@ -435,6 +559,7 @@ const Profile = () => {
               </div>
             )}
 
+            {/* Security Tab */}
             {activeTab === 'security' && (
               <div className="space-y-6">
                 <div>
@@ -493,8 +618,8 @@ const Profile = () => {
               </button>
               <button
                 onClick={handleSave}
-                disabled={isSaving}
-                className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium flex items-center gap-2 disabled:opacity-50"
+                disabled={isSaving || (activeTab === 'profile' && !isEditing)}
+                className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5" />
                 {isSaving ? 'Saving...' : 'Save Changes'}

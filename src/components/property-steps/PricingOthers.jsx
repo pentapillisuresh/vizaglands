@@ -12,6 +12,7 @@ const PricingOthers = ({ data, updateData }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -40,6 +41,21 @@ const PricingOthers = ({ data, updateData }) => {
     );
   };
 
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!price || price <= 0) {
+      errors.price = 'Price is required and must be greater than 0';
+    }
+    
+    if (!description || description.trim() === '') {
+      errors.description = 'Description is required';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const calculateScore = () => {
     let score = 0;
     if (data.listingType) score += 10;
@@ -56,18 +72,28 @@ const PricingOthers = ({ data, updateData }) => {
   };
 
   const handleSubmit = async (status) => {
+    // For published status, validate mandatory fields
+    if (status === 'published') {
+      if (!validateForm()) {
+        setError('Please fill all mandatory fields');
+        return;
+      }
+    }
+
     setLoading(true);
     setError('');
+    setValidationErrors({});
+    
     try {
       const propertyDataToSave = {
         ...data,
         price: parseFloat(price) || null,
         project_name: projectName || null,
         description: description || null,
-        privateNotes: privateNotes || null, // ✅ include this
+        privateNotes: privateNotes || null,
         approvedBy,
         amenities,
-        property_score: 100,
+        property_score: status === 'published' ? 100 : calculateScore(),
         status,
       };
 
@@ -82,6 +108,8 @@ const PricingOthers = ({ data, updateData }) => {
       setLoading(false);
     }
   };
+
+  const isPublishDisabled = loading || !price || !description;
 
   return (
     <div className="space-y-8 relative">
@@ -108,18 +136,23 @@ const PricingOthers = ({ data, updateData }) => {
 
       {/* PRICE & DETAILS */}
       <div className="space-y-6">
-        {/* Price */}
+        {/* Price - Mandatory */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Price (₹)
+            Price (₹) <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="Enter price"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto ${
+              validationErrors.price ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
+          {validationErrors.price && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.price}</p>
+          )}
         </div>
 
         {/* Project Name */}
@@ -136,21 +169,26 @@ const PricingOthers = ({ data, updateData }) => {
           />
         </div>
 
-        {/* Description */}
+        {/* Description - Mandatory */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Property Description
+            Property Description <span className="text-red-500">*</span>
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your property..."
             rows="5"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${
+              validationErrors.description ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
+          {validationErrors.description && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
+          )}
         </div>
 
-        {/* ✅ Private Notes Field */}
+        {/* Private Notes Field */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
             Private Notes
@@ -163,7 +201,7 @@ const PricingOthers = ({ data, updateData }) => {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none"
           />
           <p className="text-xs text-gray-500 mt-1">
-            Private notes are only visible to owner. It won’t be shown on the frontend.
+            Private notes are only visible to owner. It won't be shown on the frontend.
           </p>
         </div>
       </div>
@@ -179,6 +217,7 @@ const PricingOthers = ({ data, updateData }) => {
               {approvedOptions.map((opt) => (
                 <button
                   key={opt}
+                  type="button"
                   onClick={() => handleApprovedChange(opt)}
                   className={`px-4 py-2.5 rounded-full border-2 transition-all ${
                     approvedBy.includes(opt)
@@ -226,6 +265,7 @@ const PricingOthers = ({ data, updateData }) => {
               {approvedOptions.map((opt) => (
                 <button
                   key={opt}
+                  type="button"
                   onClick={() => handleApprovedChange(opt)}
                   className={`px-4 py-2.5 rounded-full border-2 transition-all ${
                     approvedBy.includes(opt)
@@ -315,11 +355,16 @@ const PricingOthers = ({ data, updateData }) => {
         </button>
         <button
           onClick={() => handleSubmit('published')}
-          disabled={loading || !price}
+          disabled={isPublishDisabled}
           className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Publishing...' : 'Publish Property'}
         </button>
+      </div>
+
+      {/* Mandatory fields note */}
+      <div className="text-xs text-gray-500 text-center mt-4">
+        <span className="text-red-500">*</span> indicates mandatory fields
       </div>
     </div>
   );

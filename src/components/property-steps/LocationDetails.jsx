@@ -76,7 +76,7 @@ const LocationDetails = ({ data, updateData, onNext }) => {
         {/* City */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            City
+            City <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -92,7 +92,7 @@ const LocationDetails = ({ data, updateData, onNext }) => {
         {/* Locality */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Locality
+            Locality <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -125,7 +125,7 @@ const LocationDetails = ({ data, updateData, onNext }) => {
         {!isLand && (
           <div>
             <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-              Apartment / Society
+              Apartment / Society <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -142,7 +142,7 @@ const LocationDetails = ({ data, updateData, onNext }) => {
         {/* Road Facing */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Road Facing (Optional)
+            Road Facing <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -229,7 +229,7 @@ const LocationDetails = ({ data, updateData, onNext }) => {
       {/* Continue Button */}
       <button
         onClick={handleContinue}
-        disabled={!city || !locality}
+        disabled={!city || !locality || (!isLand && !apartmentSociety) || !roadFacing}
         className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium 
                    px-10 py-3 rounded-lg transition-colors 
                    disabled:opacity-50 disabled:cursor-not-allowed"
