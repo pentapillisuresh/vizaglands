@@ -4,6 +4,7 @@ import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-re
 import BuyFormModal from "./BuyFormModal";
 import DevelopmentFormModal from "./DevelopmentFormModal";
 import SearchBar from "../hooks/searchBar";
+import ApiService from "../hooks/ApiService";
 
 const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -37,7 +38,7 @@ const Header = () => {
     const isLogin=localStorage.getItem("isLogin");
     if (isLogin) {
       const clientData=localStorage.getItem("clientData");
-      navigate('/post-property');
+      navigate('/vendor/dashboard');
     } else{
       navigate("/login-register")
     }
@@ -193,7 +194,7 @@ const Header = () => {
       {isSearchOpen && (
         <div>
           <SearchBar setResults={setSearchResults} />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {searchResults.map((property) => (
               <div key={property.id} className="bg-white shadow rounded-lg p-4">
                 <h3 className="font-bold text-lg mb-2">{property.propertyName}</h3>
@@ -201,7 +202,7 @@ const Header = () => {
                 <p>₹{property.price}</p>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 )}
 

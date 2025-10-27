@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Home, TrendingUp, Eye, Heart, Phone } from 'lucide-react';
+import axios from 'axios';
+import { Home, TrendingUp, Eye, Phone, Heart } from 'lucide-react';
+import ApiService from '../../hooks/ApiService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -9,65 +11,56 @@ const Dashboard = () => {
     activeListings: 0,
     totalViews: 0,
     totalInquiries: 0,
-    savedByUsers: 0,
+    // savedByUsers: 0,
     monthlyViews: 0
   });
 
   const [recentListings, setRecentListings] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [recentLeads, setRecentLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setStats({
-      totalListings: 12,
-      activeListings: 10,
-      totalViews: 3456,
-      totalInquiries: 87,
-      savedByUsers: 234,
-      monthlyViews: 1203
-    });
-
-    setRecentListings([
-      {
-        id: 1,
-        title: '3BHK Luxury Apartment',
-        location: 'Rushikonda, Visakhapatnam',
-        price: '₹85 Lakhs',
-        views: 234,
-        inquiries: 12,
-        status: 'active',
-        image: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=400'
-      },
-      {
-        id: 2,
-        title: 'Independent Villa',
-        location: 'Madhurawada, Visakhapatnam',
-        price: '₹1.2 Cr',
-        views: 189,
-        inquiries: 8,
-        status: 'active',
-        image: 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400'
-      },
-      {
-        id: 3,
-        title: 'Commercial Plot',
-        location: 'Dwaraka Nagar, Visakhapatnam',
-        price: '₹65 Lakhs',
-        views: 156,
-        inquiries: 15,
-        status: 'pending',
-        image: 'https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400'
+    const fetchDashboardData = async () => {
+      const clientToken = localStorage.getItem("token");
+  
+      try {
+        const response = await ApiService.get('/dashboard/client', {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+  
+        console.log("Dashboard API Response:", response);
+  
+        // ✅ Access nested response.data.data safely
+        if (response?.data) {
+          const data = response.data;
+  
+          setStats({
+            totalListings: data.addedPropertiesCount || 0,
+            activeListings: data.verifiedPropertiesCount || 0,
+            totalViews: data.totalViews || 0,
+            totalInquiries: data.Inquiries || 0,
+            monthlyViews: data.totalThisMonthViews || 0
+          });
+  
+          setRecentListings(data.properties || []);
+          setRecentLeads(data.leads || []);
+        } else {
+          console.warn("Unexpected response format:", response);
+        }
+  
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
       }
-    ]);
-
-    setRecentActivity([
-      { id: 1, type: 'view', message: 'Your property "3BHK Luxury Apartment" was viewed', time: '2 hours ago' },
-      { id: 2, type: 'inquiry', message: 'New inquiry for "Independent Villa"', time: '5 hours ago' },
-      { id: 3, type: 'saved', message: '"Commercial Plot" was saved by a user', time: '1 day ago' },
-      { id: 4, type: 'view', message: 'Your property "2BHK Sea View" was viewed', time: '1 day ago' },
-      { id: 5, type: 'inquiry', message: 'New inquiry for "3BHK Luxury Apartment"', time: '2 days ago' }
-    ]);
+    };
+  
+    fetchDashboardData();
   }, []);
-
+  
   const StatCard = ({ icon: Icon, title, value, change, color }) => (
     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-center justify-between">
@@ -87,6 +80,14 @@ const Dashboard = () => {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600 text-lg">
+        Loading dashboard...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -95,49 +96,34 @@ const Dashboard = () => {
           <p className="text-gray-600 mt-2">Welcome back! Here's what's happening with your properties.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <StatCard
-            icon={Home}
-            title="Total Listings"
-            value={stats.totalListings}
-            color="bg-blue-500"
-          />
-          <StatCard
-            icon={TrendingUp}
-            title="Active Listings"
-            value={stats.activeListings}
-            color="bg-green-500"
-          />
-          <StatCard
-            icon={Eye}
-            title="Total Views"
-            value={stats.totalViews.toLocaleString()}
-            change={12}
-            color="bg-orange-500"
-          />
-          <StatCard
-            icon={Phone}
-            title="Inquiries"
-            value={stats.totalInquiries}
-            change={8}
-            color="bg-purple-500"
-          />
-          <StatCard
-            icon={Heart}
-            title="Saved by Users"
-            value={stats.savedByUsers}
-            color="bg-red-500"
-          />
-          <StatCard
-            icon={TrendingUp}
-            title="This Month Views"
-            value={stats.monthlyViews.toLocaleString()}
-            change={15}
-            color="bg-indigo-500"
-          />
+        {/* Add Property CTA */}
+        <div className="mt-8 mb-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold">Ready to add more properties?</h3>
+              <p className="text-orange-100 mt-1">Reach more buyers by listing your properties with us</p>
+            </div>
+            <button
+              onClick={() => navigate('/post-property')}
+              className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+            >
+              Post New Property
+            </button>
+          </div>
         </div>
 
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <StatCard icon={Home} title="Total Listings" value={stats.totalListings} color="bg-blue-500" />
+          <StatCard icon={TrendingUp} title="Verified Listings" value={stats.activeListings} color="bg-green-500" />
+          <StatCard icon={Eye} title="Total Views" value={stats.totalViews.toLocaleString()} color="bg-orange-500" />
+          <StatCard icon={Phone} title="Inquiries" value={stats.totalInquiries} color="bg-purple-500" />
+          <StatCard icon={TrendingUp} title="This Month Views" value={stats.monthlyViews.toLocaleString()} color="bg-indigo-500" />
+        </div>
+
+        {/* Listings + Leads */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Listings */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md p-6">
               <div className="flex items-center justify-between mb-6">
@@ -150,79 +136,91 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {recentListings.map((listing) => (
-                  <div key={listing.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
-                    <img
-                      src={listing.image}
-                      alt={listing.title}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{listing.title}</h3>
-                      <p className="text-sm text-gray-600">{listing.location}</p>
-                      <p className="text-orange-600 font-bold mt-1">{listing.price}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                        listing.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        {listing.status}
-                      </span>
-                      <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          {listing.views}
+              {recentListings.length === 0 ? (
+                <p className="text-gray-500 text-center py-6">No properties found.</p>
+              ) : (
+                <div className="space-y-4">
+                  {recentListings.map((listing) => (
+                    <div
+                      key={listing._id || listing.id}
+                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
+                    >
+                      <img
+                        src={listing.photos[0] || 'https://via.placeholder.com/100'}
+                        alt={listing.title || 'Property'}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900">{listing.title || 'Untitled Property'}</h3>
+                        <p className="text-sm text-gray-600"> {listing.category.name || 'No location'}</p><span>{listing.address.city || 'No location'}</span>
+                        <p className="text-orange-600 font-bold mt-1">{listing.price || 'N/A'}</p>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${listing.status === 'active'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-yellow-100 text-yellow-700'
+                            }`}
+                        >
+                          {listing.status || 'pending'}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-4 h-4" />
-                          {listing.inquiries}
-                        </span>
+                        <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
+                          <span className="flex items-center gap-1">
+                            <Eye className="w-4 h-4" />
+                            {listing.views || 0}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-4 h-4" />
+                            {listing.inquiries || 0}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Recent Leads */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Activity</h2>
-              <div className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0">
-                    <div className={`p-2 rounded-full ${
-                      activity.type === 'inquiry' ? 'bg-orange-100' :
-                      activity.type === 'view' ? 'bg-blue-100' : 'bg-red-100'
-                    }`}>
-                      {activity.type === 'inquiry' ? <Phone className="w-4 h-4 text-orange-600" /> :
-                       activity.type === 'view' ? <Eye className="w-4 h-4 text-blue-600" /> :
-                       <Heart className="w-4 h-4 text-red-600" />}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-800">{activity.message}</p>
-                      <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Leads</h2>
 
-        <div className="mt-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold">Ready to add more properties?</h3>
-              <p className="text-orange-100 mt-1">Reach more buyers by listing your properties with us</p>
+              {recentLeads.length === 0 ? (
+                <p className="text-gray-500 text-center py-6">No leads found.</p>
+              ) : (
+                <div className="space-y-4">
+                  {recentLeads.map((lead) => (
+                    <div
+                      key={lead._id || lead.id}
+                      className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0"
+                    >
+                      <div
+                        className={`p-2 rounded-full ${lead.type === 'inquiry'
+                            ? 'bg-orange-100'
+                            : lead.type === 'view'
+                              ? 'bg-blue-100'
+                              : 'bg-red-100'
+                          }`}
+                      >
+                        {lead.type === 'inquiry' ? (
+                          <Phone className="w-4 h-4 text-orange-600" />
+                        ) : lead.type === 'view' ? (
+                          <Eye className="w-4 h-4 text-blue-600" />
+                        ) : (
+                          <Heart className="w-4 h-4 text-red-600" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-800">{lead.message || 'Lead activity'}</p>
+                        <p className="text-xs text-gray-500 mt-1">{lead.time || 'Just now'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <button
-              onClick={() => navigate('/post-property')}
-              className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Post New Property
-            </button>
           </div>
         </div>
       </div>

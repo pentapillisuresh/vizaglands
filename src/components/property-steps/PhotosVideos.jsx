@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Upload, X, Video, Mic } from 'lucide-react';
 import watermark from 'watermarkjs'; // ✅ Add this import
+import ApiService from '../../hooks/ApiService';
 
 const PhotosVideos = ({ data, updateData, onNext }) => {
   const [photos, setPhotos] = useState(data.photos || []);
   const [videos, setVideos] = useState(data.videos || []);
   const [voiceOver, setVoiceOver] = useState(data.voiceOver || null);
   const [videoUrl, setVideoUrl] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
   const [dragActive, setDragActive] = useState(false);
 
   // --- DRAG & DROP HANDLERS ---
@@ -33,6 +35,7 @@ const PhotosVideos = ({ data, updateData, onNext }) => {
 
   // ✅ UPDATED: APPLY WATERMARK ON EACH IMAGE
   // ✅ UPDATED: Apply watermark on each image properly
+// Handle file selection and watermarking
 const handleFiles = async (files) => {
   const newPhotos = [];
 
@@ -54,7 +57,7 @@ const handleFiles = async (files) => {
     // ✅ Add centered watermark text
     const fontSize = Math.floor(canvas.width * 0.08); // 8% of image width
     ctx.font = `${fontSize}px Arial`;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // white, semi-transparent
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // white semi-transparent
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.shadowColor = "rgba(0,0,0,0.6)";
@@ -63,16 +66,67 @@ const handleFiles = async (files) => {
     const text = "vizaglands.com";
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    const watermarked = canvas.toDataURL("image/jpeg", 0.9);
+    // ✅ Convert canvas to data URL
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+
+    // ✅ Convert data URL to Blob for uploading
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+
+    // ✅ Create a new File object (to mimic original file)
+    const watermarkedFile = new File([blob], file.name, { type: "image/jpeg" });
 
     newPhotos.push({
       id: Date.now() + Math.random(),
-      file,
-      preview: watermarked,
+      file: watermarkedFile,
+      preview: dataUrl, // for UI display
     });
   }
 
   setPhotos((prev) => [...prev, ...newPhotos]);
+};
+
+// Handle upload and continue
+const handleContinue = async () => {
+  try {
+    const uploaded = await uploadImages(photos);
+    updateData({ photos: uploaded, youtubeUrl });
+    onNext();
+  } catch (err) {
+    console.error("Upload failed:", err);
+  }
+};
+
+// Upload images to backend
+const uploadImages = async (imageObjects) => {
+  const clientToken = localStorage.getItem("token");
+
+  try {
+    const formData = new FormData();
+
+    // ✅ Append all files to FormData
+    imageObjects.forEach((image) => {
+      formData.append("images", image.file); // must be File/Blob
+    });
+
+    // ✅ API call
+    const response = await ApiService.post("images/upload-multiple", formData, {
+      headers: {
+        Authorization: `Bearer ${clientToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const data = response.data?.images || response.images;
+    const urls = data.map((item) => item.url);
+
+    console.log("✅ URLs only:", urls);
+
+    return urls;
+  } catch (err) {
+    console.error("❌ Error uploading images:", err);
+    throw err;
+  }
 };
 
 
@@ -82,15 +136,15 @@ const handleFiles = async (files) => {
   };
 
   // --- VIDEO ---
-  const addVideoUrl = () => {
-    if (videoUrl.trim() === '') return;
-    setVideos([...videos, { id: Date.now(), url: videoUrl.trim() }]);
-    setVideoUrl('');
-  };
+  // const addVideoUrl = () => {
+  //   if (videoUrl.trim() === '') return;
+  //   setVideos([...videos, { id: Date.now(), url: videoUrl.trim() }]);
+  //   setVideoUrl('');
+  // };
 
-  const removeVideo = (id) => {
-    setVideos(videos.filter((v) => v.id !== id));
-  };
+  // const removeVideo = (id) => {
+  //   setVideos(videos.filter((v) => v.id !== id));
+  // };
 
   // --- VOICE OVER ---
   const handleVoiceOver = (e) => {
@@ -107,10 +161,8 @@ const handleFiles = async (files) => {
     setVoiceOver(null);
   };
 
-  const handleContinue = () => {
-    updateData({ photos, videos, voiceOver });
-    onNext();
-  };
+      
+  
 
   return (
     <div className="space-y-10">
@@ -190,19 +242,19 @@ const handleFiles = async (files) => {
           <input
             type="url"
             placeholder="Enter YouTube or video link"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
             className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
           />
-          <button
+          {/* <button
             onClick={addVideoUrl}
             className="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2 rounded-lg"
           >
             Add
-          </button>
+          </button> */}
         </div>
 
-        {videos.length > 0 && (
+        {/* {videos.length > 0 && (
           <ul className="mt-4 space-y-2">
             {videos.map((v) => (
               <li
@@ -226,7 +278,7 @@ const handleFiles = async (files) => {
               </li>
             ))}
           </ul>
-        )}
+        )} */}
       </div>
 
       {/* --- Voice-over Upload --- */}

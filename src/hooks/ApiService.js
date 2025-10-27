@@ -11,7 +11,8 @@ export const initialAuthState = {
 
 const ApiService = (() => {
 
-  const baseURL = 'http://localhost:3000/api/'; // Or use a global variable or config import
+  // const baseURL = 'http://localhost:3000/api/'; // Or use a global variable or config import
+  const baseURL = 'https://vizaglandservices.esotericprojects.tech/api/'; // Or use a global variable or config import
 
 const axiosInstance = axios.create({
   baseURL,
@@ -41,10 +42,11 @@ const axiosInstance = axios.create({
   );
 
   return {
-    get: (url, params) => axiosInstance.get(url, { params }),
-    post: (url, data) => axiosInstance.post(url, data),
-    put: (url, data) => axiosInstance.put(url, data),
-    delete: (url) => axiosInstance.delete(url),
+    // ✅ Accept full config (headers, params, etc.)
+    get: (url, config = {}) => axiosInstance.get(url, config),
+    post: (url, data, config = {}) => axiosInstance.post(url, data, config),
+    put: (url, data, config = {}) => axiosInstance.put(url, data, config),
+    delete: (url, config = {}) => axiosInstance.delete(url, config),
   };
 })();
 

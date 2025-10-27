@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import ApiService from '../../hooks/ApiService';
 
 const PricingOthers = ({ data, updateData }) => {
   const [price, setPrice] = useState(data.price || '');
@@ -43,31 +44,26 @@ const PricingOthers = ({ data, updateData }) => {
 
   const validateForm = () => {
     const errors = {};
-    
-    if (!price || price <= 0) {
-      errors.price = 'Price is required and must be greater than 0';
-    }
-    
+
     if (!description || description.trim() === '') {
       errors.description = 'Description is required';
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const calculateScore = () => {
     let score = 0;
-    if (data.listingType) score += 10;
-    if (data.propertyType) score += 10;
-    if (data.propertySubtype) score += 12;
-    if (data.city) score += 12;
-    if (data.locality) score += 12;
-    if (data.plotArea) score += 12;
-    if (data.facing) score += 8;
-    if (price) score += 12;
-    if (description) score += 8;
-    if (data.photos?.length > 0) score += 4;
+    if (data.catType) score += 10;
+    if (data.marketType) score += 10;
+    if (data.address) score += 10;
+    if (data.amenities) score += 10;
+    if (data.propertyProfile) score += 20;
+    if (data.price) score += 10;
+    if (data.propertySubtype) score += 10;
+    if (description) score += 10;
+    if (data.photos?.length > 0) score += 10;
     return score;
   };
 
@@ -83,25 +79,40 @@ const PricingOthers = ({ data, updateData }) => {
     setLoading(true);
     setError('');
     setValidationErrors({});
-    
+
     try {
       const propertyDataToSave = {
         ...data,
-        price: parseFloat(price) || null,
         project_name: projectName || null,
         description: description || null,
         privateNotes: privateNotes || null,
         approvedBy,
         amenities,
-        property_score: status === 'published' ? 100 : calculateScore(),
-        status,
+        // property_score: status === 'published' ? 100 : calculateScore(),
+        // status,
       };
 
       console.log('Property saved (mock):', propertyDataToSave);
       updateData(propertyDataToSave);
 
+      const clientToken = localStorage.getItem("token");
+
+      const response = await ApiService.post('/properties', propertyDataToSave,
+        {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            "Content-Type": "multipart/form-data",
+          }
+        },
+      )
+
+      if (response) {
+        navigate('../../vendor/dashboard')
+      } else {
+        console.log("rrr::",response?.message)
+      }
       setSuccess(true);
-      setTimeout(() => navigate('/'), 2000);
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,16 +120,16 @@ const PricingOthers = ({ data, updateData }) => {
     }
   };
 
-  const isPublishDisabled = loading || !price || !description;
+  const isPublishDisabled = loading || !description;
 
   return (
     <div className="space-y-8 relative">
       <div>
         <h2 className="font-serif text-3xl font-bold text-blue-900 mb-2">
-          Pricing & Others
+          Aminities and other Details
         </h2>
         <p className="font-roboto text-gray-600">
-          Set your price and add additional details
+          Set your Aminities and add additional details
         </p>
       </div>
 
@@ -134,39 +145,20 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       )}
 
-      {/* PRICE & DETAILS */}
+      {/* Aminities & DETAILS */}
       <div className="space-y-6">
-        {/* Price - Mandatory */}
-        <div>
-          <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Price (₹) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="Enter price"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto ${
-              validationErrors.price ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
-          {validationErrors.price && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.price}</p>
-          )}
-        </div>
-
         {/* Project Name */}
         <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Project Name (Optional)
+            {data.title} Aminities
           </label>
-          <input
+          {/* <input
             type="text"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
             placeholder="Enter project name"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto"
-          />
+          /> */}
         </div>
 
         {/* Description - Mandatory */}
@@ -179,9 +171,8 @@ const PricingOthers = ({ data, updateData }) => {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your property..."
             rows="5"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${
-              validationErrors.description ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${validationErrors.description ? 'border-red-500' : 'border-gray-300'
+              }`}
           />
           {validationErrors.description && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
@@ -207,7 +198,7 @@ const PricingOthers = ({ data, updateData }) => {
       </div>
 
       {/* CONDITIONAL SECTIONS */}
-      {data.propertySubtype === 'Flat/Apartment' && (
+      {data.propertySubtype === 'Flat/Apartment' || data.propertySubtype === 'Flat/Apartment' && (
         <div className="space-y-6 mt-8">
           <div>
             <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
@@ -219,11 +210,10 @@ const PricingOthers = ({ data, updateData }) => {
                   key={opt}
                   type="button"
                   onClick={() => handleApprovedChange(opt)}
-                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${
-                    approvedBy.includes(opt)
+                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${approvedBy.includes(opt)
                       ? 'bg-blue-900 border-blue-900 text-white'
                       : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                  }`}
+                    }`}
                 >
                   {opt}
                 </button>
@@ -255,7 +245,7 @@ const PricingOthers = ({ data, updateData }) => {
         </div>
       )}
 
-      {data.propertySubtype === 'Plot' && (
+      {data.propertySubtype === 'Flat/Apartment' && (
         <div className="space-y-6 mt-8">
           <div>
             <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">
@@ -267,11 +257,10 @@ const PricingOthers = ({ data, updateData }) => {
                   key={opt}
                   type="button"
                   onClick={() => handleApprovedChange(opt)}
-                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${
-                    approvedBy.includes(opt)
+                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${approvedBy.includes(opt)
                       ? 'bg-blue-900 border-blue-900 text-white'
                       : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                  }`}
+                    }`}
                 >
                   {opt}
                 </button>
@@ -346,13 +335,6 @@ const PricingOthers = ({ data, updateData }) => {
 
       {/* ACTION BUTTONS */}
       <div className="flex gap-4">
-        <button
-          onClick={() => handleSubmit('draft')}
-          disabled={loading}
-          className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-roboto font-medium px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Saving...' : 'Save as Draft'}
-        </button>
         <button
           onClick={() => handleSubmit('published')}
           disabled={isPublishDisabled}

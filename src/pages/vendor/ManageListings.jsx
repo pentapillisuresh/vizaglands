@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Edit,
-  Trash2,
-  Eye,
-  MapPin,
-  Bed,
-  Bath,
-  Square,
-  Plus,
-  Search,
-  Filter,
-  Tag
-} from 'lucide-react';
+import { Edit, Trash2, Eye, MapPin, Bed, Bath, Square, Plus, Search, Filter, Tag } from 'lucide-react';
+import ApiService from '../../hooks/ApiService';
 
 const ManageListings = () => {
   const navigate = useNavigate();
@@ -22,105 +11,100 @@ const ManageListings = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // ✅ Fetch listings from API
   useEffect(() => {
-    const mockListings = [
-      {
-        id: 1,
-        title: '3BHK Luxury Apartment with Sea View',
-        location: 'Rushikonda, Visakhapatnam',
-        price: '₹85 Lakhs',
-        type: 'Apartment',
-        status: 'active',
-        bedrooms: 3,
-        bathrooms: 2,
-        area: '1650 sq ft',
-        views: 234,
-        inquiries: 12,
-        postedDate: '2025-09-15',
-        image:
-          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=400',
-        description:
-          'Spacious 3BHK apartment with beautiful sea view, modern amenities'
-      },
-      {
-        id: 2,
-        title: 'Independent Villa with Garden',
-        location: 'Madhurawada, Visakhapatnam',
-        price: '₹1.2 Cr',
-        type: 'Villa',
-        status: 'active',
-        bedrooms: 4,
-        bathrooms: 3,
-        area: '2800 sq ft',
-        views: 189,
-        inquiries: 8,
-        postedDate: '2025-09-10',
-        image:
-          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400',
-        description:
-          'Beautiful independent villa with private garden and parking'
-      },
-      {
-        id: 3,
-        title: 'Commercial Plot - Main Road',
-        location: 'Dwaraka Nagar, Visakhapatnam',
-        price: '₹65 Lakhs',
-        type: 'Plot',
-        status: 'pending',
-        bedrooms: null,
-        bathrooms: null,
-        area: '2400 sq ft',
-        views: 156,
-        inquiries: 15,
-        postedDate: '2025-09-20',
-        image:
-          'https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400',
-        description: 'Prime commercial plot on main road, ideal for business'
-      }
-    ];
+    const fetchListings = async () => {
+      try {
+        const clientData = localStorage.getItem("clientDetails");
+        const clientId = JSON.parse(clientData)?.id;
+        if (!clientData) {
+          console.error('No clientId found in localStorage');
+          setLoading(false);
+          return;
+        }
+        const response = await ApiService.get(`/properties?clientId=${clientId}`,
+          { headers: { 'Content-Type': 'application/json' } },
+        );
+        if (!response) {
+          throw new Error('Failed to fetch properties');
+        }
 
-    setListings(mockListings);
-    setFilteredListings(mockListings);
+        const data = await response.properties;
+        setListings(data);
+        setFilteredListings(data);
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
   }, []);
 
+  // ✅ Filter logic (search + status)
   useEffect(() => {
     let filtered = listings;
 
     if (searchQuery) {
       filtered = filtered.filter(
         (listing) =>
-          listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          listing.location.toLowerCase().includes(searchQuery.toLowerCase())
+          listing?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          listing?.location?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     if (filterStatus !== 'all') {
-      filtered = filtered.filter((listing) => listing.status === filterStatus);
+      filtered = filtered.filter((listing) => listing?.status === filterStatus);
     }
 
     setFilteredListings(filtered);
   }, [searchQuery, filterStatus, listings]);
 
+  // ✅ Handle Delete
   const handleDelete = (listing) => {
     setSelectedListing(listing);
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    setListings(listings.filter((l) => l.id !== selectedListing.id));
-    setShowDeleteModal(false);
-    setSelectedListing(null);
+  const confirmDelete = async () => {
+    if (!selectedListing) return;
+    const clientToken = localStorage.getItem('token');
+    try {
+      const response = await ApiService.delete(`properties/${selectedlisting?.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            'Content-Type': 'application/json'
+          }
+        },
+      );
+
+      if (!response) {
+        throw new Error('Failed to delete property');
+      }
+
+      // Remove deleted property from list
+      setListings((prev) => prev.filter((l) => l.id !== selectedlisting?.id));
+      setShowDeleteModal(false);
+      setSelectedListing(null);
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      alert('Failed to delete property. Please try again.');
+    }
   };
 
+  // ✅ Handle Edit
   const handleEdit = (listingId) => {
     navigate(`/post-property?edit=${listingId}`);
   };
 
-  // ✅ Mark as Sold Only
+  // ✅ Mark as Sold
   const handleStatusChange = (id, newStatus) => {
     const updatedListings = listings.map((listing) =>
-      listing.id === id ? { ...listing, status: newStatus } : listing
+      listing?.id === id ? { ...listing, status: newStatus } : listing
     );
     setListings(updatedListings);
   };
@@ -173,144 +157,156 @@ const ManageListings = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <p className="text-gray-600">
-              Showing{' '}
-              <span className="font-semibold text-gray-900">
-                {filteredListings.length}
-              </span>{' '}
-              of {listings.length} listings
-            </p>
+        {/* ✅ Loading State */}
+        {loading ? (
+          <div className="bg-white rounded-xl shadow-md p-12 text-center text-gray-500">
+            Loading listings...
           </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <p className="text-gray-600">
+                Showing{' '}
+                <span className="font-semibold text-gray-900">
+                  {filteredListings.length}
+                </span>{' '}
+                of {listings.length} listings
+              </p>
+            </div>
 
-          <div className="divide-y divide-gray-200">
-            {filteredListings.map((listing) => (
-              <div key={listing.id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <img
-                    src={listing.image}
-                    alt={listing.title}
-                    className="w-full lg:w-64 h-48 object-cover rounded-lg"
-                  />
+            <div className="divide-y divide-gray-200">
+              {filteredListings.map((listing) => (
+                <div key={listing?.id} className="p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <img
+                      src={listing?.photos[0]}
+                      alt={listing?.title}
+                      className="w-full lg:w-64 h-48 object-cover rounded-lg"
+                    />
 
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                          {listing.title}
-                        </h3>
-                        <div className="flex items-center text-gray-600 mb-2">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          <span className="text-sm">{listing.location}</span>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {listing?.title}
+                          </h3>
+                          <div className="flex items-center text-gray-600 mb-2">
+                            <MapPin className="w-4 h-4 mr-1" />
+                            <span className="text-sm">{listing?.address.city}-{listing?.address.locality}</span>
+                          </div>
+                          <p className="text-2xl font-bold text-orange-600">
+                            {listing?.price}
+                          </p>
                         </div>
-                        <p className="text-2xl font-bold text-orange-600">
-                          {listing.price}
-                        </p>
-                      </div>
-                      <span
-                        className={`px-4 py-1 rounded-full text-sm font-medium ${
-                          listing.status === 'active'
-                            ? 'bg-green-100 text-green-700'
-                            : listing.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : listing.status === 'sold'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {listing.status.charAt(0).toUpperCase() +
-                          listing.status.slice(1)}
-                      </span>
-                    </div>
-
-                    <p className="text-gray-600 mb-4">{listing.description}</p>
-
-                    <div className="flex flex-wrap items-center gap-4 mb-4">
-                      {listing.bedrooms && (
-                        <div className="flex items-center text-gray-700">
-                          <Bed className="w-5 h-5 mr-2 text-orange-500" />
-                          <span className="text-sm font-medium">
-                            {listing.bedrooms} Beds
-                          </span>
-                        </div>
-                      )}
-                      {listing.bathrooms && (
-                        <div className="flex items-center text-gray-700">
-                          <Bath className="w-5 h-5 mr-2 text-orange-500" />
-                          <span className="text-sm font-medium">
-                            {listing.bathrooms} Baths
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex items-center text-gray-700">
-                        <Square className="w-5 h-5 mr-2 text-orange-500" />
-                        <span className="text-sm font-medium">{listing.area}</span>
-                      </div>
-                      <div className="flex items-center text-gray-700">
-                        <Eye className="w-5 h-5 mr-2 text-blue-500" />
-                        <span className="text-sm font-medium">
-                          {listing.views} views
+                        <span
+                          className={`px-4 py-1 rounded-full text-sm font-medium ${listing?.status === 'active'
+                              ? 'bg-green-100 text-green-700'
+                              : listing?.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : listing?.status === 'Verified'
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-gray-100 text-gray-700'
+                            }`}
+                        >
+                          {listing?.status
+                            ? listing?.status.charAt(0).toUpperCase() +
+                            listing?.status.slice(1)
+                            : 'Unknown'}
                         </span>
                       </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => handleEdit(listing.id)}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Edit
-                      </button>
+                      <p className="text-gray-600 mb-4">{listing?.description}</p>
 
-                      <button
-                        onClick={() => handleDelete(listing)}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </button>
+                      <div className="flex flex-wrap items-center gap-4 mb-4">
+                        {listing?.profile.bedrooms && (
+                          <div className="flex items-center text-gray-700">
+                            <Bed className="w-5 h-5 mr-2 text-orange-500" />
+                            <span className="text-sm font-medium">
+                              {listing?.profile.bedrooms} Beds
+                            </span>
+                          </div>
+                        )}
+                        {listing?.profile.bathrooms && (
+                          <div className="flex items-center text-gray-700">
+                            <Bath className="w-5 h-5 mr-2 text-orange-500" />
+                            <span className="text-sm font-medium">
+                              {listing?.profile.bathrooms} Baths
+                            </span>
+                          </div>
+                        )}
+                        {listing?.profile.carpetArea && (
+                          <div className="flex items-center text-gray-700">
+                            <Square className="w-5 h-5 mr-2 text-orange-500" />
+                            <span className="text-sm font-medium">{listing?.carpetArea}</span>
+                          </div>
+                        )}
+                        {listing?.viewCount && (
+                          <div className="flex items-center text-gray-700">
+                            <Eye className="w-5 h-5 mr-2 text-blue-500" />
+                            <span className="text-sm font-medium">
+                              {listing?.viewCount} views
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
-                      <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <Eye className="w-4 h-4" />
-                        View Details
-                      </button>
-
-                      {/* ✅ Mark as Sold Button Only */}
-                      {listing.status === 'active' && (
+                      <div className="flex flex-wrap gap-3">
                         <button
-                          onClick={() =>
-                            handleStatusChange(listing.id, 'sold')
-                          }
-                          className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                          onClick={() => handleEdit(listing?.id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                         >
-                          <Tag className="w-4 h-4" />
-                          Mark as Sold
+                          <Edit className="w-4 h-4" />
+                          Edit
                         </button>
-                      )}
+
+                        <button
+                          onClick={() => handleDelete(listing)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+
+                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                          onClick={() =>{ 
+                            navigate(`../property/${listing?.id}`, { state: { property:listing } })
+                            }}>
+                          <Eye className="w-4 h-4" />
+                          View Details
+                        </button>
+
+                        {listing?.status === 'active' && (
+                          <button
+                            onClick={() => handleStatusChange(listing?.id, 'sold')}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                          >
+                            <Tag className="w-4 h-4" />
+                            Mark as Sold
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredListings.length === 0 && (
-            <div className="p-12 text-center">
-              <div className="text-gray-400 mb-4">
-                <Search className="w-16 h-16 mx-auto" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No listings found
-              </h3>
-              <p className="text-gray-600">Try adjusting your search or filters</p>
+              ))}
             </div>
-          )}
-        </div>
+
+            {filteredListings.length === 0 && (
+              <div className="p-12 text-center">
+                <div className="text-gray-400 mb-4">
+                  <Search className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No listings found
+                </h3>
+                <p className="text-gray-600">Try adjusting your search or filters</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* ✅ Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">

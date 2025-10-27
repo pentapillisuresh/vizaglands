@@ -7,7 +7,7 @@ import { useLocation } from "react-router-dom";
 function Properties() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {categoryId,city,locality,propertyType} = location.state || {};  // 🔹 State
+  const { categoryId, categoryName } = location.state || {};  // 🔹 State
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -21,8 +21,8 @@ function Properties() {
     categoryId: categoryId||"",
     marketType: "",
     status: "",
-    city: city|| "",
-    locality: locality|| "",
+    city: "",
+    locality: "",
     clientId: "",
     priceRange: "all",
   });

@@ -1,69 +1,101 @@
-import { useState, useRef } from 'react';
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Building,
-  Save,
-  Camera,
-  Lock,
-  Bell,
-  IdCard,
-  FileText,
-  Edit,
-  X
-} from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { User, Mail, Phone, Loader, Building, Save, Camera, Lock, Bell, IdCard, FileText, Edit, X } from 'lucide-react';
+import ApiService from '../../hooks/ApiService';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [profileData, setProfileData] = useState({
-    name: 'Rajesh Kumar',
+    fullName: 'Rajesh Kumar',
     email: 'rajesh.kumar@example.com',
-    phone: '+91 98765 43210',
-    company: 'Kumar Properties',
-    location: 'Visakhapatnam, Andhra Pradesh',
+    phoneNumber: '+91 98765 43210',
+    companyName: 'Kumar Properties',
     address: 'Plot No. 45, Dwaraka Nagar',
-    dealArea: 'MVP Colony, Gajuwaka, Gopalapatnam',
     bio: 'Experienced real estate professional with over 10 years in the Visakhapatnam market. Specializing in residential and commercial properties.',
-    profileImage:
+    profilePic:
       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-    aadharNumber: '',
-    aadharProof: null,
-    secondaryIdProof: null
+    kycProofName: 'Adhar',
+    kycProofNumber: '',
+    kycUploadFile: null,
+  });
+
+  const [passwords, setPasswords] = useState({
+    current: "",
+    newPass: "",
+    confirm: ""
   });
 
   const [originalData, setOriginalData] = useState({ ...profileData });
-  const [notifications, setNotifications] = useState({
-    emailNewInquiry: true,
-    emailPropertyViews: false,
-    emailWeeklyReport: true,
-    smsNewInquiry: true,
-    smsPropertySaved: false,
-    pushNewInquiry: true,
-    pushPropertyViews: true
-  });
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+
+  useEffect(() => {
+    const clientToken = localStorage.getItem('token');
+    const clientDetails = localStorage.getItem('clientDetails');
+    const clientData = JSON.parse(clientDetails);
+
+    const fetchClientData = async () => {
+      try {
+        const res = await ApiService.get(`/clients/getClient/${clientData.id}`, {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            "Content-Type": "application/json"
+          }
+        });
+        setProfileData(res.client);
+        setOriginalData(res.client);
+        console.log(`/clients/getClient/${clientData.id}`, res.client)
+
+      } catch (error) {
+        console.error("Error fetching client:", error);
+        alert("Failed to fetch client data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClientData();
+  }, []);
+
+
+  // 🟣 Handle File Upload to Image API
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+
+    formData.append("image", file);
+    const clientToken = localStorage.getItem('token');
+
+    try {
+      const res = await ApiService.post("/images/upload", formData, {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      return res.url; // Assuming your backend returns { imageUrl: "..." }
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      alert("Image upload failed");
+      return null;
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = (field, file) => {
+  const handleFileUpload = async (field, file) => {
     if (file) {
-      setProfileData((prev) => ({
-        ...prev,
-        [field]: URL.createObjectURL(file)
-      }));
-    }
-  };
+      const uploadedUrl = await uploadImage(file);
+      if (uploadedUrl) {
+        setProfileData((prev) => ({ ...prev, [field]: uploadedUrl }));
+      }
 
-  const handleNotificationChange = (field) => {
-    setNotifications((prev) => ({ ...prev, [field]: !prev[field] }));
+    }
   };
 
   const handleEditToggle = () => {
@@ -77,14 +109,58 @@ const Profile = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    const clientDetails = localStorage.getItem('clientDetails');
+    const clientData = JSON.parse(clientDetails);
+    const clientToken = localStorage.getItem('token');
+    console.log("rrr::", profileData)
+    try {
+      const res = await ApiService.put(`/clients/${clientData.id}`,
+        profileData, {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          "Content-Type": "application/json"
+        }
+      }
+      );
+      alert("Profile updated successfully!");
+      setProfileData(res.client);
+      setOriginalData(res.client);
       setIsEditing(false);
-      setOriginalData({ ...profileData });
-      alert('Profile updated successfully!');
-    }, 1000);
+    } catch (error) {
+      console.error("Error updating client:", error);
+      alert("Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 🔐 Update Password
+  const handlePasswordChange = async () => {
+    if (passwords.newPass !== passwords.confirm) {
+      alert("New passwords do not match!");
+      return;
+    }
+    const clientToken = localStorage.getItem('token');
+    const clientDetails = localStorage.getItem('clientDetails');
+    const clientData = JSON.parse(clientDetails);
+    console.log(`/clients/${clientData.id}//update-password`)
+    try {
+      await ApiService.put(`/clients/${clientData.id}/update-password`,
+        passwords, {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          "Content-Type": "multipart/form-data"
+        }
+      }
+      );
+      alert("Password updated successfully!");
+      setPasswords({ current: "", newPass: "", confirm: "" });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      alert("Password update failed");
+    }
   };
 
   const triggerFileInput = () => {
@@ -98,16 +174,37 @@ const Profile = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      handleFileUpload('profileImage', file);
+      handleFileUpload('profilePic', file);
     }
   };
 
   const handleCameraCapture = (event) => {
     const file = event.target.files[0];
     if (file) {
-      handleFileUpload('profileImage', file);
+      handleFileUpload('profilePic', file);
     }
   };
+
+  //   {
+  //     "id": "727dbc4b-204b-4381-a454-d24f44fbfa25",
+  //     "fullName": "ravikumar",
+  //     "phoneNumber": "9494130380",
+  //     "email": "ark.kumar03@gmail.com",
+  //     "role": "owner",
+  //     "kycProofName": "ADHAR",
+  //     "kycProofNumber": "12345678990",
+  //     "kycUploadFile": null,
+  //     "profilePic": null,
+  //     "companyName": null,
+  //     "address": null,
+  //     "website": null,
+  //     "bio": null,
+  //     "postLimit": 2,
+  //     "status": "active",
+  //     "isVerified": true,
+  //     "createdAt": "2025-10-23T05:59:32.000Z",
+  //     "updatedAt": "2025-10-25T18:07:21.000Z"
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -122,11 +219,10 @@ const Profile = () => {
           {activeTab === 'profile' && (
             <button
               onClick={handleEditToggle}
-              className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${
-                isEditing
-                  ? 'bg-red-500 text-white hover:bg-red-600'
-                  : 'bg-orange-500 text-white hover:bg-orange-600'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${isEditing
+                ? 'bg-red-500 text-white hover:bg-red-600'
+                : 'bg-orange-500 text-white hover:bg-orange-600'
+                }`}
             >
               {isEditing ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
               {isEditing ? 'Cancel' : 'Edit Profile'}
@@ -140,33 +236,21 @@ const Profile = () => {
             <div className="flex">
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-                  activeTab === 'profile'
-                    ? 'text-orange-600 border-b-2 border-orange-600 bg-orange-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${activeTab === 'profile'
+                  ? 'text-orange-600 border-b-2 border-orange-600 bg-orange-50'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
               >
                 <User className="w-5 h-5 inline-block mr-2" />
                 Profile Info
               </button>
-              <button
-                onClick={() => setActiveTab('notifications')}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-                  activeTab === 'notifications'
-                    ? 'text-orange-600 border-b-2 border-orange-600 bg-orange-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                <Bell className="w-5 h-5 inline-block mr-2" />
-                Notifications
-              </button>
+
               <button
                 onClick={() => setActiveTab('security')}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-                  activeTab === 'security'
-                    ? 'text-orange-600 border-b-2 border-orange-600 bg-orange-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${activeTab === 'security'
+                  ? 'text-orange-600 border-b-2 border-orange-600 bg-orange-50'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
               >
                 <Lock className="w-5 h-5 inline-block mr-2" />
                 Security
@@ -182,20 +266,20 @@ const Profile = () => {
                 <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
                   <div className="relative">
                     <img
-                      src={profileData.profileImage}
+                      src={profileData.profilePic || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
                     />
                     {isEditing && (
                       <div className="absolute bottom-0 right-0 flex gap-1">
-                        <button 
+                        <button
                           onClick={triggerFileInput}
                           className="bg-orange-500 text-white p-2 rounded-full hover:bg-orange-600 transition-colors"
                           title="Upload from device"
                         >
                           <FileText className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={triggerCameraInput}
                           className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
                           title="Take photo"
@@ -206,10 +290,10 @@ const Profile = () => {
                     )}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {profileData.name}
+                    <h3 className="text-xl font-bold text-gray-900" style={{ textTransform: 'capitalize' }}>
+                      {profileData.fullName}
                     </h3>
-                    <p className="text-gray-600">{profileData.company}</p>
+                    <p className="text-gray-600">{profileData.companyName}</p>
                     {isEditing && (
                       <p className="text-sm text-gray-500 mt-1">
                         Click buttons to upload or take a photo
@@ -245,14 +329,13 @@ const Profile = () => {
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="text"
-                        value={profileData.name}
+                        value={profileData.fullName}
                         onChange={(e) =>
                           handleInputChange('name', e.target.value)
                         }
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                          }`}
                       />
                     </div>
                   </div>
@@ -270,9 +353,8 @@ const Profile = () => {
                           handleInputChange('email', e.target.value)
                         }
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                          }`}
                       />
                     </div>
                   </div>
@@ -285,14 +367,13 @@ const Profile = () => {
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="tel"
-                        value={profileData.phone}
+                        value={profileData.phoneNumber}
                         onChange={(e) =>
-                          handleInputChange('phone', e.target.value)
+                          handleInputChange('phoneNumber', e.target.value)
                         }
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                          }`}
                       />
                     </div>
                   </div>
@@ -305,55 +386,15 @@ const Profile = () => {
                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="text"
-                        value={profileData.company}
+                        value={profileData.companyName}
                         onChange={(e) =>
-                          handleInputChange('company', e.target.value)
+                          handleInputChange('companyName', e.target.value)
                         }
                         disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                          }`}
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Location
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <input
-                        type="text"
-                        value={profileData.location}
-                        onChange={(e) =>
-                          handleInputChange('location', e.target.value)
-                        }
-                        disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                          !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Deal With Area */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Deal With Area
-                    </label>
-                    <input
-                      type="text"
-                      value={profileData.dealArea}
-                      onChange={(e) =>
-                        handleInputChange('dealArea', e.target.value)
-                      }
-                      disabled={!isEditing}
-                      placeholder="Enter areas you deal in (e.g. Gajuwaka, MVP, Vizianagaram)"
-                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                        !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                      }`}
-                    />
                   </div>
                 </div>
 
@@ -369,34 +410,32 @@ const Profile = () => {
                       handleInputChange('address', e.target.value)
                     }
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${
-                      !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                    }`}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                      }`}
                   />
                 </div>
 
                 {/* Aadhaar & ID Verification */}
-                {isEditing && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Aadhaar Number
-                      </label>
-                      <div className="relative">
-                        <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input
-                          type="text"
-                          maxLength={12}
-                          value={profileData.aadharNumber}
-                          onChange={(e) =>
-                            handleInputChange('aadharNumber', e.target.value)
-                          }
-                          placeholder="Enter your Aadhaar number"
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                        />
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Aadhaar Number
+                    </label>
+                    <div className="relative">
+                      <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        maxLength={12}
+                        disabled={!isEditing}
+                        value={profileData.kycProofNumber}
+                        onChange={(e) =>
+                          handleInputChange('kycProofNumber', e.target.value)
+                        }
+                        placeholder="Enter your Aadhaar number"
+                        className={`w-full px-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`} />
                     </div>
-
+                  </div>
+                  {isEditing && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Upload Aadhaar Proof
@@ -406,50 +445,24 @@ const Profile = () => {
                           type="file"
                           accept="image/*,application/pdf"
                           onChange={(e) =>
-                            handleFileUpload('aadharProof', e.target.files[0])
+                            handleFileUpload('kycUploadFile', e.target.files[0])
                           }
                           className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                       </div>
-                      {profileData.aadharProof && (
+                      {profileData.kycUploadFile && (
                         <div className="mt-2">
                           <p className="text-sm text-gray-600 mb-1">Preview:</p>
                           <img
-                            src={profileData.aadharProof}
+                            src={profileData.kycUploadFile}
                             alt="Aadhaar Proof"
                             className="w-40 h-24 object-cover border rounded-lg"
                           />
                         </div>
                       )}
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Upload Secondary ID Proof (e.g., PAN, Passport, DL)
-                      </label>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="file"
-                          accept="image/*,application/pdf"
-                          onChange={(e) =>
-                            handleFileUpload('secondaryIdProof', e.target.files[0])
-                          }
-                          className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        />
-                      </div>
-                      {profileData.secondaryIdProof && (
-                        <div className="mt-2">
-                          <p className="text-sm text-gray-600 mb-1">Preview:</p>
-                          <img
-                            src={profileData.secondaryIdProof}
-                            alt="Secondary ID Proof"
-                            className="w-40 h-24 object-cover border rounded-lg"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Bio */}
                 <div className="pt-6 border-t border-gray-200">
@@ -461,104 +474,12 @@ const Profile = () => {
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     disabled={!isEditing}
                     rows="4"
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none transition-colors ${
-                      !isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                    }`}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                      }`}
                   />
                 </div>
               </div>
             )}
-
-            {/* Notifications Tab */}
-            {activeTab === 'notifications' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Email Notifications
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { key: 'emailNewInquiry', label: 'New inquiry received' },
-                      {
-                        key: 'emailPropertyViews',
-                        label: 'Daily property view summary'
-                      },
-                      {
-                        key: 'emailWeeklyReport',
-                        label: 'Weekly performance report'
-                      }
-                    ].map((item) => (
-                      <label
-                        key={item.key}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                      >
-                        <span className="text-gray-700">{item.label}</span>
-                        <input
-                          type="checkbox"
-                          checked={notifications[item.key]}
-                          onChange={() => handleNotificationChange(item.key)}
-                          className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    SMS Notifications
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { key: 'smsNewInquiry', label: 'New inquiry received' },
-                      { key: 'smsPropertySaved', label: 'Property saved by user' }
-                    ].map((item) => (
-                      <label
-                        key={item.key}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                      >
-                        <span className="text-gray-700">{item.label}</span>
-                        <input
-                          type="checkbox"
-                          checked={notifications[item.key]}
-                          onChange={() => handleNotificationChange(item.key)}
-                          className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Push Notifications
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { key: 'pushNewInquiry', label: 'New inquiry received' },
-                      {
-                        key: 'pushPropertyViews',
-                        label: 'Property view milestones'
-                      }
-                    ].map((item) => (
-                      <label
-                        key={item.key}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                      >
-                        <span className="text-gray-700">{item.label}</span>
-                        <input
-                          type="checkbox"
-                          checked={notifications[item.key]}
-                          onChange={() => handleNotificationChange(item.key)}
-                          className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Security Tab */}
             {activeTab === 'security' && (
               <div className="space-y-6">
@@ -573,6 +494,10 @@ const Profile = () => {
                       </label>
                       <input
                         type="password"
+                        value={passwords.current}
+                        onChange={(e) =>
+                          setPasswords((p) => ({ ...p, current: e.target.value }))
+                        }
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -582,6 +507,10 @@ const Profile = () => {
                       </label>
                       <input
                         type="password"
+                        value={passwords.newPass}
+                        onChange={(e) =>
+                          setPasswords((p) => ({ ...p, newPass: e.target.value }))
+                        }
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -591,6 +520,10 @@ const Profile = () => {
                       </label>
                       <input
                         type="password"
+                        value={passwords.confirm}
+                        onChange={(e) =>
+                          setPasswords((p) => ({ ...p, confirm: e.target.value }))
+                        }
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                       />
                     </div>
@@ -617,13 +550,31 @@ const Profile = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSave}
-                disabled={isSaving || (activeTab === 'profile' && !isEditing)}
+                onClick={activeTab === 'security' ? handlePasswordChange : handleSave}
+                disabled={
+                  isSaving ||
+                  (activeTab === 'profile' && !isEditing)
+                }
                 className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Save className="w-5 h-5" />
-                {isSaving ? 'Saving...' : 'Save Changes'}
+                {isSaving ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Saving...
+                  </>
+                ) : activeTab === 'security' ? (
+                  <>
+                    <Lock className="w-5 h-5" />
+                    Update Password
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-5 h-5" />
+                    Save Changes
+                  </>
+                )}
               </button>
+
             </div>
           </div>
         </div>

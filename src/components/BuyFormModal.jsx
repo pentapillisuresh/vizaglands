@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import ApiService from '../hooks/ApiService';
 
 const BuyFormModal = ({ isOpen, onClose, property }) => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,11 +13,31 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
     city: '',
     location: '',
     propertyType: '',
-    areaSize: '',
-    areaUnit: '',
-    remarks: ''
+    message: ""
   });
 
+  const getCategory = async () => {
+    try {
+      const clientToken = localStorage.getItem('token');
+
+      const response = await ApiService.get('/categories', {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response?.categories) {
+        setCategories(response.categories);
+      }
+    } catch (error) {
+
+    }
+  }
+
+  useEffect(() => {
+    getCategory();
+  }, [])
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -22,25 +45,49 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
       [name]: value
     });
 
-    // Auto-set area unit based on property type
-    if (name === 'propertyType') {
-      if (value === 'Plot') {
-        setFormData((prev) => ({ ...prev, areaUnit: 'Sq. Yards', areaSize: '' }));
-      } else if (value === 'Land') {
-        setFormData((prev) => ({ ...prev, areaUnit: 'Acres', areaSize: '' }));
-      } else if (value === 'Flat' || value === 'Villa' || value === 'Commercial') {
-        setFormData((prev) => ({ ...prev, areaUnit: 'Sq. Ft', areaSize: '' }));
-      } else {
-        setFormData((prev) => ({ ...prev, areaUnit: '', areaSize: '' }));
-      }
-    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Buy Form Data:', formData, 'Property:', property);
-    alert('Form submitted successfully!');
-    onClose();
+    setLoading(true);
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      location: formData.location,
+      city: formData.city,
+      investmentAmount: formData.investmentBudget,
+      propertyType: formData.propertyType,
+      message: formData.message,
+      leadType: "investorInquiry", // or "inquiry" / "callback" etc.
+    }
+    try {
+      const response = await ApiService.post("/leads", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (response) {
+        setFormData({
+          name: "",
+          email: "",
+          phoneNumber: "",
+          city: "",
+          propertyType: "",
+          message: "",
+          investmentBudget: "",
+          location: "",
+        });
+      } else {
+        setStatus("❌ Failed to submit. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting lead:", error);
+      setStatus("⚠️ Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -68,7 +115,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
 
-              {/* Property Type */}
+            {/* Property Type */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
                 Property Type <span className="text-orange-500">*</span>
@@ -78,49 +125,22 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.propertyType}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-white focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-full text-black border border-gray-300 rounded-lg px-4 py-2.5 bg-white focus:ring-2 focus:ring-orange-500 outline-none"
               >
                 <option value="">Select Property Type</option>
-                <option value="Plot">Plot</option>
-                <option value="Land">Land</option>
+                {categories.map((item => {
+                  return (
+                    <option value={item.name}>{item.name} - {item.catType}</option>
+                  )
+                }))}
+
+                {/* <option value="Land">Land</option>
                 <option value="Flat">Flat</option>
                 <option value="Villa">Villa</option>
-                <option value="Commercial">Commercial</option>
+                <option value="Commercial">Commercial</option> */}
               </select>
             </div>
 
-            {/* Area Size & Unit - shown for all types */}
-            {formData.propertyType && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Area Size <span className="text-orange-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="areaSize"
-                    value={formData.areaSize}
-                    onChange={handleChange}
-                    required
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
-                    placeholder={`Enter area in ${formData.areaUnit || 'units'}`}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Unit
-                  </label>
-                  <input
-                    type="text"
-                    name="areaUnit"
-                    value={formData.areaUnit}
-                    readOnly
-                    className="w-full border border-gray-300 bg-gray-100 rounded-lg px-4 py-2.5 text-gray-700"
-                  />
-                </div>
-              </div>
-            )}
             {/* Name */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
@@ -180,7 +200,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.investmentBudget}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="e.g., ₹50,00,000"
               />
             </div>
@@ -196,7 +216,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.city}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter city"
               />
             </div>
@@ -212,25 +232,22 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
                 value={formData.location}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-full border text-gray-800 border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
                 placeholder="Enter preferred location"
               />
             </div>
-
-          
-
-            {/* Remarks */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Remarks
+              Message <span className="text-orange-500">*</span>
               </label>
               <textarea
-                name="remarks"
-                value={formData.remarks}
+                type="text"
+                name="message"
+                value={formData.message}
                 onChange={handleChange}
-                rows="4"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none resize-none"
-                placeholder="Any additional information or requirements..."
+                required
+                className="w-full text-gray-800  border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
+                placeholder="Enter preferred location"
               />
             </div>
           </div>

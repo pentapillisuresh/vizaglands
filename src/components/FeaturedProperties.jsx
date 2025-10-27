@@ -8,19 +8,19 @@ import ApiService from "../hooks/ApiService";
 
 const FeaturedProperties = () => {
   const navigate = useNavigate();
-  const featuredProperties = propertiesData.filter((p) => p.featured);
+  // const featuredProperties = propertiesData.filter((p) => p.featured);
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [properties, setProperties] = useState(false);
+  const [properties, setProperties] = useState([]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
 
-  const totalPages = Math.ceil(featuredProperties.length / itemsPerPage);
+  const totalPages = Math.ceil(properties?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = featuredProperties.slice(startIndex, startIndex + itemsPerPage);
+  const currentItems = properties?.slice(startIndex, startIndex + itemsPerPage);
 
   const formatPrice = (price) => {
     if (price >= 10000000) {
@@ -42,9 +42,10 @@ const FeaturedProperties = () => {
 
     try {
       const response = await ApiService.get(`/dashboard?limit=5&page=${currentPage}`);
-      console.log("properties response:", response.status);
+
       const propertyData = response.data
       setProperties(propertyData?.mostViewedProperties?.properties);
+
     } catch (err) {
       console.error("Properties error:", err);
       
@@ -90,12 +91,14 @@ const FeaturedProperties = () => {
               data-aos="fade-up"
               data-aos-delay={100 + idx * 100}
               className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer group hover:shadow-2xl transition-shadow duration-300"
-              onClick={() => navigate(`/property/${property.id}`)}
+              onClick={() => navigate(`/property/${property.id}`, { state: { property } })}
+              
+
             >
               {/* Image */}
               <div className="h-56 overflow-hidden">
                 <img
-                  src={Array.isArray(property.mainImages) ? property.mainImages[0] : property.mainImages}
+                  src={Array.isArray(property?.photos) ? property.photos[0] : property.photos}
                   alt={property.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -112,30 +115,30 @@ const FeaturedProperties = () => {
                 <div className="flex items-center gap-2 text-gray-600 mb-4">
                   <MapPin size={16} className="text-orange-500" />
                   <span className="text-sm">
-                    {property.location}, {property.city}
+                    {property.address.city}, {property.address.locality}
                   </span>
                 </div>
-
-                <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
-                  {property.bedrooms > 0 && (
+ 
+                {property?.profile && <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
+                  {property.profile.bedrooms > 0 && (
                     <div className="flex items-center gap-1">
                       <Bed size={16} className="text-[#003366]" />
-                      <span>{property.bedrooms}</span>
+                      <span>{property.profile.bedrooms}</span>
                     </div>
                   )}
-                  {property.bathrooms > 0 && (
+                  {property.profile.bathrooms > 0 && (
                     <div className="flex items-center gap-1">
                       <Bath size={16} className="text-[#003366]" />
-                      <span>{property.bathrooms}</span>
+                      <span>{property.profile.bathrooms}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
                     <Maximize size={16} className="text-[#003366]" />
                     <span>
-                      {property.area} {property.areaUnit}
+                      {property.profile.carpetArea} {property.profile.areaUnit}
                     </span>
                   </div>
-                </div>
+                </div>}
 
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="text-2xl font-bold text-orange-600">

@@ -63,34 +63,36 @@ const LocationsSection = ({cityLocalities}) => {
           data-aos="fade-up"
           data-aos-delay="200"
         >
-          {cityLocalities.map((location) => (
-            <div key={location.id} className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">
-                {location.name}
-              </h3>
+                        {/* "cityLocalities": [
+            {
+                "city": "vizag",
+                "localities": [
+                    "allipuram"
+                ]
+            }
+        ] */}
 
+          {cityLocalities.map((location) => (
+            <div key={location.city} className="space-y-4">
+              <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">
+                {location.city}
+              </h3>
               <div className="space-y-4">
-                {location.areas.map((area, index) => (
+                {location.localities.map((area, index) => (
                   <div
                     key={index}
                     className="text-gray-700 leading-relaxed"
                     data-aos="fade-right"
                     data-aos-delay={150 * index}
                   >
-                    <span className="font-medium text-gray-800">
-                      {area.name}:
-                    </span>
+                    
                     <span className="ml-2 text-sm text-gray-600">
-                      {area.types.map((type, i) => (
-                        <React.Fragment key={i}>
+                        <React.Fragment key={area}>
                           <span className="hover:text-orange-500 cursor-pointer transition-colors duration-300">
-                            {type}
+                            {area}
                           </span>
-                          {i !== area.types.length - 1 && (
                             <span className="mx-2 text-gray-400">|</span>
-                          )}
                         </React.Fragment>
-                      ))}
                     </span>
                   </div>
                 ))}

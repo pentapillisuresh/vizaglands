@@ -21,10 +21,12 @@ const LoginForm = ({ onClose }) => {
 
       if (error) {
         setError(error.message);
-      } else if (data?.user) {
+      } else if (data?.client) {
         // ✅ successful login
         if (onClose) onClose();
-        navigate('/select-user-type'); // ✅ navigate after login
+        setTimeout(() => {
+          navigate('/vendor/dashboard');
+        }, 2000);
       } else {
         setError('Something went wrong. Please try again.');
       }

@@ -1,18 +1,18 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { X, Image as ImageIcon, Trash2 } from 'lucide-react';
+import ApiService from '../hooks/ApiService';
 
 const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phoneNumber: '',
     city: '',
     location: '',
-    sublocation: '',
     propertyType: '',
-    areaSize: '',
-    remarks: '',
-    images: []
+    message: ''
   });
 
   // Handle text inputs
@@ -22,6 +22,29 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
       [e.target.name]: e.target.value
     });
   };
+
+  const getCategory = async () => {
+    try {
+      const clientToken = localStorage.getItem('token');
+
+      const response = await ApiService.get('/categories', {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response?.categories) {
+        setCategories(response.categories);
+      }
+    } catch (error) {
+
+    }
+  }
+
+  useEffect(() => {
+    getCategory();
+  }, [])
 
   // Handle image upload
   const handleImageUpload = (e) => {
@@ -45,11 +68,46 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
   };
 
   // Submit form
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Development Form Data:', formData, 'Property:', property);
-    alert('Development inquiry submitted successfully!');
-    onClose();
+    setLoading(true);
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      location: formData.location,
+      city: formData.city,
+      propertyType: formData.propertyType,
+      message: formData.message,
+      leadType: "developmentInquiry", // or "inquiry" / "callback" etc.
+    }
+    try {
+      const response = await ApiService.post("/leads", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (response) {
+        setFormData({
+          name: "",
+          email: "",
+          phoneNumber: "",
+          city: "",
+          propertyType: "",
+          message: "",
+          location: "",
+        });
+
+       
+      } else {
+        console.log("❌ Failed to submit. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting lead:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -118,7 +176,7 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
               value={formData.phoneNumber}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               placeholder="Enter your phone number"
             />
           </div>
@@ -134,7 +192,7 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
               value={formData.city}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               placeholder="Enter city"
             />
           </div>
@@ -150,23 +208,8 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
               value={formData.location}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               placeholder="Enter location/area"
-            />
-          </div>
-
-          {/* Sublocation */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Sublocation
-            </label>
-            <input
-              type="text"
-              name="sublocation"
-              value={formData.sublocation}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-              placeholder="Enter specific sublocation or landmark"
             />
           </div>
 
@@ -180,103 +223,32 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
               value={formData.propertyType}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
             >
               <option value="">Select property type</option>
-              <option value="Plot">Plot</option>
-              <option value="Land">Land</option>
+              {categories.map((item => {
+                return(
+                  <option value={item.name}>{item.name} - {item.catType}</option>
+               ) }))}
+
+              {/* <option value="Land">Land</option> */}
             </select>
           </div>
 
-          {/* Conditional Area Input */}
-          {formData.propertyType && (
-            <div>
+          <div>
               <label className="block text-gray-700 font-medium mb-2">
-                {formData.propertyType === 'Plot'
-                  ? 'Enter Plot Size (sq. yard)'
-                  : 'Enter Land Area (acres)'}{' '}
-                <span className="text-orange-500">*</span>
+              Message <span className="text-orange-500">*</span>
               </label>
-              <input
-                type="number"
-                name="areaSize"
-                value={formData.areaSize}
+              <textarea
+                type="text"
+                name="message"
+                value={formData.message}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                placeholder={`Enter ${formData.propertyType.toLowerCase()} area in ${
-                  formData.propertyType === 'Plot' ? 'sq. yard' : 'acres'
-                }`}
+                className="w-full text-gray-800  border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none"
+                placeholder="Enter preferred location"
               />
             </div>
-          )}
-
-          {/* Image Upload Section */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Upload Property Images
-            </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-500 transition-colors">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                className="hidden"
-                id="imageUpload"
-              />
-              <label
-                htmlFor="imageUpload"
-                className="cursor-pointer text-orange-500 font-medium flex flex-col items-center"
-              >
-                <ImageIcon className="w-10 h-10 mb-2 text-orange-500" />
-                <span>Click to upload or drag and drop</span>
-                <span className="text-gray-500 text-sm mt-1">
-                  PNG, JPG up to 5MB each
-                </span>
-              </label>
-            </div>
-
-            {/* Image Preview Grid */}
-            {formData.images.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
-                {formData.images.map((img, index) => (
-                  <div
-                    key={index}
-                    className="relative group border rounded-lg overflow-hidden"
-                  >
-                    <img
-                      src={img.preview}
-                      alt={`Upload ${index + 1}`}
-                      className="w-full h-24 object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute top-1 right-1 bg-black bg-opacity-60 p-1 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Remarks */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Remarks / Development Requirements
-            </label>
-            <textarea
-              name="remarks"
-              value={formData.remarks}
-              onChange={handleChange}
-              rows="4"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
-              placeholder="Describe your development plans, requirements, or any specific information..."
-            />
-          </div>
 
           {/* Submit Button */}
           <div className="mt-6 flex gap-3">

@@ -38,7 +38,7 @@ function App() {
           <Route path='/blog' element={<Blog />} />
           <Route path="/select-user-type" element={<SelectUserType />} />
           <Route path="/post-property" element={<PostProperty />} />
-          <Route path="/properties/:categorySlug" element={<Properties />} />
+          <Route path="/properties-list/" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/vendor/dashboard" element={<Dashboard />} />
           <Route path="/vendor/manage-listings" element={<ManageListings />} />

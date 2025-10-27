@@ -45,21 +45,21 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+    
     if (!formData.role) {
       setError('Please select your role (Owner/Agent/Builder)');
       return;
     }
-
+    
     setLoading(true);
     try {
-      const { data, error } = await signUp(email, password, fullName, phoneNumber, role);
+      const { data, error } = await signUp(formData?.email, formData?.password, formData?.fullName, formData?.phoneNumber, formData?.role);
 
       if (error) {
         setError(error.message);
-      } else if (data?.user) {
+      } else if (data?.client) {
         // ✅ Navigate to login after successful signup
-        navigate('/login-register');
+        navigate('/vendor/dashboard');
       }
     } catch (error) {
       setError(error.message);

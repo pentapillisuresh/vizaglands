@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  FiMail,
-  FiPhone,
-  FiMapPin,
-  FiFacebook,
-  FiTwitter,
-  FiInstagram,
-  FiLinkedin,
-} from "react-icons/fi";
+import {FiMail,FiPhone,FiMapPin,FiFacebook,FiTwitter,FiInstagram,FiLinkedin,} from "react-icons/fi";
 import BuyFormModal from "./BuyFormModal";
 import DevelopmentFormModal from "./DevelopmentFormModal";
 

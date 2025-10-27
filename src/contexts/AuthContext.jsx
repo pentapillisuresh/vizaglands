@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = async (email, password, fullName, phoneNumber, role) => {
+    console.log("rrr::");
     console.log("email::", email);
     console.log("password::", password);
     console.log("fullName::", fullName);
@@ -62,22 +63,19 @@ export const AuthProvider = ({ children }) => {
     console.log("role::", role);
   
     try {
-      const response = await ApiService.post(
-        `/auth/register`,
-        { fullName, phoneNumber, email, password, role },
+      const response = await ApiService.post(`/auth/register`,{ fullName, phoneNumber, email, password, role },
         { headers: { 'Content-Type': 'application/json' } }
       );
   
-      const { data } = response;
-      console.log("Registration response:", data);
+      console.log("Registration response:", response);
   
-      if (data?.token && data?.user) {
-        // Save user/token to state/localStorage
-        setUser(data.user);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('clientDetails', JSON.stringify(data.user));
+      if (response?.token && response?.client) {
+        // Save client/token to state/localStorage
+        setUser(response.client);
+        localStorage.setItem('token', response?.token);
+        localStorage.setItem('clientDetails', JSON.stringify(response?.client));
   
-        return { data, error: null };
+        return { data:response, error: null };
       } else {
         return { data: null, error: { message: 'Invalid response from server' } };
       }
@@ -91,22 +89,19 @@ export const AuthProvider = ({ children }) => {
   
   const signIn = async (email, password) => {
     try {
-      const response = await ApiService.post(
-        `/auth/login/client`,
+      const response = await ApiService.post(`/auth/login/client`,
         { email, password },
         { headers: { 'Content-Type': 'application/json' } }
       );
-  
-      const { data } = response;
-      console.log('Login success:', data);
-  
-      if (data?.token && data?.user) {
+
+      if (response?.token && response?.client) {
         // Store token and user
-        setUser(data.user);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('clientDetails', JSON.stringify(data.user));
+        setUser(response?.client);
+        localStorage.setItem('token', response?.token);
+        localStorage.setItem('isLogin',true);
+        localStorage.setItem('clientDetails', JSON.stringify(response?.client));
   
-        return { data, error: null };
+        return { data:response, error: null };
       } else {
         return { data: null, error: { message: 'Invalid response from server' } };
       }

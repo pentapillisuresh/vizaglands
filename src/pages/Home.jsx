@@ -27,9 +27,11 @@ function Home() {
   const getDashBoardData = async (e) => {
     // e.preventDefault();
     setLoading(true);
-console.log()
+const payload={
+  
+}
     try {
-      const response = await ApiService.get(`/dashboard`);
+      const response = await ApiService.get(`/dashboard`,);
       console.log("dashboard response:", response.status);
       const dashboardData = response.data
       setCategories(dashboardData?.categories);
