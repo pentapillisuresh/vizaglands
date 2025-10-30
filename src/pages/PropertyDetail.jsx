@@ -38,23 +38,23 @@ function PropertyDetail() {
     e.preventDefault();
     setLoading(true);
     setStatus("");
-const payload={
-  propertyId: property.id || null, // fallback if not provided
-  name: formData.name,
-  email: formData.email,
-  phoneNumber: formData.phoneNumber,
-  message: formData.message,
-  leadType: "callback", // or "inquiry" / "callback" etc.
-}
+    const payload = {
+      propertyId: property.id || null, // fallback if not provided
+      name: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      message: formData.message,
+      leadType: "callback", // or "inquiry" / "callback" etc.
+    }
     try {
-      const response = await ApiService.post("/leads",payload, {
+      const response = await ApiService.post("/leads", payload, {
         headers: {
           "Content-Type": "application/json",
         }
       });
 
       if (response) {
-        setStatus("✅ ",request.message);
+        setStatus("✅ ", request.message);
         setFormData({
           name: "",
           email: "",
@@ -152,11 +152,11 @@ const payload={
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setTimeout(() => {
       updateViewCount()
     }, 5000);
-  },[id])
+  }, [id])
 
   useEffect(() => {
     getpropertyByCategory()
@@ -177,7 +177,26 @@ const payload={
   const category = property?.category || {};
   const client = property?.client || {};
 
-  const galleryImages = property?.photos?.length ? property?.photos : [category?.photo];
+  let galleryImages = [];
+
+  try {
+    if (Array.isArray(property?.photos)) {
+      // Already an array
+      galleryImages = property.photos;
+    } else if (typeof property?.photos === 'string' && property.photos.startsWith('[')) {
+      // JSON string
+      galleryImages = JSON.parse(property.photos);
+    } else if (property?.photos) {
+      // Single image URL (not array)
+      galleryImages = [property.photos];
+    } else {
+      // Fallback
+      galleryImages = [category?.photo];
+    }
+  } catch (err) {
+    console.error('Error parsing photos:', err);
+    galleryImages = [category?.photo];
+  }
 
   const safeShow = (val) => val !== null && val !== undefined && val !== "" && val !== 0;
 
@@ -402,8 +421,8 @@ const payload={
                   >
                     {loading ? "Submitting..." : "Request a Callback"}
                   </button>
-                </form>              
-                </div>
+                </form>
+              </div>
 
               <div className="border-t mt-6 pt-6 text-sm text-gray-500">
                 <Calendar size={16} className="inline text-orange-500 mr-1" />
@@ -427,7 +446,13 @@ const payload={
                   {/* Image */}
                   <div className="h-56 overflow-hidden">
                     <img
-                      src={Array.isArray(property?.photos) ? property?.photos[0] : property?.photos}
+                      src={
+                        Array.isArray(property?.photos)
+                          ? property.photos[0] // already an array
+                          : typeof property?.photos === "string" && property.photos.startsWith("[")
+                            ? JSON.parse(property.photos)[0] // JSON string like '["img1.jpg", "img2.jpg"]'
+                            : property?.photos // single image URL string
+                      }
                       alt={property?.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />

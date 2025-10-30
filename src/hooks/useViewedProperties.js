@@ -20,7 +20,7 @@ export const useViewedProperties = () => {
   const addViewedProperty = (propertyId) => {
     setViewedPropertyIds((prev) => {
       const updatedIds = [propertyId, ...prev.filter(id => id !== propertyId)].slice(0, 10);
-      localStorage.setItem(VIEWED_PROPERTIES_KEY, JSON.stringify(updatedIds));
+      // localStorage.setItem(VIEWED_PROPERTIES_KEY, JSON.stringify(updatedIds));
       return updatedIds;
     });
   };

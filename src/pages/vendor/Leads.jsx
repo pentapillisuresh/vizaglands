@@ -4,6 +4,8 @@ import {
   Filter, Search, ExternalLink, Star
 } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
+import LeadItem from '../../components/LeadItem';
+import LeadDetailModal from '../../components/LeadDetailModal';
 
 const Leads = () => {
   const [leads, setLeads] = useState([]);
@@ -209,12 +211,13 @@ const Leads = () => {
             <div className="divide-y divide-gray-200">
               {filteredLeads.map((lead) => (
                 <LeadItem
-                  key={lead.id}
-                  lead={lead}
-                  onViewDetails={() => handleViewDetails(lead)}
-                  getStatusBadge={getStatusBadge}
-                  getPriorityBadge={getPriorityBadge}
-                />
+                key={lead.id}
+                lead={lead}
+                onViewDetails={() => handleViewDetails(lead)}
+                getStatusBadge={getStatusBadge}
+                getPriorityBadge={getPriorityBadge}
+              />
+              
               ))}
             </div>
           ) : (

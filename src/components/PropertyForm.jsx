@@ -327,14 +327,14 @@ export default function PropertyForm({ initialData = null, onSubmit, onCancel, a
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+{/* 
           <input
             type="text"
             placeholder="Video URLs (comma-separated)"
-            value={formData.videos.join(", ")}
+            value={formData?.videos.join(", ")}
             onChange={(e) => handleChange("videos", e.target.value.split(","))}
             className="border rounded-lg px-3 py-2 text-sm"
-          />
+          /> */}
           <input
             type="text"
             placeholder="YouTube URL"

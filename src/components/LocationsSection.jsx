@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { Home, Users, Handshake } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LocationsSection = ({cityLocalities}) => {
+  const navigate = useNavigate();
   const locations = [
     {
       id: 1,
@@ -88,7 +90,15 @@ const LocationsSection = ({cityLocalities}) => {
                     
                     <span className="ml-2 text-sm text-gray-600">
                         <React.Fragment key={area}>
-                          <span className="hover:text-orange-500 cursor-pointer transition-colors duration-300">
+                          <span className="hover:text-orange-500 cursor-pointer transition-colors duration-300" onClick={()=>
+                                  {navigate("/properties-list", {
+                                    state: {
+                                      city: location.city,
+                                      locality: area,
+                                    },
+                                  })}
+                            
+                          }>
                             {area}
                           </span>
                             <span className="mx-2 text-gray-400">|</span>

@@ -214,7 +214,7 @@ const ManageListings = () => {
                 <div key={listing?.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
                     <img
-                      src={listing?.photos[0]}
+                      src={JSON.parse(listing?.photos)[0]}
                       alt={listing?.title}
                       className="w-full lg:w-64 h-48 object-cover rounded-lg"
                     />
@@ -250,7 +250,7 @@ const ManageListings = () => {
                         </span>
                       </div>
 
-                      <p className="text-gray-600 mb-4">{listing?.description}</p>
+                      {/* <p className="text-gray-600 mb-4">{listing?.description}</p> */}
 
                       <div className="flex flex-wrap items-center gap-4 mb-4">
                         {listing?.profile.bedrooms && (

@@ -8,14 +8,39 @@ function EditPhotosForm({ existingPhotos = [],setPropertyURLs }) {
   });
 
   // Load existing photos when component mounts or updates
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      photos: existingPhotos.map((url) => ({ url, isNew: false })),
-    }));
-  }, [existingPhotos]);
+// Load existing photos when component mounts or updates
+useEffect(() => {
+  let normalized = [];
 
-  // Handle new image uploads
+  if (Array.isArray(existingPhotos)) {
+    // Already an array
+    normalized = existingPhotos;
+  } else if (
+    typeof existingPhotos === "string" &&
+    existingPhotos.startsWith("[")
+  ) {
+    // JSON string like '["url1","url2"]'
+    try {
+      normalized = JSON.parse(existingPhotos);
+    } catch (err) {
+      console.error("Failed to parse existingPhotos:", err);
+      normalized = [];
+    }
+  } else if (typeof existingPhotos === "string" && existingPhotos.length > 0) {
+    // Single image string
+    normalized = [existingPhotos];
+  }
+
+  // ✅ Update formData
+  setFormData({
+    photos: normalized.map((url) => ({
+      url,
+      isNew: false,
+    })),
+  });
+}, [existingPhotos]);
+
+// Handle new image uploads
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     const newPhotos = files.map((file) => ({
