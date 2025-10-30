@@ -345,7 +345,7 @@ function Properties() {
 /* PROPERTY CARD */
 function PropertyCard({ property, formatPrice }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const media = property.photos || [];
+  const media = JSON.parse(property.photos) || [];
   const nextSlide = () => setCurrentIndex((i) => (i + 1) % media.length);
   const prevSlide = () => setCurrentIndex((i) => (i - 1 + media.length) % media.length);
 

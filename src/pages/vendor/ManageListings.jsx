@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, Trash2, Eye, MapPin, Bed, Bath, Square, Plus, Search, Filter, Tag } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
+import PropertyForm from '../../components/PropertyForm';
 
 const ManageListings = () => {
   const navigate = useNavigate();
@@ -12,35 +13,36 @@ const ManageListings = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProperty, setEditingProperty] = useState(null);
 
   // ✅ Fetch listings from API
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const clientData = localStorage.getItem("clientDetails");
-        const clientId = JSON.parse(clientData)?.id;
-        if (!clientData) {
-          console.error('No clientId found in localStorage');
-          setLoading(false);
-          return;
-        }
-        const response = await ApiService.get(`/properties?clientId=${clientId}`,
-          { headers: { 'Content-Type': 'application/json' } },
-        );
-        if (!response) {
-          throw new Error('Failed to fetch properties');
-        }
-
-        const data = await response.properties;
-        setListings(data);
-        setFilteredListings(data);
-      } catch (error) {
-        console.error('Error fetching listings:', error);
-      } finally {
+  const fetchListings = async () => {
+    try {
+      const clientData = localStorage.getItem("clientDetails");
+      const clientId = JSON.parse(clientData)?.id;
+      if (!clientData) {
+        console.error('No clientId found in localStorage');
         setLoading(false);
+        return;
       }
-    };
+      const response = await ApiService.get(`/properties?clientId=${clientId}`,
+        { headers: { 'Content-Type': 'application/json' } },
+      );
+      if (!response) {
+        throw new Error('Failed to fetch properties');
+      }
 
+      const data = await response.properties;
+      setListings(data);
+      setFilteredListings(data);
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchListings();
   }, []);
 
@@ -97,8 +99,10 @@ const ManageListings = () => {
   };
 
   // ✅ Handle Edit
-  const handleEdit = (listingId) => {
-    navigate(`/post-property?edit=${listingId}`);
+  const handleEdit = (listing) => {
+    setEditingProperty(listing)
+    // navigate(`/post-property?edit=${listing.id}`);
+    setShowEditModal(true);
   };
 
   // ✅ Mark as Sold
@@ -108,6 +112,37 @@ const ManageListings = () => {
     );
     setListings(updatedListings);
   };
+
+  const handleUpdateProperty = async (formData) => {
+    console.log("from::", formData)
+
+    try {
+      const adminToken = localStorage.getItem("token");
+
+      const response = await ApiService.put(`/properties/${formData.id}`, formData,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+          }
+        },
+      )
+
+      if (response) {
+        setShowEditModal(false);
+        navigate('./')
+      } else {
+        console.log("rrr::", response?.message)
+      }
+      fetchListings();
+      setShowEditModal(false);
+      setEditingProperty(null);
+      alert("Property updated successfully!");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -200,12 +235,12 @@ const ManageListings = () => {
                         </div>
                         <span
                           className={`px-4 py-1 rounded-full text-sm font-medium ${listing?.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : listing?.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : listing?.status === 'Verified'
-                                  ? 'bg-red-100 text-red-700'
-                                  : 'bg-gray-100 text-gray-700'
+                            ? 'bg-green-100 text-green-700'
+                            : listing?.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : listing?.status === 'Verified'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-gray-100 text-gray-700'
                             }`}
                         >
                           {listing?.status
@@ -252,7 +287,7 @@ const ManageListings = () => {
 
                       <div className="flex flex-wrap gap-3">
                         <button
-                          onClick={() => handleEdit(listing?.id)}
+                          onClick={() => handleEdit(listing)}
                           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                         >
                           <Edit className="w-4 h-4" />
@@ -268,9 +303,9 @@ const ManageListings = () => {
                         </button>
 
                         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-                          onClick={() =>{ 
-                            navigate(`../property/${listing?.id}`, { state: { property:listing } })
-                            }}>
+                          onClick={() => {
+                            navigate(`../property/${listing?.id}`, { state: { property: listing } })
+                          }}>
                           <Eye className="w-4 h-4" />
                           View Details
                         </button>
@@ -334,6 +369,51 @@ const ManageListings = () => {
           </div>
         </div>
       )}
+
+      {showEditModal && editingProperty && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
+              <h2 className="text-xl font-bold text-gray-900">Edit Property</h2>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingProperty(null);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <Plus className="w-5 h-5 text-gray-500 rotate-45" />
+              </button>
+            </div>
+            <div className="p-6">
+              <PropertyForm
+                initialData={editingProperty}
+                onSubmit={handleUpdateProperty}
+                onCancel={() => {
+                  setShowEditModal(false);
+                  setEditingProperty(null);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fade-in-down {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+        .animate-fade-in-down {
+          animation: fade-in-down 0.5s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

@@ -15,15 +15,15 @@ const CommercialAdSection = () => {
   return (
     <section className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Video */}
-<video
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="absolute inset-0 w-full h-full object-cover"
->
-  <source src="/videos/real.mp4" type="video/mp4" />
-</video>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src="/videos/real.mp4" type="video/mp4" />
+      </video>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60"></div>

@@ -48,7 +48,7 @@ const FeaturedProperties = () => {
 
     } catch (err) {
       console.error("Properties error:", err);
-      
+
     } finally {
       setLoading(false);
     }
@@ -92,13 +92,19 @@ const FeaturedProperties = () => {
               data-aos-delay={100 + idx * 100}
               className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer group hover:shadow-2xl transition-shadow duration-300"
               onClick={() => navigate(`/property/${property.id}`, { state: { property } })}
-              
+
 
             >
               {/* Image */}
               <div className="h-56 overflow-hidden">
                 <img
-                  src={Array.isArray(property?.photos) ? property.photos[0] : property.photos}
+                  src={
+                    Array.isArray(property?.photos)
+                      ? property.photos[0]
+                      : property?.photos
+                        ? JSON.parse(property.photos)[0]
+                        : '/placeholder.jpg' // optional fallback
+                  }
                   alt={property.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -118,7 +124,7 @@ const FeaturedProperties = () => {
                     {property.address.city}, {property.address.locality}
                   </span>
                 </div>
- 
+
                 {property?.profile && <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
                   {property.profile.bedrooms > 0 && (
                     <div className="flex items-center gap-1">
@@ -163,8 +169,8 @@ const FeaturedProperties = () => {
             onClick={handlePrev}
             disabled={currentPage === 1}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${currentPage === 1
-                ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
+              ? "text-gray-400 border-gray-200 cursor-not-allowed"
+              : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
               }`}
           >
             <ChevronLeft size={18} /> Previous
@@ -178,8 +184,8 @@ const FeaturedProperties = () => {
             onClick={handleNext}
             disabled={currentPage === totalPages}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${currentPage === totalPages
-                ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
+              ? "text-gray-400 border-gray-200 cursor-not-allowed"
+              : "text-[#003366] border-gray-300 hover:bg-orange-50 hover:text-orange-600"
               }`}
           >
             Next <ChevronRight size={18} />

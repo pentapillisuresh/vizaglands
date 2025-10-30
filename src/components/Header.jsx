@@ -13,7 +13,13 @@ const Header = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLogin,setIslogin] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    const rrr = localStorage.getItem('isLogin');
+    setIslogin(rrr === 'true'); // ensure it's a boolean
+  }, []); // 👈 empty dependency array — run once
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -25,14 +31,13 @@ const Header = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  },);
 
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
-    localStorage.removeItem("vendorToken");
-    navigate("/");
-  };
+    navigate("/login-register")
+    };
 
   const clientDashboards=()=>{
     const isLogin=localStorage.getItem("isLogin");
@@ -128,6 +133,8 @@ const Header = () => {
                 {isVendorMenuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
                     <div className="py-2">
+                      {isLogin && 
+                      <>
                       <button
                         onClick={() => navigate("/vendor/dashboard")}
                         className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
@@ -146,18 +153,19 @@ const Header = () => {
                       >
                         <Users className="w-4 h-4 mr-2" /> Leads
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => navigate("/vendor/analytics")}
                         className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
                         <BarChart3 className="w-4 h-4 mr-2" /> Analytics
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => navigate("/vendor/profile")}
                         className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                       >
                         <User className="w-4 h-4 mr-2" /> Profile
                       </button>
+                      </>}
                       <button
                         onClick={() => navigate("/login-register")}
                         className="w-full text-left px-4 py-2 flex items-center text-orange-600 hover:bg-orange-50"
@@ -165,12 +173,12 @@ const Header = () => {
                         <User className="w-4 h-4 mr-2" /> Login / Register
                       </button>
                       <hr className="my-1 border-gray-200" />
-                      <button
+                     {isLogin && <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 flex items-center text-red-500 hover:bg-red-50"
                       >
                         <LogOut className="w-4 h-4 mr-2" /> Logout
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 )}

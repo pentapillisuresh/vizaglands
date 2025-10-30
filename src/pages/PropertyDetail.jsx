@@ -127,8 +127,36 @@ const payload={
     } finally {
       setLoading(false);
     }
-
   }
+
+  const updateViewCount = async () => {
+    try {
+      const clientToken = localStorage.getItem("token");
+
+      const response = await ApiService.put(`/properties/updateView/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            'Content-Type': 'application/json'
+          }
+        },
+      )
+
+      if (response) {
+        navigate('./')
+      } else {
+        console.log("rrr::", response?.message)
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  useEffect(()=>{
+    setTimeout(() => {
+      updateViewCount()
+    }, 5000);
+  },[id])
 
   useEffect(() => {
     getpropertyByCategory()

@@ -59,7 +59,7 @@ function Properties() {
 
         // API call
         const res = await ApiService.get(
-          `http://localhost:3000/api/properties?${params.toString()}`
+          `/properties?${params.toString()}`
         );
 
         const data = res?.properties || [];
@@ -345,7 +345,7 @@ function Properties() {
 /* PROPERTY CARD */
 function PropertyCard({ property, formatPrice }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const media = property.photos || [];
+  const media = JSON.parse(property.photos) || [];
   const nextSlide = () => setCurrentIndex((i) => (i + 1) % media.length);
   const prevSlide = () => setCurrentIndex((i) => (i - 1 + media.length) % media.length);
 
@@ -388,7 +388,7 @@ function PropertyCard({ property, formatPrice }) {
             <MapPin size={16} className="text-orange-500 mr-1" />
             {property.address?.locality}, {property.address?.city}
           </div>
-          <p className="text-sm text-gray-600 mb-3">{property.description}</p>
+          {/* <p className="text-sm text-gray-600 mb-3">{property.description}</p> */}
           <div className="text-xl font-bold text-orange-600">
             {formatPrice(property.price)}
           </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,6 +37,10 @@ const LoginForm = ({ onClose }) => {
       setLoading(false);
     }
   };
+
+  useEffect(()=>{
+localStorage.clear();
+  },[])
 
   return (
     <div className="min-h-screen flex">
