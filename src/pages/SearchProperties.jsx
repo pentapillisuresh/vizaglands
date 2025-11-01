@@ -389,7 +389,7 @@ function PropertyCard({ property, formatPrice }) {
             {property.address?.locality}, {property.address?.city}
           </div>
           <p className="text-sm text-gray-600 mb-3">{property.description}</p>
-          {!property?.price ? (
+          {property?.price ? (
             <div className="text-xl font-bold text-orange-600">
               {formatPrice(property.price)}
             </div>

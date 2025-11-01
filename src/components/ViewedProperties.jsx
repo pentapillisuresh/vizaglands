@@ -88,7 +88,7 @@ const ViewedProperties = () => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                {!property?.price ? (
+                {property?.price ? (
                   <div className="flex items-center text-orange-600 font-bold text-lg">
                     <IndianRupee className="w-5 h-5" />
                     <span>{formatPrice(property.price)}</span>

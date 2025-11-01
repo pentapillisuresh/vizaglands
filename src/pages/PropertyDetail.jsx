@@ -280,7 +280,7 @@ function PropertyDetail() {
                   </div>
                 </div>
                 <div className="text-right">
-                  {!property?.price ? (
+                  {property?.price ? (
                     <div className="text-3xl font-bold text-orange-600">{formatPrice(property?.price)}</div>
 
                   ) : (
@@ -508,7 +508,7 @@ function PropertyDetail() {
                     </div>}
 
                     <div className="flex items-center justify-between pt-4 border-t">
-                    {!property?.price ? (
+                    {property?.price ? (
                       <div className="text-2xl font-bold text-orange-600">
                         {formatPrice(property?.price)}
                       </div>

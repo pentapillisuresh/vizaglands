@@ -388,7 +388,7 @@ function PropertyCard({ property, formatPrice }) {
             <MapPin size={16} className="text-orange-500 mr-1" />
             {property.address?.locality}, {property.address?.city}
           </div>
-          {!property?.price ? (
+          {property?.price ? (
             <div className="text-xl font-bold text-orange-600">
               {formatPrice(property.price)}
             </div>

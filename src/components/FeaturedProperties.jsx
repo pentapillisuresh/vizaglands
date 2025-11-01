@@ -148,7 +148,7 @@ const FeaturedProperties = () => {
 
                 <div className="flex items-center justify-between pt-4 border-t">
                 <div className="text-right">
-                  {!property?.price ? (
+                  {property?.price ? (
                     <div className="text-3xl font-bold text-orange-600">{formatPrice(property?.price)}</div>
 
                   ) : (
