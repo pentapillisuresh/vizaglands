@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Mail, Phone, Loader, Building, Save, Camera, Lock, Bell, IdCard, FileText, Edit, X } from 'lucide-react';
+import { User, Mail, Phone, Loader, Building, Save, Camera, Lock, Bell, IdCard, FileText, Edit, X, Eye, EyeIcon, EyeOff } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
 
 const Profile = () => {
@@ -7,6 +7,7 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const [profileData, setProfileData] = useState({
     fullName: 'Rajesh Kumar',
@@ -331,7 +332,7 @@ const Profile = () => {
                         type="text"
                         value={profileData.fullName}
                         onChange={(e) =>
-                          handleInputChange('name', e.target.value)
+                          handleInputChange('fullName', e.target.value)
                         }
                         disabled={!isEditing}
                         className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
@@ -518,14 +519,32 @@ const Profile = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Confirm New Password
                       </label>
-                      <input
-                        type="password"
-                        value={passwords.confirm}
-                        onChange={(e) =>
-                          setPasswords((p) => ({ ...p, confirm: e.target.value }))
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                      />
+
+                      <div className="relative">
+                        <input
+                          type={showConfirm ? "text" : "password"}
+                          value={passwords.confirm}
+                          onChange={(e) =>
+                            setPasswords((prev) => ({ ...prev, confirm: e.target.value }))
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none pr-10"
+                          placeholder="Re-enter your new password"
+                        />
+
+                        {/* Eye Icon Button */}
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm(!showConfirm)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                          tabIndex={-1}
+                        >
+                          {showConfirm ? (
+                            <Eye className="h-5 w-5" />
+                          ) : (
+                            <EyeOff className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -7,6 +7,7 @@ import {
 import { propertiesData } from "../data/propertiesData";
 import ApiService from "../hooks/ApiService";
 import AOS from "aos";
+import PropertyMap from "../components/PropertyMap";
 
 function PropertyDetail() {
   const { id } = useParams();
@@ -279,7 +280,17 @@ function PropertyDetail() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-orange-600">{formatPrice(property?.price)}</div>
+                  {!property?.price ? (
+                    <div className="text-3xl font-bold text-orange-600">{formatPrice(property?.price)}</div>
+
+                  ) : (
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
+                      onClick={() => alert("Contact us for price!")}
+                    >
+                      Contact Us for Price
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -327,7 +338,9 @@ function PropertyDetail() {
                   )}
                 </div>
               </Section>
-
+              <div>
+                <PropertyMap pin={address?.pincode} />
+              </div>
               {/* Amenities */}
               {Array.isArray(property?.amenities) && property?.amenities.length > 0 && (
                 <Section title="Amenities & Features">
@@ -495,9 +508,19 @@ function PropertyDetail() {
                     </div>}
 
                     <div className="flex items-center justify-between pt-4 border-t">
+                    {!property?.price ? (
                       <div className="text-2xl font-bold text-orange-600">
                         {formatPrice(property?.price)}
                       </div>
+                  ) : (
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
+                      onClick={() => alert("Contact us for price!")}
+                    >
+                      Contact Us for Price
+                    </button>
+                  )}
+                      
                     </div>
                   </div>
                 </article>
@@ -505,6 +528,8 @@ function PropertyDetail() {
             </div>
           </div>
         )}
+
+
       </div>
     </div>
   );

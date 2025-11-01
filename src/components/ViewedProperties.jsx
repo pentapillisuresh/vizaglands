@@ -88,10 +88,20 @@ const ViewedProperties = () => {
                 </div>
 
                 <div className="flex items-center justify-between">
+                {!property?.price ? (
                   <div className="flex items-center text-orange-600 font-bold text-lg">
                     <IndianRupee className="w-5 h-5" />
                     <span>{formatPrice(property.price)}</span>
                   </div>
+                  ) : (
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
+                      onClick={() => alert("Contact us for price!")}
+                    >
+                      Contact Us for Price
+                    </button>
+                  )}
+                  
                 </div>
               </div>
             </div>

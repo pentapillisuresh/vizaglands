@@ -146,14 +146,14 @@ const Dashboard = () => {
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
                     >
                       <img
-                        src={listing.photos[0] || 'https://via.placeholder.com/100'}
+                        src={JSON.parse(listing.photos)[0] || 'https://via.placeholder.com/100'}
                         alt={listing.title || 'Property'}
                         className="w-24 h-24 object-cover rounded-lg"
                       />
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{listing.title || 'Untitled Property'}</h3>
                         <p className="text-sm text-gray-600"> {listing.category.name || 'No location'}</p><span>{listing.address.city || 'No location'}</span>
-                        <p className="text-orange-600 font-bold mt-1">{listing.price || 'N/A'}</p>
+                        <p className="text-orange-600 font-bold mt-1">{listing.price || 'Contact Us'}</p>
                       </div>
                       <div className="text-right">
                         <span

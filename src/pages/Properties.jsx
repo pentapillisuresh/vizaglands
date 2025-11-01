@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {Home,MapPin,Phone,ChevronLeft,ChevronRight,PlayCircle} from "lucide-react";
+import { Home, MapPin, Phone, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 import ApiService from "../hooks/ApiService";
 import { useLocation } from "react-router-dom";
 
 function Properties() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {categoryId,city,locality,propertyType} = location.state || {};  // 🔹 State
+  const { categoryId, city, locality, propertyType } = location.state || {};  // 🔹 State
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,11 +18,11 @@ function Properties() {
 
   // 🔹 Filter form
   const [filters, setFilters] = useState({
-    categoryId: categoryId||"",
+    categoryId: categoryId || "",
     marketType: "",
     status: "",
-    city: city|| "",
-    locality: locality|| "",
+    city: city || "",
+    locality: locality || "",
     clientId: "",
     priceRange: "all",
   });
@@ -388,10 +388,18 @@ function PropertyCard({ property, formatPrice }) {
             <MapPin size={16} className="text-orange-500 mr-1" />
             {property.address?.locality}, {property.address?.city}
           </div>
-          {/* <p className="text-sm text-gray-600 mb-3">{property.description}</p> */}
-          <div className="text-xl font-bold text-orange-600">
-            {formatPrice(property.price)}
-          </div>
+          {!property?.price ? (
+            <div className="text-xl font-bold text-orange-600">
+              {formatPrice(property.price)}
+            </div>
+          ) : (
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
+              onClick={() => alert("Contact us for price!")}
+            >
+              Contact Us for Price
+            </button>
+          )}
         </div>
       </div>
     </article>

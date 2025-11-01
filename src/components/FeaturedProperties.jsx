@@ -147,9 +147,19 @@ const FeaturedProperties = () => {
                 </div>}
 
                 <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {formatPrice(property.price)}
-                  </div>
+                <div className="text-right">
+                  {!property?.price ? (
+                    <div className="text-3xl font-bold text-orange-600">{formatPrice(property?.price)}</div>
+
+                  ) : (
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
+                      onClick={() => alert("Contact us for price!")}
+                    >
+                      Contact Us for Price
+                    </button>
+                  )}
+                </div>
                   <button className="text-[#003366] hover:text-orange-600 font-semibold transition-colors">
                     View Details →
                   </button>

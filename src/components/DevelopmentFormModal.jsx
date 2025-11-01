@@ -226,10 +226,12 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
               className="w-full text-gray-800 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
             >
               <option value="">Select property type</option>
-              {categories.map((item => {
+              <option value="Land">Lands</option>
+              <option value="plot">Plots</option>
+              {/* {categories.map((item => {
                 return(
                   <option value={item.name}>{item.name} - {item.catType}</option>
-               ) }))}
+               ) }))} */}
 
               {/* <option value="Land">Land</option> */}
             </select>

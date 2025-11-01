@@ -230,7 +230,7 @@ const ManageListings = () => {
                             <span className="text-sm">{listing?.address.city}-{listing?.address.locality}</span>
                           </div>
                           <p className="text-2xl font-bold text-orange-600">
-                            {listing?.price}
+                            {listing?.price} || Contact For Price 
                           </p>
                         </div>
                         <span

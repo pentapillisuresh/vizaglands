@@ -18,9 +18,12 @@ const PropertyCard = ({ property }) => {
         <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full transition-all duration-300 hover:bg-orange-500 hover:text-white group/heart">
           <FiHeart className="w-5 h-5 transition-transform duration-300 group-hover/heart:scale-110" />
         </button>
-
         <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+        {property.price ?(
           <span className="text-gray-800 font-bold text-lg">{property.price}</span>
+        ):(
+          <span className="text-gray-500 text-sm">{property.price}</span>
+        )}
         </div>
       </div>
 

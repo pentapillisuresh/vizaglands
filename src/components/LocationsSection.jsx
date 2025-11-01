@@ -4,7 +4,7 @@ import "aos/dist/aos.css";
 import { Home, Users, Handshake } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const LocationsSection = ({cityLocalities}) => {
+const LocationsSection = ({ cityLocalities }) => {
   const navigate = useNavigate();
   const locations = [
     {
@@ -65,7 +65,7 @@ const LocationsSection = ({cityLocalities}) => {
           data-aos="fade-up"
           data-aos-delay="200"
         >
-                        {/* "cityLocalities": [
+          {/* "cityLocalities": [
             {
                 "city": "vizag",
                 "localities": [
@@ -80,32 +80,30 @@ const LocationsSection = ({cityLocalities}) => {
                 {location.city}
               </h3>
               <div className="space-y-4">
-                {location.localities.map((area, index) => (
-                  <div
-                    key={index}
-                    className="text-gray-700 leading-relaxed"
-                    data-aos="fade-right"
-                    data-aos-delay={150 * index}
-                  >
-                    
-                    <span className="ml-2 text-sm text-gray-600">
-                        <React.Fragment key={area}>
-                          <span className="hover:text-orange-500 cursor-pointer transition-colors duration-300" onClick={()=>
-                                  {navigate("/properties-list", {
-                                    state: {
-                                      city: location.city,
-                                      locality: area,
-                                    },
-                                  })}
-                            
-                          }>
-                            {area}
-                          </span>
-                            <span className="mx-2 text-gray-400">|</span>
-                        </React.Fragment>
-                    </span>
-                  </div>
-                ))}
+                <div className="flex flex-wrap gap-2 text-gray-700 leading-relaxed">
+                  {location.localities.map((area, index) => (
+                    <React.Fragment key={index}>
+                      <span
+                        className="hover:text-orange-500 cursor-pointer transition-colors duration-300 text-sm text-gray-600"
+                        data-aos="fade-right"
+                        data-aos-delay={150 * index}
+                        onClick={() =>
+                          navigate("/properties-list", {
+                            state: {
+                              city: location.city,
+                              locality: area,
+                            },
+                          })
+                        }
+                      >
+                        {area}
+                      </span>
+                      {index < location.localities.length - 1 && (
+                        <span className="text-gray-400 mx-2">|</span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
