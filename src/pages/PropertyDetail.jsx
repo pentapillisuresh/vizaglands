@@ -50,7 +50,7 @@ function PropertyDetail() {
     try {
       const response = await ApiService.post("/leads", payload, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         }
       });
 
@@ -130,6 +130,27 @@ function PropertyDetail() {
     }
   }
 
+  const addViewProperty = async () => {
+    try {
+      const clientToken = localStorage.getItem("token");
+  
+      const response = await ApiService.post(
+        `/propertyView`,              // URL
+        { propertyId: id },           // Request body
+        {                             // Config (headers)
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      console.log('Property view recorded:', response.data);
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+  
   const updateViewCount = async () => {
     try {
       const clientToken = localStorage.getItem("token");
@@ -154,6 +175,14 @@ function PropertyDetail() {
   };
 
   useEffect(() => {
+    const userDetails=localStorage.getItem("clientDetails");
+    const isLogin=localStorage.getItem("isLogin");
+    if (isLogin) {
+      addViewProperty()
+    } else {
+      
+    }
+
     setTimeout(() => {
       updateViewCount()
     }, 5000);

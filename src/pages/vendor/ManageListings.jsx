@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Edit, Trash2, Eye, MapPin, Bed, Bath, Square, Plus, Search, Filter, Tag } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
 import PropertyForm from '../../components/PropertyForm';
+import getPhotoSrc from '../../hooks/getPhotos';
 
 const ManageListings = () => {
   const navigate = useNavigate();
@@ -100,9 +101,13 @@ const ManageListings = () => {
 
   // ✅ Handle Edit
   const handleEdit = (listing) => {
-    setEditingProperty(listing)
-    // navigate(`/post-property?edit=${listing.id}`);
-    setShowEditModal(true);
+    // setEditingProperty(listing)
+    navigate(`/post-property?edit=${listing.id}`, {
+      state: {
+        listing, // or any other data you want to send
+        mode: 'edit',
+      },
+    });    // setShowEditModal(true);
   };
 
   // ✅ Mark as Sold
@@ -210,11 +215,11 @@ const ManageListings = () => {
             </div>
 
             <div className="divide-y divide-gray-200">
-              {filteredListings.map((listing) => (
+              {filteredListings?.map((listing) => (
                 <div key={listing?.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
                     <img
-                      src={JSON.parse(listing?.photos)[0]}
+                    src={ getPhotoSrc(listing.photos)}
                       alt={listing?.title}
                       className="w-full lg:w-64 h-48 object-cover rounded-lg"
                     />

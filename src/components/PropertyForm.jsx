@@ -24,7 +24,7 @@ export default function PropertyForm({ initialData = null, onSubmit, onCancel, a
       locality: "",
       subLocality: "",
       apartmentDoorNo: "",
-      nearby: "",
+      near_by: "",
       landmark: "",
       pincode: "",
     },

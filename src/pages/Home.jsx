@@ -13,11 +13,19 @@ import ViewedProperties from "../components/ViewedProperties";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
+import RecentViewProperties from "../components/RecentViewProperties";
 
 function Home() {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [cityLocalities, setCityLocalities] = useState([]);
+  const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    const clientDetails = localStorage.getItem("clientDetails");
+    const isLogin = localStorage.getItem("isLogin");
+    setIsLogin(isLogin);
+  })
 
 
   useEffect(() => {
@@ -27,9 +35,7 @@ function Home() {
   const getDashBoardData = async (e) => {
     // e.preventDefault();
     setLoading(true);
-const payload={
-  
-}
+
     try {
       const response = await ApiService.get(`/dashboard`,);
       console.log("dashboard response:", response.status);
@@ -58,11 +64,11 @@ const payload={
       <PropertyCategories categories={categories} />
       <FeaturedProperties />
       <ViewedProperties />
-
       {/* <HowItWorks /> */}
       <CommercialAdSection />
+      {isLogin && <RecentViewProperties />}
       <Testimonials />
-      <LocationsSection cityLocalities ={cityLocalities} />
+      <LocationsSection cityLocalities={cityLocalities} />
       {/* <Footer /> */}
     </div>
   );

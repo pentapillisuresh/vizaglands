@@ -1,8 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ApiService from "../hooks/ApiService";
 
 const CommercialAdSection = () => {
+  const [commercialAds, setCommercialAds] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Initialize AOS animations
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -12,17 +17,51 @@ const CommercialAdSection = () => {
     });
   }, []);
 
+  // Fetch commercial ad data once on mount
+  useEffect(() => {
+    const getCommercialData = async () => {
+      try {
+        const res = await ApiService.get(`/commercialAds/getActiveCommercialAds`, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        // Assuming your API returns something like { photo: "https://..." }
+        const data = res?.data || res; 
+        console.log("Fetched data:", data);
+
+        // Check if there's a photo property
+        if (data?.photo) {
+          setCommercialAds(data.photo);
+          console.log("rrr:::",commercialAds);
+        } else {
+          console.warn("No commercial ad photo found, using fallback video.");
+        }
+      } catch (err) {
+        console.error("Error fetching commercial data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getCommercialData();
+  }, []);
+  
+
   return (
     <section className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Video */}
       <video
+      key={commercialAds || "fallback"}
         autoPlay
         loop
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
-        <source src="/videos/real.mp4" type="video/mp4" />
+        <source
+          src={!loading && commercialAds ? commercialAds : "/videos/real.mp4"}
+          type="video/mp4"
+        />
       </video>
 
       {/* Overlay */}
@@ -57,7 +96,7 @@ const CommercialAdSection = () => {
         </button>
       </div>
 
-      {/* Bottom Gradient Overlay for smoother transition to next section */}
+      {/* Bottom Gradient Overlay */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>
     </section>
   );

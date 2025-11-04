@@ -146,7 +146,11 @@ const Dashboard = () => {
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
                     >
                       <img
-                        src={JSON.parse(listing.photos)[0] || 'https://via.placeholder.com/100'}
+                      src={
+                        Array.isArray(listing.photos)
+                          ? listing.photos[0]
+                          : listing.photos || "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg"
+                      }
                         alt={listing.title || 'Property'}
                         className="w-24 h-24 object-cover rounded-lg"
                       />

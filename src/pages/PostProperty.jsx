@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import StepIndicator from '../components/StepIndicator';
 import BasicDetails from '../components/property-steps/BasicDetails';
@@ -10,7 +10,12 @@ import PricingOthers from '../components/property-steps/PricingOthers';
 
 const PostProperty = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // ✅ Detect edit mode and get listing data
+  const listing = location.state?.listing || null;
+  const isEditMode = Boolean(listing);
   // ✅ Updated structure to match backend model
   const [propertyData, setPropertyData] = useState({
     categoryId: '',
@@ -22,25 +27,31 @@ const PostProperty = () => {
     catType: 'Residential',
     price: '',
     photos: [],
-    videos: [],
+    videos: "",
+    audio: "",
+    availableStatus:'Ready to Move',
+    ageOfProperty:'',
     youtubeUrl: '',
+    approvedBy:'',
     amenities: [],
-
     // ✅ Address nested object
     address: {
       city: '',
       locality: '',
       subLocality: '',
       apartmentDoorNo: '',
-      nearby: '',
-      landmark: '',
-      pincode: '',
+      near_by: '',
+      road_facing: '',
+      lat: '',
+      lon: '',
     },
     // ✅ Property profile nested object
     propertyProfile: {
       type: "",
       bedrooms: 0,
+      units:0,
       landArea: 0,
+      plotArea: 0,
       poojaRooms: 0,
       bathrooms: 0,
       length: 0,
@@ -77,24 +88,55 @@ const PostProperty = () => {
       securityAvailable: false
   },
   });
-
-  const navigate = useNavigate();
+  // ✅ If editing, prefill property data
+  useEffect(() => {
+    if (isEditMode && listing) {
+      setPropertyData((prev) => ({
+        ...prev,
+        ...listing,
+        address: {
+          ...prev.address,
+          ...listing.address,
+        },
+        propertyProfile: {
+          ...prev.propertyProfile,
+          ...listing.profile,
+        },
+      }));
+    }
+  }, [isEditMode, listing]);
 
   const steps = [
     { number: 1, title: 'Basic Details', subtitle: 'Step 1' },
     { number: 2, title: 'Location Details', subtitle: 'Step 2' },
     { number: 3, title: 'Property Profile', subtitle: 'Step 3' },
     { number: 4, title: 'Photos, Videos & Voice-over', subtitle: 'Step 4' },
-    { number: 5, title: 'Pricing & Amenities', subtitle: 'Step 5' },
+    { number: 5, title: 'Amenities', subtitle: 'Step 5' },
   ];
 
   // ✅ Update function to merge step data
+  // const updatePropertyData = (data) => {
+  //   setPropertyData((prev) => {
+  //     const updated = { ...prev, ...data };
+  //     return updated;
+  //   });
+  //   console.log('Updated propertyData:', { ...propertyData, ...data });
+  // };
+
+  // ✅ Merge partial updates from child components
   const updatePropertyData = (data) => {
-    setPropertyData((prev) => {
-      const updated = { ...prev, ...data };
-      return updated;
-    });
-    console.log('Updated propertyData:', { ...propertyData, ...data });
+    setPropertyData((prev) => ({
+      ...prev,
+      ...data,
+      address: {
+        ...prev.address,
+        ...(data.address || {}),
+      },
+      propertyProfile: {
+        ...prev.propertyProfile,
+        ...(data.propertyProfile || {}),
+      },
+    }));
   };
 
   const handleNext = () => {
@@ -178,18 +220,18 @@ const PostProperty = () => {
             </button>
 
             {currentStep === 1 && (
-              <BasicDetails data={propertyData} updateData={updatePropertyData} onNext={handleNext} />
+              <BasicDetails data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode} />
             )}
             {currentStep === 2 && (
-              <LocationDetails data={propertyData} updateData={updatePropertyData} onNext={handleNext} />
+              <LocationDetails data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode} />
             )}
             {currentStep === 3 && (
-              <PropertyProfile data={propertyData} updateData={updatePropertyData} onNext={handleNext} />
+              <PropertyProfile data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode} />
             )}
             {currentStep === 4 && (
-              <PhotosVideos data={propertyData} updateData={updatePropertyData} onNext={handleNext} />
+              <PhotosVideos data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode}/>
             )}
-            {currentStep === 5 && <PricingOthers data={propertyData} updateData={updatePropertyData} />}
+            {currentStep === 5 && <PricingOthers data={propertyData} updateData={updatePropertyData} isEditMode={isEditMode} />}
           </div>
         </div>
       </div>

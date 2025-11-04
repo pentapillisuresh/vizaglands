@@ -345,7 +345,27 @@ function Properties() {
 /* PROPERTY CARD */
 function PropertyCard({ property, formatPrice }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const media = JSON.parse(property.photos) || [];
+
+let media = [];
+
+try {
+  if (typeof property.photos === "string") {
+    // Try parsing only if it looks like JSON (starts with "[" or "{")
+    if (property.photos.trim().startsWith("[")) {
+      media = JSON.parse(property.photos);
+    } else {
+      // It's just a single URL string
+      media = [property.photos];
+    }
+  } else if (Array.isArray(property.photos)) {
+    media = property.photos;
+  } else {
+    media = [];
+  }
+} catch (err) {
+  console.error("Invalid photo format:", property.photos, err);
+  media = [];
+}
   const nextSlide = () => setCurrentIndex((i) => (i + 1) % media.length);
   const prevSlide = () => setCurrentIndex((i) => (i - 1 + media.length) % media.length);
 

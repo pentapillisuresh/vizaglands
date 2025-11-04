@@ -5,11 +5,12 @@ import { MapPin, Bed, Bath, Maximize, ChevronLeft, ChevronRight } from "lucide-r
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
+import getPhotoSrc from "../hooks/getPhotos";
 
 const FeaturedProperties = () => {
   const navigate = useNavigate();
   // const featuredProperties = propertiesData.filter((p) => p.featured);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState([]);
@@ -98,14 +99,8 @@ const FeaturedProperties = () => {
               {/* Image */}
               <div className="h-56 overflow-hidden">
                 <img
-                  src={
-                    Array.isArray(property?.photos)
-                      ? property.photos[0]
-                      : property?.photos
-                        ? JSON.parse(property.photos)[0]
-                        : '/placeholder.jpg' // optional fallback
-                  }
-                  alt={property.title}
+                  src={getPhotoSrc(property.photos)}
+                    alt={property.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>
