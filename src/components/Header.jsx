@@ -166,12 +166,12 @@ const Header = () => {
                         <User className="w-4 h-4 mr-2" /> Profile
                       </button>
                       </>}
-                      <button
+                    {!isLogin &&  <button
                         onClick={() => navigate("/login-register")}
                         className="w-full text-left px-4 py-2 flex items-center text-orange-600 hover:bg-orange-50"
                       >
                         <User className="w-4 h-4 mr-2" /> Login / Register
-                      </button>
+                      </button>}
                       <hr className="my-1 border-gray-200" />
                      {isLogin && <button
                         onClick={handleLogout}

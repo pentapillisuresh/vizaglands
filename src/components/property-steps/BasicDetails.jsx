@@ -7,7 +7,7 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
   // 🧩 Local states (initialized with data)
   const [listingType, setListingType] = useState(data?.marketType || 'Sale');
   const [propertyType, setPropertyType] = useState(data?.category?.catType || 'residential');
-  const [propertySubtype, setPropertySubtype] = useState(data?.category?.name || 'Land');
+  const [propertySubtype, setPropertySubtype] = useState(data?.category?.name || '');
   const [customSubtype, setCustomSubtype] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,8 +76,8 @@ useEffect(() => {
 
     updateData({
       categoryId: selectedCategory?.id || '',
-      propertyName: title,
-      title,
+      // propertyName: title,
+      title, 
       marketType: listingType,
       propertyKind: propertyType,
       propertySubtype,
@@ -125,7 +125,7 @@ useEffect(() => {
           I'm looking to
         </label>
         <div className="flex flex-wrap gap-3">
-          {['Sale', 'Rent', 'Lease'].map((type) => (
+          {['Sale', 'Rent'].map((type) => (
             <button
               key={type}
               onClick={() => setListingType(type)}
@@ -204,7 +204,7 @@ useEffect(() => {
           </label>
           <input
             type="text"
-            placeholder="Enter property title (e.g. 3BHK Villa in Gated Community)"
+            placeholder={`Enter Property Title ( ${propertySubtype} For sale )`}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ApiService from "../hooks/ApiService";
 // import Header from "../components/Header";
 // import Footer from "../components/Footer";
 
@@ -9,7 +10,8 @@ function Contact() {
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
-
+const [status,setStatus]=useState("")
+const [loading,setLoading]=useState(false)
   // ✅ Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -17,6 +19,7 @@ function Contact() {
     phone: "",
     message: "",
   });
+
 
   // ✅ Handle input changes
   const handleChange = (e) => {
@@ -27,10 +30,46 @@ function Contact() {
   };
 
   // ✅ Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thank you for reaching out! We will contact you soon.");
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    setLoading(true);
+    setStatus("");
+    const payload = {
+      // propertyId: property.id || null, // fallback if not provided
+      name: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phone,
+      message: formData.message,
+      leadType: "callback", // or "inquiry" / "callback" etc.
+    }
+    try {
+      const response = await ApiService.post("/leads", payload, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+console.log("rrr::",response)
+      if (response) {
+        alert("lead updated successfully")
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+
+        setTimeout(() => {
+          setStatus("")
+        }, 2000);
+      } else {
+        setStatus("❌ Failed to submit. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting lead:", error);
+      setStatus("⚠️ Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -99,7 +99,7 @@ const DevelopmentFormModal = ({ isOpen, onClose, property }) => {
           location: "",
         });
 
-       
+       onClose();
       } else {
         console.log("❌ Failed to submit. Please try again.");
       }

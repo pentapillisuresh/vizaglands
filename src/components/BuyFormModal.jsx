@@ -69,6 +69,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
       });
 
       if (response) {
+        alert("THANK YOU","For your cooperation we will contact you sooon")
         setFormData({
           name: "",
           email: "",
@@ -79,6 +80,7 @@ const BuyFormModal = ({ isOpen, onClose, property }) => {
           investmentBudget: "",
           location: "",
         });
+        onClose();
       } else {
         setStatus("❌ Failed to submit. Please try again.");
       }

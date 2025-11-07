@@ -40,7 +40,7 @@ const PostProperty = () => {
       locality: '',
       subLocality: '',
       apartmentDoorNo: '',
-      near_by: '',
+      near_by: [],
       road_facing: '',
       lat: '',
       lon: '',

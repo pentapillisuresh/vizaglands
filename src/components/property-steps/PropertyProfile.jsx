@@ -1,304 +1,12 @@
-// import { useState } from "react";
-
-
-// const PropertyProfile = ({ data, updateData, onNext,isEditMode }) => {
-//   const [propertySubtype] = useState(data?.propertySubtype || "");
-//   console.log("data::", data?.propertySubtype)
-//   // Plot / Land fields
-//   const [plotArea, setPlotArea] = useState(data.plotArea || 1);
-//   const [landArea, setLandArea] = useState(data.landArea || "");
-//   const [plotAreaUnit, setPlotAreaUnit] = useState(data.plotAreaUnit || "sq yards");
-//   const [length, setLength] = useState(data.length || "");
-//   const [breadth, setBreadth] = useState(data.breadth || "");
-//   const [facing, setFacing] = useState(data.facing || "");
-//   const [frontage, setFrontage] = useState(data.frontage || "");
-//   // const [plotNumber, setPlotNumber] = useState(data.plotNumber || "");
-//   const [price, setPrice] = useState(data.price || 0);
-//   // Apartment / Villa / Other fields
-//   const [bedrooms, setBedrooms] = useState(data.bedrooms || null);
-//   const [bathrooms, setBathrooms] = useState(data.bathrooms || null);
-//   const [balconies, setBalconies] = useState(data.balconies || null);
-//   const [poojaRoom, setPoojaRoom] = useState(data.poojaRoom || true);
-//   const [carpetArea, setCarpetArea] = useState(data.carpetArea || 1);
-//   const [builtArea, setBuiltArea] = useState(data.builtArea || "");
-//   const [superBuiltArea, setSuperBuiltArea] = useState(data.superBuiltArea || "");
-//   const [areaUnit, setAreaUnit] = useState(data.areaUnit || "sqft");
-//   const [parkingType, setParkingType] = useState(data.parkingType || "");
-//   const [status, setStatus] = useState(data.status || "Ready to Move");
-//   const [possession, setPossession] = useState(data.possession || "");
-//   const [ageOfProperty, setAgeOfProperty] = useState(data.ageOfProperty || "");
-//   const [flatNumber, setFlatNumber] = useState(data.flatNumber || "");
-//   const [units, setUnits] = useState(data.units || "");
-//   const [officeNumber, setOfficeNumber] = useState(data.officeNumber || "");
-//   const [shopNumber, setShopNumber] = useState(data.shopNumber || "");
-
-//   // Floor details
-//   const [totalFloors, setTotalFloors] = useState(data.totalFloors || "");
-//   const [propertyOnFloor, setPropertyOnFloor] = useState(data.propertyOnFloor || "");
-
-//   // NEW: Additional Commercial Fields
-//   const [roadWidth, setRoadWidth] = useState(data.roadWidth || null);
-//   const [cornerShop, setCornerShop] = useState(data.cornerShop || false);
-//   const [pantryAvailable, setPantryAvailable] = useState(data.pantryAvailable || false);
-//   const [washroomAvailable, setWashroomAvailable] = useState(data.washroomAvailable || false);
-//   const [liftAvailable, setLiftAvailable] = useState(data.liftAvailable || false);
-//   const [powerBackup, setPowerBackup] = useState(data.powerBackup || false);
-//   const [acAvailable, setAcAvailable] = useState(data.acAvailable || false);
-//   const [furnishedStatus, setFurnishedStatus] = useState(data.furnishedStatus || "unfurnished");
-//   const [cabins, setCabins] = useState(data.cabins || null);
-//   const [conferenceRooms, setConferenceRooms] = useState(data.conferenceRooms || null);
-//   const [workstations, setWorkstations] = useState(data.workstations || "");
-//   const [parkingSpaces, setParkingSpaces] = useState(data.parkingSpaces || null);
-//   const [securityAvailable, setSecurityAvailable] = useState(data.securityAvailable || false);
-//   const [waterSupply, setWaterSupply] = useState(data.waterSupply || "");
-
-//   // Toggle states for area types
-//   const [showBuiltArea, setShowBuiltArea] = useState(!!data.builtArea);
-//   const [showSuperBuiltArea, setShowSuperBuiltArea] = useState(!!data.superBuiltArea);
-
-//   // Toggle for optional addons
-//   const [showCommercialAddons, setShowCommercialAddons] = useState(false);
-
-//   const facingOptions = [
-//     "East",
-//     "West",
-//     "North",
-//     "South",
-//     "North-East",
-//     "North-West",
-//     "South-East",
-//     "South-West",
-//   ];
-
-//   // Property type checks
-//   const isPlotOrLand =
-//     propertySubtype === "Plot" ||
-//     propertySubtype === "Land" ||
-//     propertySubtype === "Commercial Land" ||
-//     propertySubtype === "Warehouse / Godown" ||
-//     propertySubtype === "Industrial Building";
-
-//   const isLand =
-//     propertySubtype === "Land" ||
-//     propertySubtype === "Commercial Land" ||
-//     propertySubtype === "Warehouse / Godown" ||
-//     propertySubtype === "Industrial Building";
-
-//   // Residential properties
-//   const isFlatOrVilla =
-//     propertySubtype === "Flat/Apartment" ||
-//     propertySubtype === "Independent House / Villa";
-
-//   const isFlat = propertySubtype === "Flat/Apartment";
-//   const isPlot = propertySubtype === "Plot";
-
-//   // Commercial properties that need unit number and floor details
-//   const isOfficeSpace = propertySubtype === "Office Space";
-//   const isShopShowroom = propertySubtype === "Shop / Showroom";
-
-//   // Properties that need floor details
-//   const needsFloorDetails =
-//     isFlatOrVilla ||
-//     isOfficeSpace ||
-//     isShopShowroom;
-
-//   // Properties that need unit number
-//   const needsUnitNumber =
-//     isFlat ||
-//     isOfficeSpace ||
-//     isShopShowroom;
-
-//   // Properties that can have commercial addons
-//   const canHaveCommercialAddons = isOfficeSpace || isShopShowroom;
-
-//   const handleContinue = () => {
-//     console.log("propertySubtype ::", propertySubtype)
-//     const payload = { propertySubtype };
-//     payload.price = price;
-
-//     if (isPlotOrLand) {
-//       console.log("**plot**")
-//       payload.propertyProfile = {
-//         plotArea,
-//         price,
-//         areaUnit: plotAreaUnit,
-//         length,
-//         breadth,
-//       };
-//       if (isLand) {
-//         payload.propertyProfile.frontage = frontage;
-//       } else {
-//         payload.propertyProfile.facing = facing;
-//       }
-
-//       // Add plot number for Plot type
-//       // if (isPlot) {
-//       //   payload.propertyProfile.plotNumber = plotNumber;
-//       // }
-//     } else {
-//       console.log("**flat**")
-//       console.log("bedrooms::", bedrooms)
-//       payload.ageOfProperty = ageOfProperty || 0,
-//         payload.possession = possession || 0,
-//         payload.availableStatus = status,
-//         payload.propertyProfile = {
-//           ...payload.propertyProfile,
-//           bedrooms,
-//           bathrooms,
-//           balconies,
-//           poojaRoom,
-//           carpetArea,
-//           builtArea: showBuiltArea ? builtArea : "",
-//           superBuiltArea: showSuperBuiltArea ? superBuiltArea : "",
-//           areaUnit,
-//           price,
-//           units,
-//           parkingType,
-//           parkingSpaces,
-//           status,
-//           possession,
-//           ageOfProperty: status === "Ready to Move" ? ageOfProperty : "",
-//         };
-//       console.log("payload ::", payload)
-//       // Add unit numbers based on property type
-//       if (isFlat) {
-//         payload.propertyProfile.flatNumber = flatNumber;
-//       }
-//       if (isOfficeSpace) {
-//         payload.propertyProfile.officeNumber = officeNumber;
-//       }
-//       if (isShopShowroom) {
-//         payload.propertyProfile.shopNumber = shopNumber;
-//       }
-
-//       // Add floor details for properties that need them
-//       if (needsFloorDetails) {
-//         payload.propertyProfile.totalFloors = totalFloors;
-//         payload.propertyProfile.propertyOnFloor = propertyOnFloor;
-//       }
-
-//       // Add commercial addon fields
-//       if (canHaveCommercialAddons) {
-//         payload.propertyProfile = {
-//           ...payload.propertyProfile,
-//           roadWidth,
-//           cornerShop,
-//           pantryAvailable,
-//           washroomAvailable,
-//           liftAvailable,
-//           powerBackup,
-//           acAvailable,
-//           furnishedStatus,
-//           securityAvailable,
-//           waterSupply,
-//         };
-//         // Office-specific fields
-//         if (isOfficeSpace) {
-//           console.log("**office**")
-
-//           payload.propertyProfile = {
-//             ...payload.propertyProfile,
-//             cabins,
-//             conferenceRooms,
-//             workstations,
-//             parkingSpaces,
-//           };
-//         }
-
-//         // Shop-specific fields
-//         if (isShopShowroom) {
-//           console.log("**shop**")
-
-//           payload.propertyProfile = {
-//             ...payload.propertyProfile, // keep existing fields if any
-//             parkingSpaces,              // add or override parkingSpaces
-//           };
-//           console.log("canHaveCommercialAddons::", payload.propertyProfile)
-
-//         }
-//       }
-//     }
-//     updateData(payload);
-//     onNext();
-//   };
-
-//   const allPlotFieldsFilled =
-//     plotArea && plotAreaUnit && length && breadth && (isLand ? frontage : facing);
-
-//   // At least one area type is mandatory
-//   const hasAtLeastOneArea = carpetArea || builtArea || superBuiltArea;
-
-//   // Base validation for residential properties
-//   const baseResidentialValidation =
-//     bedrooms &&
-//     bathrooms &&
-//     balconies !== "" &&
-//     poojaRoom !== "" &&
-//     hasAtLeastOneArea &&
-//     areaUnit &&
-//     parkingType &&
-//     status &&
-//     (status === "Ready to Move" && ageOfProperty ? true :
-//       status === "Under Construction" && possession ? true : false);
-
-//   // Additional validation for properties with floor details
-//   const floorDetailsValidation = !needsFloorDetails || (totalFloors && propertyOnFloor);
-
-//   // Additional validation for unit numbers
-//   const unitNumberValidation =
-//     !needsUnitNumber ||
-//     (isFlat && flatNumber) ||
-//     (isOfficeSpace && officeNumber) ||
-//     (isShopShowroom && shopNumber);
-
-//   const allApartmentFieldsFilled =
-//     baseResidentialValidation &&
-//     floorDetailsValidation &&
-//     unitNumberValidation || canHaveCommercialAddons;
-
-//   const isFormComplete = isPlotOrLand ? allPlotFieldsFilled : allApartmentFieldsFilled;
-//   // Get appropriate label for unit number
-//   const getUnitNumberLabel = () => {
-//     if (isFlat) return "Total Units";
-//     if (isOfficeSpace) return "Office Number";
-//     if (isShopShowroom) return "Shop Number";
-//     return "Unit Number";
-//   };
-
-//   // Get appropriate placeholder for unit number
-//   const getUnitNumberPlaceholder = () => {
-//     if (isFlat) return "Enter Units";
-//     if (isOfficeSpace) return "Enter office number";
-//     if (isShopShowroom) return "Enter shop number";
-//     return "Enter unit number";
-//   };
-
-//   // Get appropriate value for unit number
-//   const getUnitNumberValue = () => {
-//     if (isFlat) return units;
-//     if (isOfficeSpace) return officeNumber;
-//     if (isShopShowroom) return shopNumber;
-//     return "";
-//   };
-
-  // Handle unit number change
-  // const handleUnitNumberChange = (value) => {
-  //   if (isFlat) setUnits(value);
-  //   if (isOfficeSpace) setOfficeNumber(value);
-  //   if (isShopShowroom) setShopNumber(value);
-  // };
-
-
 import { useState, useEffect } from "react";
 
 const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   // Property subtype
   const [propertySubtype, setPropertySubtype] = useState(data.propertySubtype || "");
-  console.log("data::", data);
 
   // --- Plot / Land fields ---
-  const [plotArea, setPlotArea] = useState(1);
-  const [landArea, setLandArea] = useState(1);
+  const [plotArea, setPlotArea] = useState(0);
+  const [landArea, setLandArea] = useState(0);
   const [plotAreaUnit, setPlotAreaUnit] = useState("sq yards");
   const [length, setLength] = useState("");
   const [breadth, setBreadth] = useState("");
@@ -312,15 +20,15 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const [balconies, setBalconies] = useState(null);
   const [poojaRoom, setPoojaRoom] = useState(true);
   const [carpetArea, setCarpetArea] = useState(1);
-  const [builtArea, setBuiltArea] = useState("");
-  const [superBuiltArea, setSuperBuiltArea] = useState("");
+  const [builtArea, setBuiltArea] = useState(0);
+  const [superBuiltArea, setSuperBuiltArea] = useState(0);
   const [areaUnit, setAreaUnit] = useState("sqft");
   const [parkingType, setParkingType] = useState("");
   const [status, setStatus] = useState("Ready to Move");
   const [possession, setPossession] = useState("");
   const [ageOfProperty, setAgeOfProperty] = useState("");
   const [flatNumber, setFlatNumber] = useState("");
-  const [units, setUnits] = useState("");
+  const [units, setUnits] = useState(0);
   const [officeNumber, setOfficeNumber] = useState("");
   const [shopNumber, setShopNumber] = useState("");
 
@@ -329,7 +37,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const [propertyOnFloor, setPropertyOnFloor] = useState("");
 
   // --- Commercial fields ---
-  const [roadWidth, setRoadWidth] = useState(null);
+  const [roadWidth, setRoadWidth] = useState(0);
   const [cornerShop, setCornerShop] = useState(false);
   const [pantryAvailable, setPantryAvailable] = useState(false);
   const [washroomAvailable, setWashroomAvailable] = useState(false);
@@ -350,7 +58,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const [showCommercialAddons, setShowCommercialAddons] = useState(false);
 
   // --- Facing options ---
-  const facingOptions = ["East","West","North","South","North-East","North-West","South-East","South-West"];
+  const facingOptions = ["East", "West", "North", "South", "North-East", "North-West", "South-East", "South-West"];
 
   // --- Property type flags ---
   const isPlotOrLand = ["Plot", "Land", "Commercial Land", "Warehouse / Godown", "Industrial Building"].includes(propertySubtype);
@@ -368,52 +76,52 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   useEffect(() => {
     if (!data) return;
 
-    setPlotArea(data?.profile?.plotArea || 1);
-    setLandArea(data?.profile?.landArea || 1);
-    setPlotAreaUnit(data?.profile?.plotAreaUnit || "sq yards");
-    setLength(data?.profile?.length || "");
-    setBreadth(data?.profile?.breadth || "");
-    setFacing(data?.profile?.facing || "");
-    setFrontage(data?.profile?.frontage || "");
+    setPlotArea(data?.propertyProfile?.plotArea || 1);
+    setLandArea(data?.propertyProfile?.landArea || 1);
+    setPlotAreaUnit(data?.propertyProfile?.plotAreaUnit || (isLand ? "acres" : "sqft"));
+    setLength(data?.propertyProfile?.length || "");
+    setBreadth(data?.propertyProfile?.breadth || "");
+    setFacing(data?.propertyProfile?.facing || "");
+    setFrontage(data?.propertyProfile?.frontage || "");
     setPrice(data?.price || 0);
 
-    setBedrooms(data?.profile?.bedrooms || null);
-    setBathrooms(data?.profile?.bathrooms || null);
-    setBalconies(data?.profile?.balconies || null);
-    setPoojaRoom(data?.profile?.poojaRoom ?? true);
-    setCarpetArea(data?.profile?.carpetArea || 1);
-    setBuiltArea(data?.profile?.builtArea || "");
-    setSuperBuiltArea(data?.profile?.superBuiltArea || "");
-    setAreaUnit(data?.profile?.areaUnit || "sqft");
-    setParkingType(data?.profile?.parkingType || "");
+    setBedrooms(data?.propertyProfile?.bedrooms || null);
+    setBathrooms(data?.propertyProfile?.bathrooms || null);
+    setBalconies(data?.propertyProfile?.balconies || null);
+    setPoojaRoom(data?.propertyProfile?.poojaRoom ?? true);
+    setCarpetArea(data?.propertyProfile?.carpetArea || 1);
+    setBuiltArea(data?.propertyProfile?.buildArea || 0);
+    setSuperBuiltArea(data?.propertyProfile?.superBuildArea || 0);
+    setAreaUnit(data?.propertyProfile?.areaUnit || (isLand ? "acres" : "sqft"));
+    setParkingType(data?.propertyProfile?.parkingType || "");
     setStatus(data?.availableStatus || "Ready to Move");
     setPossession(data?.possession || "");
     setAgeOfProperty(data?.ageOfProperty || "");
-    setFlatNumber(data?.profile?.flatNumber || "");
-    setUnits(data?.profile?.units || "");
-    setOfficeNumber(data?.profile?.officeNumber || "");
-    setShopNumber(data?.profile?.shopNumber || "");
+    setFlatNumber(data?.propertyProfile?.flatNumber || "");
+    setUnits(data?.propertyProfile?.units || 0);
+    setOfficeNumber(data?.propertyProfile?.officeNumber || "");
+    setShopNumber(data?.propertyProfile?.shopNumber || "");
 
-    setTotalFloors(data?.profile?.totalFloors || "");
-    setPropertyOnFloor(data?.profile?.propertyOnFloor || "");
+    setTotalFloors(data?.propertyProfile?.totalFloors || "");
+    setPropertyOnFloor(data?.propertyProfile?.propertyOnFloor || "");
 
-    setRoadWidth(data?.profile?.roadWidth || null);
-    setCornerShop(data?.profile?.cornerShop || false);
-    setPantryAvailable(data?.profile?.pantryAvailable || false);
-    setWashroomAvailable(data?.profile?.washroomAvailable || false);
-    setLiftAvailable(data?.profile?.liftAvailable || false);
-    setPowerBackup(data?.profile?.powerBackup || false);
-    setAcAvailable(data?.profile?.acAvailable || false);
-    setFurnishedStatus(data?.profile?.furnishedStatus || "unfurnished");
-    setCabins(data?.profile?.cabins || null);
-    setConferenceRooms(data?.profile?.conferenceRooms || null);
-    setWorkstations(data?.profile?.workstations || "");
-    setParkingSpaces(data?.profile?.parkingSpaces || null);
-    setSecurityAvailable(data?.profile?.securityAvailable || false);
-    setWaterSupply(data?.profile?.waterSupply || "");
+    setRoadWidth(data?.propertyProfile?.roadWidth || 0);
+    setCornerShop(data?.propertyProfile?.cornerShop || false);
+    setPantryAvailable(data?.propertyProfile?.pantryAvailable || false);
+    setWashroomAvailable(data?.propertyProfile?.washroomAvailable || false);
+    setLiftAvailable(data?.propertyProfile?.liftAvailable || false);
+    setPowerBackup(data?.propertyProfile?.powerBackup || false);
+    setAcAvailable(data?.propertyProfile?.acAvailable || false);
+    setFurnishedStatus(data?.propertyProfile?.furnishedStatus || "unfurnished");
+    setCabins(data?.propertyProfile?.cabins || null);
+    setConferenceRooms(data?.propertyProfile?.conferenceRooms || null);
+    setWorkstations(data?.propertyProfile?.workstations || "");
+    setParkingSpaces(data?.propertyProfile?.parkingSpaces || null);
+    setSecurityAvailable(data?.propertyProfile?.securityAvailable || false);
+    setWaterSupply(data?.propertyProfile?.waterSupply || "");
 
-    setShowBuiltArea(!!data?.profile?.builtArea);
-    setShowSuperBuiltArea(!!data?.profile?.superBuiltArea);
+    setShowBuiltArea(!!data?.propertyProfile?.builtArea);
+    setShowSuperBuiltArea(!!data?.propertyProfile?.superBuiltArea);
     setShowCommercialAddons(canHaveCommercialAddons);
   }, [data, propertySubtype]);
 
@@ -424,11 +132,12 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     if (isPlotOrLand) {
       payload.propertyProfile = {
         plotArea,
+        landArea,
         areaUnit: plotAreaUnit,
         length,
         breadth,
         price,
-        ...(isLand ? { frontage } : { facing }),
+        ...(isLand ? { frontage: frontage ?? "" } : { facing }),
       };
     } else {
       payload.propertyProfile = {
@@ -437,8 +146,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         balconies,
         poojaRoom,
         carpetArea,
-        builtArea: showBuiltArea ? builtArea : "",
-        superBuiltArea: showSuperBuiltArea ? superBuiltArea : "",
+        buildArea: builtArea,
+        superBuildArea: superBuiltArea,
         areaUnit,
         price,
         units,
@@ -446,7 +155,6 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         parkingSpaces,
         status,
         possession,
-        ageOfProperty: status === "Ready to Move" ? ageOfProperty : "",
         ...(needsFloorDetails ? { totalFloors, propertyOnFloor } : {}),
         ...(isFlat ? { flatNumber } : {}),
         ...(isOfficeSpace ? { officeNumber, cabins, conferenceRooms, workstations } : {}),
@@ -465,8 +173,10 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         } : {}),
       };
     }
+    payload.ageOfProperty = status === "Ready to Move" ? ageOfProperty : "",
 
-    updateData(payload);
+
+      updateData(payload);
     onNext();
   };
 
@@ -585,58 +295,61 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               ? `${Math.round(price / plotArea)} per ${plotAreaUnit}`
               : `${Math.round(price / landArea)} per ${plotAreaUnit}`}
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Length (ft) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                value={length}
-                onChange={(e) => setLength(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Breadth (ft) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                value={breadth}
-                onChange={(e) => setBreadth(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-          </div>
 
           {!isLand ? (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Facing <span className="text-red-500">*</span>
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {facingOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setFacing(option)}
-                    className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${facing === option
-                      ? "bg-orange-500 border-orange-500 text-white"
-                      : "bg-white border-gray-300 text-gray-700 hover:border-orange-300"
-                      }`}
-                  >
-                    {option}
-                  </button>
-                ))}
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Length (ft) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={length}
+                    onChange={(e) => setLength(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Width (ft) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={breadth}
+                    onChange={(e) => setBreadth(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Facing <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {facingOptions.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => setFacing(option)}
+                      className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${facing === option
+                        ? "bg-orange-500 border-orange-500 text-white"
+                        : "bg-white border-gray-300 text-gray-700 hover:border-orange-300"
+                        }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           ) : (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Roadfacing (in ft) <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
+                type="text"
                 value={frontage}
                 onChange={(e) => setFrontage(e.target.value)}
                 placeholder="e.g., 100"
@@ -647,22 +360,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         </div>
       ) : (
         <div className="space-y-6">
-          {needsUnitNumber && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {getUnitNumberLabel()}
-              </label>
-              <input
-                type="text"
-                value={getUnitNumberValue()}
-                onChange={(e) => handleUnitNumberChange(e.target.value)}
-                placeholder={getUnitNumberPlaceholder()}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-          )}
-
-          {(isFlatOrVilla || propertySubtype === "Farmhouse") && (
+          {(isFlatOrVilla) && (
             <div>
               <label className="block font-medium text-gray-700 mb-2">
                 Bedrooms <span className="text-red-500">*</span>
@@ -684,7 +382,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
             </div>
           )}
 
-          {(isFlatOrVilla || propertySubtype === "Farmhouse") && (
+          {(isFlatOrVilla) && (
             <div>
               <label className="block font-medium text-gray-700 mb-2">
                 Bathrooms <span className="text-red-500">*</span>
@@ -706,7 +404,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
             </div>
           )}
 
-          {(isFlatOrVilla || propertySubtype === "Farmhouse") && (
+          {(isFlatOrVilla) && (
             <div>
               <label className="block font-medium text-gray-700 mb-2">
                 Balconies <span className="text-red-500">*</span>
@@ -728,7 +426,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
             </div>
           )}
 
-          {(isFlatOrVilla || propertySubtype === "Farmhouse") && (
+          {(isFlatOrVilla) && (
             <div>
               <label className="block font-medium text-gray-700 mb-2">
                 Pooja Room <span className="text-red-500">*</span>
@@ -873,7 +571,20 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               )}
             </div>
           </div>
-
+          {needsUnitNumber && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {getUnitNumberLabel()}
+              </label>
+              <input
+                type="text"
+                value={getUnitNumberValue()}
+                onChange={(e) => handleUnitNumberChange(e.target.value)}
+                placeholder={getUnitNumberPlaceholder()}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          )}
           {needsFloorDetails && (
             <div className="space-y-4 pt-4 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">Floor Details</h3>
@@ -919,7 +630,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
             />
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Parking Spaces
             </label>
@@ -930,7 +641,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               placeholder="Number of parking slots"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
             />
-          </div>
+          </div> */}
           <div>
             <label className="block font-medium text-gray-700 mb-2">
               Availability Status <span className="text-red-500">*</span>

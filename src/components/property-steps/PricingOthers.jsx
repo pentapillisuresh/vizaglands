@@ -198,7 +198,7 @@ console.log("rrr::",data)
       </div>
 
       {/* Conditional: Approved By & Amenities */}
-      {(data.propertySubtype === 'Flat/Apartment' || data.propertySubtype === 'Plot') && (
+      {(data.propertySubtype === 'Flat/Apartment' || data.propertySubtype === 'Plot'|| data.propertySubtype==='Independent House / Villa') && (
         <div className="space-y-6 mt-8">
           {/* Approved By */}
           <div>

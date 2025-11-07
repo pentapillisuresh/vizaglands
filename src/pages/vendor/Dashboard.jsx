@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Home, TrendingUp, Eye, Phone, Heart } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
+import getPhotoSrc from '../../hooks/getPhotos';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       const clientToken = localStorage.getItem("token");
-  
+
       try {
         const response = await ApiService.get('/dashboard/client', {
           headers: {
@@ -30,13 +31,13 @@ const Dashboard = () => {
             'Content-Type': 'application/json'
           }
         });
-  
+
         console.log("Dashboard API Response:", response);
-  
+
         // ✅ Access nested response.data.data safely
         if (response?.data) {
           const data = response.data;
-  
+
           setStats({
             totalListings: data.addedPropertiesCount || 0,
             activeListings: data.verifiedPropertiesCount || 0,
@@ -44,23 +45,23 @@ const Dashboard = () => {
             totalInquiries: data.Inquiries || 0,
             monthlyViews: data.totalThisMonthViews || 0
           });
-  
+
           setRecentListings(data.properties || []);
           setRecentLeads(data.leads || []);
         } else {
           console.warn("Unexpected response format:", response);
         }
-  
+
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchDashboardData();
   }, []);
-  
+
   const StatCard = ({ icon: Icon, title, value, change, color }) => (
     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-center justify-between">
@@ -104,7 +105,17 @@ const Dashboard = () => {
               <p className="text-orange-100 mt-1">Reach more buyers by listing your properties with us</p>
             </div>
             <button
-              onClick={() => navigate('/post-property')}
+              onClick={() => {
+                const clientDetails = JSON.parse(localStorage.getItem("clientDetails")); // ✅ use getItem + parse JSON
+                const postLimit = clientDetails?.postLimit || 0;
+                const propertyCount = stats.totalListings || 0;
+
+                if (propertyCount < postLimit) { // ✅ swapped condition
+                  navigate("/post-property");
+                } else {
+                  alert("Sorry, your post limit is over");
+                }
+              }}
               className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Post New Property
@@ -146,11 +157,7 @@ const Dashboard = () => {
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
                     >
                       <img
-                      src={
-                        Array.isArray(listing.photos)
-                          ? listing.photos[0]
-                          : listing.photos || "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg"
-                      }
+                        src={getPhotoSrc(listing.photos)}
                         alt={listing.title || 'Property'}
                         className="w-24 h-24 object-cover rounded-lg"
                       />
@@ -162,8 +169,8 @@ const Dashboard = () => {
                       <div className="text-right">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${listing.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
                             }`}
                         >
                           {listing.status || 'pending'}
@@ -202,10 +209,10 @@ const Dashboard = () => {
                     >
                       <div
                         className={`p-2 rounded-full ${lead.type === 'inquiry'
-                            ? 'bg-orange-100'
-                            : lead.type === 'view'
-                              ? 'bg-blue-100'
-                              : 'bg-red-100'
+                          ? 'bg-orange-100'
+                          : lead.type === 'view'
+                            ? 'bg-blue-100'
+                            : 'bg-red-100'
                           }`}
                       >
                         {lead.type === 'inquiry' ? (

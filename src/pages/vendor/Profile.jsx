@@ -10,17 +10,17 @@ const Profile = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [profileData, setProfileData] = useState({
-    fullName: 'Rajesh Kumar',
-    email: 'rajesh.kumar@example.com',
-    phoneNumber: '+91 98765 43210',
-    companyName: 'Kumar Properties',
-    address: 'Plot No. 45, Dwaraka Nagar',
-    bio: 'Experienced real estate professional with over 10 years in the Visakhapatnam market. Specializing in residential and commercial properties.',
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    companyName: '',
+    address: '',
+    bio: '',
     profilePic:
-      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-    kycProofName: 'Adhar',
+      '',
+    kycProofName: 'ADHAR',
     kycProofNumber: '',
-    kycUploadFile: null,
+    kycUploadFile: '',
   });
 
   const [passwords, setPasswords] = useState({
@@ -93,9 +93,12 @@ const Profile = () => {
     if (file) {
       const uploadedUrl = await uploadImage(file);
       if (uploadedUrl) {
-        setProfileData((prev) => ({ ...prev, [field]: uploadedUrl }));
+        // ✅ Replace the old URL only if a new file is uploaded successfully
+        setProfileData((prev) => ({
+          ...prev,
+          [field]: uploadedUrl || prev[field],
+        }));
       }
-
     }
   };
 
@@ -330,6 +333,7 @@ const Profile = () => {
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="text"
+                        placeholder='FullName'
                         value={profileData.fullName}
                         onChange={(e) =>
                           handleInputChange('fullName', e.target.value)
@@ -349,6 +353,7 @@ const Profile = () => {
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="email"
+                        placeholder='Email'
                         value={profileData.email}
                         onChange={(e) =>
                           handleInputChange('email', e.target.value)
@@ -368,6 +373,7 @@ const Profile = () => {
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="tel"
+                        placeholder='Phone Number'
                         value={profileData.phoneNumber}
                         onChange={(e) =>
                           handleInputChange('phoneNumber', e.target.value)
@@ -387,6 +393,7 @@ const Profile = () => {
                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="text"
+                        placeholder='Company Name'
                         value={profileData.companyName}
                         onChange={(e) =>
                           handleInputChange('companyName', e.target.value)
@@ -406,6 +413,7 @@ const Profile = () => {
                   </label>
                   <input
                     type="text"
+                    placeholder='Address'
                     value={profileData.address}
                     onChange={(e) =>
                       handleInputChange('address', e.target.value)
@@ -433,36 +441,54 @@ const Profile = () => {
                           handleInputChange('kycProofNumber', e.target.value)
                         }
                         placeholder="Enter your Aadhaar number"
-                        className={`w-full px-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`} />
+                        className={`w-full px-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                          }`}
+                      />
                     </div>
                   </div>
-                  {isEditing && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Upload Aadhaar Proof
-                      </label>
-                      <div className="flex items-center gap-3">
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {profileData.kycUploadFile ? "Replace Aadhaar Proof" : "Upload Aadhaar Proof"}
+                    </label>
+
+                    <div className="flex items-center gap-3">
+                      {isEditing && (
                         <input
                           type="file"
                           accept="image/*,application/pdf"
-                          onChange={(e) =>
-                            handleFileUpload('kycUploadFile', e.target.files[0])
-                          }
+                          onChange={(e) => handleFileUpload('kycUploadFile', e.target.files[0])}
                           className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
-                      </div>
-                      {profileData.kycUploadFile && (
-                        <div className="mt-2">
-                          <p className="text-sm text-gray-600 mb-1">Preview:</p>
+                      )}
+                    </div>
+
+                    {/* ✅ Show preview if Aadhaar already exists */}
+                    {profileData.kycUploadFile && (
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-600 mb-1">Current Aadhaar Proof:</p>
+
+                        {/* 🖼️ If it's an image */}
+                        {profileData.kycUploadFile ? (
                           <img
                             src={profileData.kycUploadFile}
                             alt="Aadhaar Proof"
                             className="w-40 h-24 object-cover border rounded-lg"
                           />
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        ) : (
+                          // 📄 If it's a PDF or other file
+                          <a
+                            href={profileData.kycUploadFile}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-orange-600 underline text-sm"
+                          >
+                            View Uploaded Document
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Bio */}
@@ -472,6 +498,7 @@ const Profile = () => {
                   </label>
                   <textarea
                     value={profileData.bio}
+                    placeholder='Tell about your self'
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     disabled={!isEditing}
                     rows="4"

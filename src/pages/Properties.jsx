@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, MapPin, Phone, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
+import { Home, MapPin, Bath, Bed, Maximize, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 import ApiService from "../hooks/ApiService";
 import { useLocation } from "react-router-dom";
 
@@ -345,32 +345,34 @@ function Properties() {
 /* PROPERTY CARD */
 function PropertyCard({ property, formatPrice }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+  let media = [];
 
-let media = [];
-
-try {
-  if (typeof property.photos === "string") {
-    // Try parsing only if it looks like JSON (starts with "[" or "{")
-    if (property.photos.trim().startsWith("[")) {
-      media = JSON.parse(property.photos);
+  try {
+    if (typeof property.photos === "string") {
+      // Try parsing only if it looks like JSON (starts with "[" or "{")
+      if (property.photos.trim().startsWith("[")) {
+        media = JSON.parse(property.photos);
+      } else {
+        // It's just a single URL string
+        media = [property.photos];
+      }
+    } else if (Array.isArray(property.photos)) {
+      media = property.photos;
     } else {
-      // It's just a single URL string
-      media = [property.photos];
+      media = [];
     }
-  } else if (Array.isArray(property.photos)) {
-    media = property.photos;
-  } else {
+  } catch (err) {
+    console.error("Invalid photo format:", property.photos, err);
     media = [];
   }
-} catch (err) {
-  console.error("Invalid photo format:", property.photos, err);
-  media = [];
-}
   const nextSlide = () => setCurrentIndex((i) => (i + 1) % media.length);
   const prevSlide = () => setCurrentIndex((i) => (i - 1 + media.length) % media.length);
 
   return (
-    <article className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border">
+    <article className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border"
+    onClick={() => navigate(`/property/${property.id}`, { state: { property } })}>
+
       <div className="flex flex-col md:flex-row">
         {/* Media */}
         <div className="relative md:w-96 flex-shrink-0 group">
@@ -420,7 +422,43 @@ try {
               Contact Us for Price
             </button>
           )}
+          {property?.profile && <div className="flex items-center gap-4 mb-4 mt-4 text-sm text-gray-600">
+            {property.profile.bedrooms > 0 && (
+              <div className="flex items-center gap-1">
+                <Bed size={16} className="text-[#003366]" />
+                <span>{property.profile.bedrooms}</span>
+              </div>
+            )}
+            {property.profile.bathrooms > 0 && (
+              <div className="flex items-center gap-1">
+                <Bath size={16} className="text-[#003366]" />
+                <span>{property.profile.bathrooms}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <Maximize size={16} className="text-[#003366]" />
+              <span>
+                {property.profile.carpetArea} {property.profile.areaUnit}
+              </span>
+            </div>
+          </div>}
+
+          {property?.amenities && <div className="flex flex-wrap gap-4 mb-4 mt-4 text-sm text-gray-600">
+            {property?.amenities.map((item) => {
+              return (
+                <div className="flex items-center gap-1">
+                  <PlayCircle size={16} className="text-[#003366]" />
+                  <span>{item}</span>
+                </div>
+              )
+            })}
+
+          </div>}
+          {/* <button className="text-[#003366] hover:text-orange-600 font-semibold transition-colors">
+                    View Details →
+                  </button> */}
         </div>
+
       </div>
     </article>
   );

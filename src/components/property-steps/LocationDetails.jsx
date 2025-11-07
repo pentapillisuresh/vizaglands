@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import ApiService from "../../hooks/ApiService";
+import getAdvantages from "../../hooks/getNearBy";
 
 const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [cities, setCities] = useState([]);
   const [localities, setLocalities] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [propertyName, setPropertyName] = useState(data.propertyName || '');
   const [city, setCity] = useState(data.address?.city || "");
   const [locality, setLocality] = useState(data.address?.locality || "");
   const [subLocality, setSubLocality] = useState(data.address?.sublocality || "");
@@ -13,11 +15,8 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [pincode, setPincode] = useState(data.address?.pincode || "");
   const [lat, setLat] = useState(data.address?.lat || "");
   const [lon, setLon] = useState(data.address?.lon || "");
-  const [advantages, setAdvantages] = useState(
-    data.advantages && data.advantages.length
-      ? data.advantages
-      : [{ info: "", distance: "250 m" }]
-  );
+  const [advantages, setAdvantages] = useState(getAdvantages(data));
+
 
   // ✅ Detect if property is land-like
   const subtype = (data.propertySubtype || "").trim().toLowerCase();
@@ -48,10 +47,12 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   useEffect(() => {
     const fetchCities = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/city");
-        if (!res.ok) throw new Error("Failed to fetch city data");
-        const result = await res.json();
-        setCities(result);
+        const res = await ApiService.get("/city", {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        setCities(res);
       } catch (error) {
         console.error("Error fetching cities:", error);
       } finally {
@@ -80,9 +81,9 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
     if (isEditMode && data.address && cities.length > 0) {
       setCity(data.address.city || "");
       setLocality(data.address.locality || "");
-      console.log("locality::",data.address.locality)
+      console.log("locality::", data.address.locality)
       setSubLocality(data.address.subLocality || "");
-      console.log("subLocality::",data.address.subLocality)
+      console.log("subLocality::", data.address.subLocality)
       setApartmentDoorNo(data.address.apartmentDoorNo || "");
       setRoadFacing(data.address.road_facing || "");
       setPincode(data.address.pincode || "");
@@ -121,12 +122,13 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
         locality,
         sublocality: subLocality,
         apartmentDoorNo: isLand ? "" : apartmentDoorNo,
-        roadFacing,
+        road_facing: roadFacing,
         pincode,
         lat,
         lon,
         near_by: advantages,
       },
+      propertyName: propertyName,
     });
     onNext();
   };
@@ -158,6 +160,21 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
         </p>
       </div>
 
+      <div>
+          <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
+            property Name
+          </label>
+          <input
+            type="text"
+            value={propertyName}
+            onChange={(e) => setPropertyName(e.target.value)}
+            placeholder="e.g., D-201, Sunrise Apartments"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg
+                       focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                       outline-none font-roboto"
+          />
+        </div>
+
       {/* 🏙️ City Dropdown */}
       <div>
         <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
@@ -174,7 +191,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
                      outline-none font-roboto bg-white"
           >
             <option value="">Select a City</option>
-            {cities.map((c) => (
+            {cities?.map((c) => (
               <option key={c.id} value={c.city}>
                 {c.city}
               </option>
@@ -194,14 +211,13 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
           disabled={!city}
           className={`w-full px-4 py-3 border border-gray-300 rounded-lg
                    focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                   outline-none font-roboto bg-white ${
-                     !city ? "opacity-50 cursor-not-allowed" : ""
-                   }`}
+                   outline-none font-roboto bg-white ${!city ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           <option value="">
             {city ? "Select a Locality" : "Select a City first"}
           </option>
-          {localities.map((loc, index) => (
+          {localities?.map((loc, index) => (
             <option key={index} value={loc}>
               {loc}
             </option>
@@ -212,7 +228,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
       {/* 🏘️ Sub Locality */}
       <div>
         <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-          Sub Locality (Optional)
+          {isLand ? "Village" : "Sub Locality"}
         </label>
         <input
           type="text"
@@ -246,13 +262,13 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
       {/* 🚗 Road Facing */}
       <div>
         <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-          Road Facing (Optional)
+          Road Facing <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={roadFacing}
           onChange={(e) => setRoadFacing(e.target.value)}
-          placeholder="e.g., Opposite Main Road"
+          placeholder="100 fts"
           className="w-full px-4 py-3 border border-gray-300 rounded-lg
                      focus:ring-2 focus:ring-orange-500 focus:border-transparent
                      outline-none font-roboto"
@@ -284,9 +300,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
             value={lon}
             onChange={(e) => setLon(e.target.value)}
             placeholder="e.g., 83.2185"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                       outline-none font-roboto"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto"
           />
         </div>
       </div>
@@ -300,8 +314,8 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
           Add nearby landmarks and distances
         </p>
 
-        {advantages.map((item, index) => (
-          <div
+        {Array.isArray(advantages) && advantages.map((item, index) => (         
+           <div
             key={index}
             className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4"
           >

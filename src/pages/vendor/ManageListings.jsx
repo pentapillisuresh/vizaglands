@@ -74,9 +74,10 @@ const ManageListings = () => {
 
   const confirmDelete = async () => {
     if (!selectedListing) return;
+    console.log("rrr:::", selectedListing)
     const clientToken = localStorage.getItem('token');
     try {
-      const response = await ApiService.delete(`properties/${selectedlisting?.id}`,
+      const response = await ApiService.delete(`properties/${selectedListing?.id}`,
         {
           headers: {
             Authorization: `Bearer ${clientToken}`,
@@ -90,7 +91,7 @@ const ManageListings = () => {
       }
 
       // Remove deleted property from list
-      setListings((prev) => prev.filter((l) => l.id !== selectedlisting?.id));
+      setListings((prev) => prev.filter((l) => l.id !== selectedListing?.id));
       setShowDeleteModal(false);
       setSelectedListing(null);
     } catch (error) {
@@ -147,6 +148,32 @@ const ManageListings = () => {
       alert(err.message);
     }
   };
+
+  const handleSold = async (id) => {
+    if (
+      window.confirm(
+        "Are you sure you want to make as SOLD this property? This action cannot be undone."
+      )
+    ) {
+      const clientToken = localStorage.getItem('token');
+      try {
+        const res = await ApiService.put(`/properties/${id}`, { isSold: true }, {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            "Content-Type": "application/json'"
+          }
+        });
+        if (res) {
+
+          alert("Property update isSold successfully!");
+          fetchListings();
+        }
+      } catch (err) {
+        alert("Failed to delete property.");
+      }
+    }
+  };
+
 
 
   return (
@@ -219,11 +246,11 @@ const ManageListings = () => {
                 <div key={listing?.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
                     <img
-                    src={ getPhotoSrc(listing.photos)}
+                      src={getPhotoSrc(listing.photos)}
                       alt={listing?.title}
                       className="w-full lg:w-64 h-48 object-cover rounded-lg"
                     />
-
+                   
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
                         <div>
@@ -235,24 +262,24 @@ const ManageListings = () => {
                             <span className="text-sm">{listing?.address.city}-{listing?.address.locality}</span>
                           </div>
                           <p className="text-2xl font-bold text-orange-600">
-                            {listing?.price} || Contact For Price 
+                            {listing?.price || "Contact For Price"}
                           </p>
                         </div>
                         <span
-                          className={`px-4 py-1 rounded-full text-sm font-medium ${listing?.status === 'active'
-                            ? 'bg-green-100 text-green-700'
-                            : listing?.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : listing?.status === 'Verified'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-gray-100 text-gray-700'
+                          className={`px-4 py-1 rounded-full text-sm font-medium ${listing?.isSold
+                              ? 'bg-red-100 text-red-700'
+                              : listing?.status === 'active'
+                                ? 'bg-green-100 text-green-700'
+                                : listing?.status === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-700'
+                                  : listing?.status === 'verified'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-gray-100 text-gray-700'
                             }`}
                         >
-                          {listing?.status
-                            ? listing?.status.charAt(0).toUpperCase() +
-                            listing?.status.slice(1)
-                            : 'Unknown'}
+                          {listing?.isSold ? 'Sold' : listing?.status?.charAt(0).toUpperCase() + listing?.status?.slice(1) || 'Unknown'}
                         </span>
+
                       </div>
 
                       {/* <p className="text-gray-600 mb-4">{listing?.description}</p> */}
@@ -315,9 +342,9 @@ const ManageListings = () => {
                           View Details
                         </button>
 
-                        {listing?.status === 'active' && (
+                        {(!listing.isSold && listing.status === "verified") && (
                           <button
-                            onClick={() => handleStatusChange(listing?.id, 'sold')}
+                            onClick={() => handleSold(listing.id)}
                             className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
                           >
                             <Tag className="w-4 h-4" />

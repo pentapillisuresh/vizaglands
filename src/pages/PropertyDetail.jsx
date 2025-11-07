@@ -8,6 +8,7 @@ import { propertiesData } from "../data/propertiesData";
 import ApiService from "../hooks/ApiService";
 import AOS from "aos";
 import PropertyMap from "../components/PropertyMap";
+import getPhotoSrc from "../hooks/getPhotos";
 
 function PropertyDetail() {
   const { id } = useParams();
@@ -55,14 +56,15 @@ function PropertyDetail() {
       });
 
       if (response) {
-        setStatus("✅ ", request.message);
+        // setStatus("✅ ", request.message);
+
         setFormData({
           name: "",
           email: "",
           phoneNumber: "",
           message: "",
         });
-
+alert("Thankyou for contacting us,our team will contact you very soon ")
         setTimeout(() => {
           setStatus("")
         }, 2000);
@@ -85,6 +87,7 @@ function PropertyDetail() {
   // ✅ Get property from navigation state
   useEffect(() => {
     const prop = location.state?.property;
+    console.log("property:::", prop)
     if (prop) {
       setProperty(prop);
       window.scrollTo(0, 0);
@@ -133,7 +136,7 @@ function PropertyDetail() {
   const addViewProperty = async () => {
     try {
       const clientToken = localStorage.getItem("token");
-  
+
       const response = await ApiService.post(
         `/propertyView`,              // URL
         { propertyId: id },           // Request body
@@ -144,13 +147,13 @@ function PropertyDetail() {
           },
         }
       );
-  
+
       console.log('Property view recorded:', response.data);
     } catch (err) {
-      alert(err.response?.data?.message || err.message);
+      console.log(err.response?.data?.message || err.message);
     }
   };
-  
+
   const updateViewCount = async () => {
     try {
       const clientToken = localStorage.getItem("token");
@@ -175,12 +178,12 @@ function PropertyDetail() {
   };
 
   useEffect(() => {
-    const userDetails=localStorage.getItem("clientDetails");
-    const isLogin=localStorage.getItem("isLogin");
+    const userDetails = localStorage.getItem("clientDetails");
+    const isLogin = localStorage.getItem("isLogin");
     if (isLogin) {
       addViewProperty()
     } else {
-      
+
     }
 
     setTimeout(() => {
@@ -367,9 +370,27 @@ function PropertyDetail() {
                   )}
                 </div>
               </Section>
-              <div>
-                <PropertyMap pin={address?.pincode} />
-              </div>
+              {/* Nearby Details */}
+              {Array.isArray(address?.near_by) && address.near_by.length > 0 && (
+                <Section title="Nearby Places">
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    {address.near_by.map((place, idx) => (
+                      <li key={idx} className="flex justify-between">
+                        <span>{place.info}</span>
+                        {place.distance && (
+                          <span className="text-sm text-gray-500">{place.distance}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
+              )}
+
+              {/* Map Section */}
+              <Section title="Location on Map">
+                <PropertyMap lat={address?.lat} lon={address?.lon} />
+              </Section>
+
               {/* Amenities */}
               {Array.isArray(property?.amenities) && property?.amenities.length > 0 && (
                 <Section title="Amenities & Features">
@@ -488,13 +509,7 @@ function PropertyDetail() {
                   {/* Image */}
                   <div className="h-56 overflow-hidden">
                     <img
-                      src={
-                        Array.isArray(property?.photos)
-                          ? property.photos[0] // already an array
-                          : typeof property?.photos === "string" && property.photos.startsWith("[")
-                            ? JSON.parse(property.photos)[0] // JSON string like '["img1.jpg", "img2.jpg"]'
-                            : property?.photos // single image URL string
-                      }
+                      src={getPhotoSrc(property?.photos)}
                       alt={property?.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -537,19 +552,19 @@ function PropertyDetail() {
                     </div>}
 
                     <div className="flex items-center justify-between pt-4 border-t">
-                    {property?.price ? (
-                      <div className="text-2xl font-bold text-orange-600">
-                        {formatPrice(property?.price)}
-                      </div>
-                  ) : (
-                    <button
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
-                      onClick={() => alert("Contact us for price!")}
-                    >
-                      Contact Us for Price
-                    </button>
-                  )}
-                      
+                      {property?.price ? (
+                        <div className="text-2xl font-bold text-orange-600">
+                          {formatPrice(property?.price)}
+                        </div>
+                      ) : (
+                        <button
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
+                          onClick={() => alert("Contact us for price!")}
+                        >
+                          Contact Us for Price
+                        </button>
+                      )}
+
                     </div>
                   </div>
                 </article>
