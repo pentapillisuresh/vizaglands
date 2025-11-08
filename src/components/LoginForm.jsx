@@ -12,32 +12,44 @@ const LoginForm = ({ onClose }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    try {
-      const { data, error } = await signIn(email, password);
+  try {
+    const { data, error } = await signIn(email, password);
 
-      if (error) {
-        setError(error.message);
-      } else if (data?.client) {
-        // ✅ successful login
-        if (onClose) onClose();
-        setTimeout(() => {
-          navigate('/vendor/dashboard');
-        }, 2000);
-      } else {
-        setError('Something went wrong. Please try again.');
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Unexpected error occurred');
-    } finally {
-      setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else if (data?.client) {
+      // ✅ Successful login: Save login info locally
+      const userData = data.client;
+
+      localStorage.setItem('isLogin', 'true');
+      localStorage.setItem('clientData', JSON.stringify(userData));
+      localStorage.setItem('token', data.token || '');
+
+      // 🚀 Notify Header immediately
+      window.dispatchEvent(new Event('storage'));
+
+      if (onClose) onClose();
+
+      // Redirect after slight delay (optional)
+      setTimeout(() => {
+        navigate('/vendor/dashboard');
+      }, 1000);
+    } else {
+      setError('Something went wrong. Please try again.');
     }
-  };
+  } catch (err) {
+    console.error('Login error:', err);
+    setError('Unexpected error occurred');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     localStorage.clear();
