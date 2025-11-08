@@ -160,9 +160,10 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
         </p>
       </div>
 
-      <div>
+      {!((subtype || "").toLowerCase().includes("land") || (data?.marketType).toLowerCase() === "rent") && (
+        <div>
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            property Name
+            Project Name
           </label>
           <input
             type="text"
@@ -170,11 +171,11 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
             onChange={(e) => setPropertyName(e.target.value)}
             placeholder="e.g., D-201, Sunrise Apartments"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                       outline-none font-roboto"
+                 focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                 outline-none font-roboto"
           />
         </div>
-
+      )}
       {/* 🏙️ City Dropdown */}
       <div>
         <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
@@ -261,18 +262,19 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
 
       {/* 🚗 Road Facing */}
       <div>
-        <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-          Road Facing <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          value={roadFacing}
-          onChange={(e) => setRoadFacing(e.target.value)}
-          placeholder="100 fts"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg
-                     focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                     outline-none font-roboto"
-        />
+      <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
+    Road Facing <span className="text-red-500">*</span>
+  </label>
+  <input
+    type="number"
+    value={roadFacing}
+    onChange={(e) => setRoadFacing(e.target.value)}
+    placeholder="100 ft"
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg
+               focus:ring-2 focus:ring-orange-500 focus:border-transparent
+               outline-none font-roboto"
+    min="0"
+  />
       </div>
 
       {/* 🌍 Coordinates */}
@@ -314,8 +316,8 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
           Add nearby landmarks and distances
         </p>
 
-        {Array.isArray(advantages) && advantages.map((item, index) => (         
-           <div
+        {Array.isArray(advantages) && advantages.map((item, index) => (
+          <div
             key={index}
             className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-4"
           >

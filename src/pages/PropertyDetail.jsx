@@ -19,6 +19,7 @@ function PropertyDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [showContact, setShowContact] = useState(false);
   const [page, setPage] = useState(1);
+  
   const [similarProperties, setSimilarProperties] = useState(propertiesData);
   const [formData, setFormData] = useState({
     name: "",
@@ -97,6 +98,36 @@ alert("Thankyou for contacting us,our team will contact you very soon ")
     }
   }, [location.state, id]);
 
+  useEffect(() => {
+   fetchPropertyDetails()
+  }, [location.state, id]);
+
+
+  const fetchPropertyDetails = async () => {
+   
+    try {
+      const response = await ApiService.get(`/properties/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log("Dashboard API Response:", response);
+
+      // ✅ Access nested response.data.data safely
+      if (response?.property) {
+        const propertyDetails = response.property;
+setProperty(propertyDetails);
+      } else {
+        console.warn("Unexpected response format:", response);
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const getpropertyByCategory = async () => {
     const payload = {
@@ -303,6 +334,7 @@ alert("Thankyou for contacting us,our team will contact you very soon ")
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h1 className="text-3xl font-bold text-[#003366] mb-2">{property?.title}</h1>
+                  <h3 className="text-sm font-bold text-[#003366] mb-2">{property?.propertyName}</h3>
                   <div className="flex items-center gap-2 text-gray-600">
                     <MapPin size={18} className="text-orange-500" />
                     <span className="text-lg">

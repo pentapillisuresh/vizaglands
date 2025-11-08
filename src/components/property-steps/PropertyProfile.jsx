@@ -12,18 +12,24 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const [breadth, setBreadth] = useState("");
   const [facing, setFacing] = useState("");
   const [frontage, setFrontage] = useState("");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(null);
+  const [showPlotSize, setShowPlotSize] = useState(false);
+  const [plotSize, setPlotSize] = useState(null);
+  const [showUDS_area, setShowUDS_area] = useState(false);
+  const [UDS_area, setUDS_area] = useState(null);
 
   // --- Apartment / Villa / Residential fields ---
   const [bedrooms, setBedrooms] = useState(null);
   const [bathrooms, setBathrooms] = useState(null);
   const [balconies, setBalconies] = useState(null);
   const [poojaRoom, setPoojaRoom] = useState(true);
-  const [carpetArea, setCarpetArea] = useState(1);
+  const [carpetArea, setCarpetArea] = useState(null);
   const [builtArea, setBuiltArea] = useState(0);
   const [superBuiltArea, setSuperBuiltArea] = useState(0);
   const [areaUnit, setAreaUnit] = useState("sqft");
   const [parkingType, setParkingType] = useState("");
+  const [closedParking, setClosedParking] = useState(0);
+  const [openParking, setOpenParking] = useState(0);
   const [status, setStatus] = useState("Ready to Move");
   const [possession, setPossession] = useState("");
   const [ageOfProperty, setAgeOfProperty] = useState("");
@@ -64,6 +70,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const isPlotOrLand = ["Plot", "Land", "Commercial Land", "Warehouse / Godown", "Industrial Building"].includes(propertySubtype);
   const isLand = ["Land", "Commercial Land", "Warehouse / Godown", "Industrial Building"].includes(propertySubtype);
   const isFlatOrVilla = ["Flat/Apartment", "Independent House / Villa"].includes(propertySubtype);
+  const isVilla = ["Independent House / Villa", "Farmhouse"].includes(propertySubtype);
   const isFlat = propertySubtype === "Flat/Apartment";
   const isPlot = propertySubtype === "Plot";
   const isOfficeSpace = propertySubtype === "Office Space";
@@ -78,22 +85,24 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
 
     setPlotArea(data?.propertyProfile?.plotArea || 1);
     setLandArea(data?.propertyProfile?.landArea || 1);
-    setPlotAreaUnit(data?.propertyProfile?.plotAreaUnit || (isLand ? "acres" : "sqft"));
+    setPlotAreaUnit(data?.propertyProfile?.plotAreaUnit || (isLand ? "acres" : isPlot ? "sq yards" : "sqft"));
     setLength(data?.propertyProfile?.length || "");
     setBreadth(data?.propertyProfile?.breadth || "");
     setFacing(data?.propertyProfile?.facing || "");
     setFrontage(data?.propertyProfile?.frontage || "");
-    setPrice(data?.price || 0);
+    setPrice(data?.price || null);
 
     setBedrooms(data?.propertyProfile?.bedrooms || null);
     setBathrooms(data?.propertyProfile?.bathrooms || null);
     setBalconies(data?.propertyProfile?.balconies || null);
     setPoojaRoom(data?.propertyProfile?.poojaRoom ?? true);
-    setCarpetArea(data?.propertyProfile?.carpetArea || 1);
+    setCarpetArea(data?.propertyProfile?.carpetArea || null);
     setBuiltArea(data?.propertyProfile?.buildArea || 0);
     setSuperBuiltArea(data?.propertyProfile?.superBuildArea || 0);
     setAreaUnit(data?.propertyProfile?.areaUnit || (isLand ? "acres" : "sqft"));
     setParkingType(data?.propertyProfile?.parkingType || "");
+    setClosedParking(data?.propertyProfile?.closedParking || 0);
+    setOpenParking(data?.propertyProfile?.openParking || 0);
     setStatus(data?.availableStatus || "Ready to Move");
     setPossession(data?.possession || "");
     setAgeOfProperty(data?.ageOfProperty || "");
@@ -152,6 +161,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         price,
         units,
         parkingType,
+        closedParking,
+        openParking,
         parkingSpaces,
         status,
         possession,
@@ -292,8 +303,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
           </div>
           <p className="font-roboto mb-3 font-bold text-black-600">
             {isPlot
-              ? `${Math.round(price / plotArea)} per ${plotAreaUnit}`
-              : `${Math.round(price / landArea)} per ${plotAreaUnit}`}
+              ? `${Math.round(price / plotArea) ?? 0}  per ${plotAreaUnit}`
+              : `${Math.round(price / landArea) ?? 0} per ${plotAreaUnit}`}
           </p>
 
           {!isLand ? (
@@ -510,6 +521,23 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                     + Add Super Built-up Area
                   </button>
                 )}
+                {isFlat && !showUDS_area && (
+                  <button
+                    onClick={() => setShowUDS_area(true)}
+                    className="px-4 py-2 border-2 border-dashed border-orange-500 text-orange-500 rounded-lg font-medium hover:bg-orange-50 transition-colors"
+                  >
+                    + Add UDS Area
+                  </button>
+                )}
+                {isVilla && !showPlotSize && (
+                  <button
+                    onClick={() => setShowPlotSize(true)}
+                    className="px-4 py-2 border-2 border-dashed border-orange-500 text-orange-500 rounded-lg font-medium hover:bg-orange-50 transition-colors"
+                  >
+                    + Add Plot Size
+                  </button>
+                )}
+
               </div>
 
               {showBuiltArea && (
@@ -569,6 +597,64 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                   </div>
                 </div>
               )}
+
+              {showUDS_area && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    UDS Area
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="number"
+                      value={UDS_area}
+                      onChange={(e) => setUDS_area(e.target.value)}
+                      placeholder="Enter UDS area"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
+                    />
+                    <div className="flex items-center">
+                      <span className="text-gray-600">{areaUnit}</span>
+                      <button
+                        onClick={() => {
+                          setShowUDS_area(false);
+                          setUDS_area("");
+                        }}
+                        className="ml-4 text-red-500 hover:text-red-700 font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {showPlotSize && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Plot Size
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="number"
+                      value={plotSize}
+                      onChange={(e) => setPlotSize(e.target.value)}
+                      placeholder="Enter Plot area"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
+                    />
+                    <div className="flex items-center">
+                      <span className="text-gray-600">{areaUnit}</span>
+                      <button
+                        onClick={() => {
+                          setShowPlotSize(false);
+                          setPlotSize("");
+                        }}
+                        className="ml-4 text-red-500 hover:text-red-700 font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           {needsUnitNumber && (
@@ -603,7 +689,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
-                <div>
+               {!isVilla && <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Property on Floor <span className="text-red-500">*</span>
                   </label>
@@ -614,22 +700,73 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                     placeholder="Enter floor number"
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
                   />
-                </div>
+                </div>}
               </div>
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Parking <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={parkingType}
-              onChange={(e) => setParkingType(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
+<div className="flex flex-col sm:flex-row sm:items-center gap-6">
+<div className="flex items-center gap-6">
+  {/* Closed Parking */}
+  <div className="flex flex-col">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Closed Parking <span className="text-red-500">*</span>
+    </label>
+    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setClosedParking(Math.max(0, closedParking - 1))}
+        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+      >
+        −
+      </button>
+      <input
+        type="text"
+        readOnly
+        value={closedParking}
+        className="w-12 text-center border-x border-gray-200 focus:outline-none"
+      />
+      <button
+        type="button"
+        onClick={() => setClosedParking(closedParking + 1)}
+        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+      >
+        +
+      </button>
+    </div>
+  </div>
+
+  {/* Open Parking */}
+  <div className="flex flex-col">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Open Parking <span className="text-red-500">*</span>
+    </label>
+    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpenParking(Math.max(0, openParking - 1))}
+        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+      >
+        −
+      </button>
+      <input
+        type="text"
+        readOnly
+        value={openParking}
+        className="w-12 text-center border-x border-gray-200 focus:outline-none"
+      />
+      <button
+        type="button"
+        onClick={() => setOpenParking(openParking + 1)}
+        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+      >
+        +
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
           {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Parking Spaces
