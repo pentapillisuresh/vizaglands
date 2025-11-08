@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -10,7 +11,7 @@ import AOS from "aos";
 import PropertyMap from "../components/PropertyMap";
 import getPhotoSrc from "../hooks/getPhotos";
 
-function PropertyDetail() {
+function ClientPropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,8 +20,6 @@ function PropertyDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [showContact, setShowContact] = useState(false);
   const [page, setPage] = useState(1);
-  const fromUser = location.state?.from || null;
-  console.log(fromUser)
   const [similarProperties, setSimilarProperties] = useState(propertiesData);
   const [formData, setFormData] = useState({
     name: "",
@@ -283,7 +282,7 @@ function PropertyDetail() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="gap-5">
           {/* Left Section */}
           <div className="lg:col-span-2">
             {/* Image Gallery */}
@@ -438,176 +437,7 @@ function PropertyDetail() {
               )}
             </div>
           </div>
-
-          {/* Right Section - Contact */}
-          {fromUser !== 'client' && (
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-lg p-6 sticky top-8">
-                <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-br from-[#003366] to-[#004d99] rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Building size={36} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-[#003366] mb-1" style={{ textTransform: 'capitalize' }}>
-                    {client.fullName || "Property Advisor"}
-                  </h3>
-                  {client.phoneNumber && (
-                    <p className="text-sm text-gray-600">📞 {client.phoneNumber}</p>
-                  )}
-                </div>
-
-                {!showContact ? (
-                  <button
-                    onClick={() => setShowContact(true)}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 mb-4"
-                  >
-                    <Phone size={20} /> Show Contact Details
-                  </button>
-                ) : (
-                  <div className="space-y-4 mb-4">
-                    {client.phoneNumber && (
-                      <ContactCard icon={<Phone size={20} />} label="Call Now" value={client.phoneNumber} />
-                    )}
-                    <ContactCard icon={<Mail size={20} />} label="Email" value="info@vizaglands.com" />
-                  </div>
-                )}
-                <div className="border-t pt-6">
-                  <h4 className="font-bold text-[#003366] mb-4">Schedule a Visit</h4>
-                  <form className="space-y-4" onSubmit={handleSubmit}>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      placeholder="Your Name"
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      placeholder="Your Email"
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    />
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      placeholder="Your Phone"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    />
-                    <textarea
-                      name="message"
-                      placeholder="Message (Optional)"
-                      rows="3"
-                      value={formData.message}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    ></textarea>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className={`w-full bg-[#003366] hover:bg-[#004d99] text-white py-3 rounded-lg font-semibold transition-colors ${loading ? "opacity-70 cursor-not-allowed" : ""
-                        }`}
-                    >
-                      {loading ? "Submitting..." : "Request a Callback"}
-                    </button>
-                  </form>
-                </div>
-
-                <div className="border-t mt-6 pt-6 text-sm text-gray-500">
-                  <Calendar size={16} className="inline text-orange-500 mr-1" />
-                  Posted on: {new Date(property?.createdAt).toLocaleDateString()}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-        {similarProperties?.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-[#003366] mb-6">Similar Properties</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {similarProperties?.map((property, idx) => (
-                <article
-                  key={property?.id}
-                  data-aos="fade-up"
-                  data-aos-delay={100 + idx * 100}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer group hover:shadow-2xl transition-shadow duration-300"
-                  onClick={() => navigate(`/property/${property?.id}`, { state: { property } })}
-                >
-                  {/* Image */}
-                  <div className="h-56 overflow-hidden">
-                    <img
-                      src={getPhotoSrc(property?.photos)}
-                      alt={property?.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-xl font-bold text-[#003366] group-hover:text-orange-600 transition-colors">
-                        {property?.title}
-                      </h3>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-gray-600 mb-4">
-                      <MapPin size={16} className="text-orange-500" />
-                      <span className="text-sm">
-                        {property?.address?.city}, {property?.address?.locality}
-                      </span>
-                    </div>
-
-                    {property?.profile && <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
-                      {property?.profile?.bedrooms > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Bed size={16} className="text-[#003366]" />
-                          <span>{property?.profile?.bedrooms}</span>
-                        </div>
-                      )}
-                      {property?.profile?.bathrooms > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Bath size={16} className="text-[#003366]" />
-                          <span>{property?.profile?.bathrooms}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <Maximize size={16} className="text-[#003366]" />
-                        <span>
-                          {property?.profile?.carpetArea} {property?.profile?.areaUnit}
-                        </span>
-                      </div>
-                    </div>}
-
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      {property?.price ? (
-                        <div className="text-2xl font-bold text-orange-600">
-                          {formatPrice(property?.price)}
-                        </div>
-                      ) : (
-                        <button
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
-                          onClick={() => alert("Contact us for price!")}
-                        >
-                          Contact Us for Price
-                        </button>
-                      )}
-
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
-
-
       </div>
     </div>
   );
@@ -648,5 +478,5 @@ const ContactCard = ({ icon, label, value }) => (
   </div>
 );
 
-export default PropertyDetail;
+export default ClientPropertyDetail;
 

@@ -13,6 +13,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const [facing, setFacing] = useState("");
   const [frontage, setFrontage] = useState("");
   const [price, setPrice] = useState(null);
+  const [advance, setAdvance] = useState(null);
   const [showPlotSize, setShowPlotSize] = useState(false);
   const [plotSize, setPlotSize] = useState(null);
   const [showUDS_area, setShowUDS_area] = useState(false);
@@ -91,7 +92,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     setFacing(data?.propertyProfile?.facing || "");
     setFrontage(data?.propertyProfile?.frontage || "");
     setPrice(data?.price || null);
-
+    setAdvance(data?.advance || null);
     setBedrooms(data?.propertyProfile?.bedrooms || null);
     setBathrooms(data?.propertyProfile?.bathrooms || null);
     setBalconies(data?.propertyProfile?.balconies || null);
@@ -137,6 +138,9 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   // --- Payload creation for Add/Edit ---
   const handleContinue = () => {
     const payload = { propertySubtype, price };
+    if (data?.marketType.toLowerCase()!=='sale') {
+      payload.advance(advance)
+    }
 
     if (isPlotOrLand) {
       payload.propertyProfile = {
@@ -242,7 +246,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
           )} */}
           <div>
             <label className="block font-roboto text-sm font-medium text-gray-700 mt-8 mb-4">
-              Price (₹) <span className="text-red-500">*</span>
+             { data?.marketType.toLowerCase()==='sale' ? "Price": "Rent"} (₹) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
