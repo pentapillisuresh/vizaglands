@@ -6,8 +6,8 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
   const { userProfile } = useAuth();
   // 🧩 Local states (initialized with data)
   const [listingType, setListingType] = useState(data?.marketType || 'Sale');
-  const [propertyType, setPropertyType] = useState(data?.category?.catType || 'residential');
-  const [propertySubtype, setPropertySubtype] = useState(data?.category?.name || '');
+  const [propertyType, setPropertyType] = useState(data?.category?.catType || data?.propertyKind);
+  const [propertySubtype, setPropertySubtype] = useState(data?.category?.name || data.propertySubtype);
   const [customSubtype, setCustomSubtype] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,22 +15,22 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(data?.categoryId || '');
 
   // Custom order for category sorting
-  const customOrder = ["Plot", "Flat/Apartment", "IndependentHouse/Villa", "Land", "FarmHouse"];
+  // const customOrder = data?.marketType === "sale" ? ["Plot", "Flat/Apartment", "IndependentHouse/Villa", "Land", "FarmHouse"] : ["Flat/Apartment", "IndependentHouse/Villa", "FarmHouse", "Plot", "Land",];
 
-// 🧩 Prefill once when data or categories change
-useEffect(() => {
-  if (!isEditMode || !data) return;
+  // 🧩 Prefill once when data or categories change
+  useEffect(() => {
+    if (!isEditMode || !data) return;
 
-  // Prefer nested category if available
-  const catName = data.category?.name?.trim() || data.propertySubtype?.trim() || '';
-  const catType = data.category?.catType?.toLowerCase() || data.propertyKind?.toLowerCase() || 'residential';
+    // Prefer nested category if available
+    const catName = data.category?.name?.trim() || data.propertySubtype?.trim() || '';
+    const catType = data.category?.catType?.toLowerCase() || data.propertyKind?.toLowerCase() || 'residential';
 
-  setListingType(data.marketType || 'Sale');
-  setPropertyType(catType);
-  setPropertySubtype(catName);
-  setTitle(data.title || '');
-  setSelectedCategoryId(data.categoryId || '');
-}, [isEditMode, data, categories]);
+    setListingType(data.marketType || 'Sale');
+    setPropertyType(catType);
+    setPropertySubtype(catName);
+    setTitle(data.title || '');
+    setSelectedCategoryId(data.categoryId || '');
+  }, [isEditMode, data, categories]);
   // 🧭 Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -77,7 +77,7 @@ useEffect(() => {
     updateData({
       categoryId: selectedCategory?.id || '',
       // propertyName: title,
-      title, 
+      title,
       marketType: listingType,
       propertyKind: propertyType,
       propertySubtype,
@@ -101,11 +101,11 @@ useEffect(() => {
   const subtypes = propertyType === 'residential' ? residentialTypes : commercialTypes;
 
   // 🧩 Sort subtypes in custom order
-  const sortedSubtypes = [...subtypes].sort((a, b) => {
-    const indexA = customOrder.indexOf(a.name);
-    const indexB = customOrder.indexOf(b.name);
-    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-  });
+  // const sortedSubtypes = [...subtypes].sort((a, b) => {
+  //   const indexA = customOrder.indexOf(a.name);
+  //   const indexB = customOrder.indexOf(b.name);
+  //   return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  // });
 
   return (
     <div className="space-y-8">
@@ -120,6 +120,7 @@ useEffect(() => {
       </div>
 
       {/* 💰 Listing Type */}
+      {/* Listing Type Selector */}
       <div>
         <label className="block font-roboto text-base font-medium text-gray-700 mb-3">
           I'm looking to
@@ -129,12 +130,13 @@ useEffect(() => {
             <button
               key={type}
               onClick={() => setListingType(type)}
-              className={`px-6 py-2.5 rounded-full border-2 font-roboto capitalize transition-all ${listingType === type
+              className={`px-6 py-2.5 rounded-full border-2 font-roboto capitalize transition-all
+          ${listingType === type
                   ? 'bg-orange-500 border-orange-500 text-white'
                   : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
                 }`}
             >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {type}
             </button>
           ))}
         </div>
@@ -170,46 +172,56 @@ useEffect(() => {
         {loading ? (
           <p className="text-gray-500">Loading property types...</p>
         ) : (
-          <div className="flex flex-wrap gap-3">
-            {sortedSubtypes.map((subtype) => {
-              const isActive =
-                propertySubtype?.toLowerCase().trim() === subtype.name?.toLowerCase().trim();
+          <div className="mt-4 flex flex-wrap gap-3">
+            {subtypes
+              .slice()
+              .sort((a, b) => {
+                const customOrder = listingType.toLowerCase() === 'sale'
+                  ? ["Plot", "Flat/Apartment", "IndependentHouse/Villa", "Land", "FarmHouse"]
+                  : ["Flat/Apartment", "IndependentHouse/Villa", "FarmHouse", "Plot", "Land"];
 
-              console.log(propertySubtype?.toLowerCase().trim(), "===", subtype.name?.toLowerCase().trim())
+                const indexA = customOrder.indexOf(a.name);
+                const indexB = customOrder.indexOf(b.name);
+                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+              })
+              .map((subtype) => {
+                const isActive =
+                  propertySubtype?.toLowerCase().trim() === subtype.name?.toLowerCase().trim();
 
-              return (
-                <button
-                  key={subtype.id}
-                  onClick={() => {
-                    setPropertySubtype(subtype.name);
-                    setSelectedCategoryId(subtype.id);
-                  }}
-                  className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all ${isActive
-                      ? 'bg-orange-500 border-orange-500 text-white'
-                      : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                    }`}
-                >
-                  {subtype.name}
-                </button>
-              );
-            })}
-          </div>
-        )}
+                return (
+                  <button
+                    key={subtype.id}
+                    onClick={() => {
+                      setPropertySubtype(subtype.name);
+                      setSelectedCategoryId(subtype.id);
+                    }}
+                    className={`px-5 py-2.5 rounded-full border-2 font-roboto transition-all
+            ${isActive
+                        ? 'bg-orange-500 border-orange-500 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
+                      }`}
+                  >
+                    {subtype.name}
+                  </button>
+                );
+              })}
+          </div>)}
 
 
         {/* 🏠 Property Title */}
         <div className="mt-4">
           <label className="block font-roboto text-base font-medium text-gray-700 mb-3">
-            Property Title
+            {listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"}
           </label>
           <input
             type="text"
-            placeholder={`Enter Property Title ( ${propertySubtype} For sale )`}
+            placeholder={`Enter ${listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"} (${propertySubtype} for ${listingType.toLowerCase()})`}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
+
       </div>
 
       {/* Continue */}

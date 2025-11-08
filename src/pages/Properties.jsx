@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Home, MapPin, Bath, Bed, Maximize, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Home, MapPin, Bath, Bed, Maximize,
+  ChevronLeft, ChevronRight, PlayCircle,
+} from "lucide-react";
 import ApiService from "../hooks/ApiService";
-import { useLocation } from "react-router-dom";
 
 function Properties() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { categoryId, city, locality, propertyType } = location.state || {};  // 🔹 State
+  const { categoryId, city, locality, propertyType } = location.state || {};
+
+  // 🔹 States
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -16,10 +20,14 @@ function Properties() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // 🔹 Filter form
+  // 🔹 City & Locality dropdowns
+  const [cities, setCities] = useState([]);
+  const [localities, setLocalities] = useState([]);
+
+  // 🔹 Filters
   const [filters, setFilters] = useState({
     categoryId: categoryId || "",
-    marketType: "",
+    marketType: "sale", // ✅ default to "sale"
     status: "",
     city: city || "",
     locality: locality || "",
@@ -29,7 +37,37 @@ function Properties() {
 
   const [activeFilters, setActiveFilters] = useState(filters);
 
-  // 🔹 Fetch properties
+  // 🏙️ Fetch Cities
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const res = await ApiService.get("/city", {
+          headers: { "Content-Type": "application/json" },
+        });
+        setCities(res);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  // 📍 Populate localities when city changes
+  useEffect(() => {
+    if (filters.city && cities.length > 0) {
+      const selectedCity = cities.find(
+        (c) => c.city.toLowerCase() === filters.city.toLowerCase()
+      );
+      setLocalities(selectedCity ? selectedCity.locality : []);
+      if (!selectedCity?.locality.includes(filters.locality)) {
+        setFilters((prev) => ({ ...prev, locality: "" }));
+      }
+    } else {
+      setLocalities([]);
+    }
+  }, [filters.city, cities]);
+
+  // 🔹 Fetch Properties (core)
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -40,11 +78,18 @@ function Properties() {
         params.append("page", page);
         params.append("limit", 10);
 
-        const { categoryId, marketType, status, city, locality, clientId, priceRange } =
-          activeFilters;
+        const {
+          categoryId,
+          marketType,
+          status,
+          city,
+          locality,
+          clientId,
+          priceRange,
+        } = activeFilters;
 
         if (categoryId) params.append("categoryId", categoryId);
-        if (marketType) params.append("marketType", marketType);
+        params.append("marketType", marketType || "sale"); // ✅ always at least sale
         if (status) params.append("status", status);
         if (city) params.append("city", city);
         if (locality) params.append("locality", locality);
@@ -57,11 +102,8 @@ function Properties() {
           if (!isNaN(max)) params.append("maxPrice", max);
         }
 
-        // API call
-        const res = await ApiService.get(
-          `/properties?${params.toString()}`
-        );
-
+        // API Call
+        const res = await ApiService.get(`/properties?${params.toString()}`);
         const data = res?.properties || [];
         const total = res?.totalPages || data.length;
 
@@ -81,7 +123,6 @@ function Properties() {
             break;
         }
 
-        console.log("rrr::", sorted); // ✅ Logs the actual data
         setFilteredProperties(sorted);
         setTotalPages(Math.ceil(total / 10));
         setCategory({
@@ -99,7 +140,7 @@ function Properties() {
     fetchProperties();
   }, [activeFilters, sortBy, page]);
 
-  // 🔹 Filter form handling
+  // 🔹 Handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -117,6 +158,7 @@ function Properties() {
     return `₹${(num / 100000).toFixed(2)} Lac`;
   };
 
+  // 🔹 UI
   if (loading)
     return (
       <div className="min-h-screen flex justify-center items-center text-gray-600">
@@ -160,21 +202,6 @@ function Properties() {
           <div className="bg-white rounded-xl shadow-md p-6 sticky top-8">
             <h3 className="text-xl font-bold text-[#003366] mb-4">Filters</h3>
 
-            {/* Category ID */}
-            {/* <div className="mb-4">
-              <label className="block text-sm font-semibold mb-1">
-                Category ID
-              </label>
-              <input
-                type="text"
-                name="categoryId"
-                value={filters.categoryId}
-                onChange={handleChange}
-                placeholder="e.g. 1"
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-            </div> */}
-
             {/* Market Type */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">
@@ -186,70 +213,53 @@ function Properties() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
               >
-                <option value="">All</option>
                 <option value="sale">For Sale</option>
                 <option value="rent">For Rent</option>
               </select>
             </div>
 
-            {/* Status */}
-            {/* <div className="mb-4">
-              <label className="block text-sm font-semibold mb-1">
-                Status
-              </label>
-              <select
-                name="status"
-                value={filters.status}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg"
-              >
-                <option value="">All</option>
-                <option value="available">Available</option>
-                <option value="sold">Sold</option>
-              </select>
-            </div> */}
-
-            {/* City & Locality */}
+            {/* City Dropdown */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">City</label>
-              <input
-                type="text"
+              <select
                 name="city"
                 value={filters.city}
                 onChange={handleChange}
-                placeholder="e.g. Vizag"
                 className="w-full px-3 py-2 border rounded-lg"
-              />
+              >
+                <option value="">Select City</option>
+                {cities?.map((c) => (
+                  <option key={c.id} value={c.city}>
+                    {c.city}
+                  </option>
+                ))}
+              </select>
             </div>
 
+            {/* Locality Dropdown */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">
                 Locality
               </label>
-              <input
-                type="text"
+              <select
                 name="locality"
                 value={filters.locality}
                 onChange={handleChange}
-                placeholder="e.g. Allipuram"
-                className="w-full px-3 py-2 border rounded-lg"
-              />
+                disabled={!filters.city}
+                className={`w-full px-3 py-2 border rounded-lg ${
+                  !filters.city ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                <option value="">
+                  {filters.city ? "Select Locality" : "Select City first"}
+                </option>
+                {localities?.map((loc, idx) => (
+                  <option key={idx} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
             </div>
-
-            {/* Client ID */}
-            {/* <div className="mb-4">
-              <label className="block text-sm font-semibold mb-1">
-                Client ID
-              </label>
-              <input
-                type="text"
-                name="clientId"
-                value={filters.clientId}
-                onChange={handleChange}
-                placeholder="Client ID"
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-            </div> */}
 
             {/* Price Range */}
             <div className="mb-4">
@@ -342,7 +352,7 @@ function Properties() {
   );
 }
 
-/* PROPERTY CARD */
+/* PROPERTY CARD (unchanged) */
 function PropertyCard({ property, formatPrice }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
@@ -350,11 +360,9 @@ function PropertyCard({ property, formatPrice }) {
 
   try {
     if (typeof property.photos === "string") {
-      // Try parsing only if it looks like JSON (starts with "[" or "{")
       if (property.photos.trim().startsWith("[")) {
         media = JSON.parse(property.photos);
       } else {
-        // It's just a single URL string
         media = [property.photos];
       }
     } else if (Array.isArray(property.photos)) {
@@ -366,15 +374,19 @@ function PropertyCard({ property, formatPrice }) {
     console.error("Invalid photo format:", property.photos, err);
     media = [];
   }
+
   const nextSlide = () => setCurrentIndex((i) => (i + 1) % media.length);
-  const prevSlide = () => setCurrentIndex((i) => (i - 1 + media.length) % media.length);
+  const prevSlide = () =>
+    setCurrentIndex((i) => (i - 1 + media.length) % media.length);
 
   return (
-    <article className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border"
-    onClick={() => navigate(`/property/${property.id}`, { state: { property } })}>
-
+    <article
+      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border"
+      onClick={() =>
+        navigate(`/property/${property.id}`, { state: { property } })
+      }
+    >
       <div className="flex flex-col md:flex-row">
-        {/* Media */}
         <div className="relative md:w-96 flex-shrink-0 group">
           <div className="w-full aspect-[4/3] bg-gray-100 relative overflow-hidden">
             <img
@@ -401,7 +413,6 @@ function PropertyCard({ property, formatPrice }) {
           )}
         </div>
 
-        {/* Details */}
         <div className="flex-1 p-6">
           <h2 className="text-2xl font-bold text-[#003366] mb-2">
             {property.title}
@@ -410,6 +421,7 @@ function PropertyCard({ property, formatPrice }) {
             <MapPin size={16} className="text-orange-500 mr-1" />
             {property.address?.locality}, {property.address?.city}
           </div>
+
           {property?.price ? (
             <div className="text-xl font-bold text-orange-600">
               {formatPrice(property.price)}
@@ -422,43 +434,30 @@ function PropertyCard({ property, formatPrice }) {
               Contact Us for Price
             </button>
           )}
-          {property?.profile && <div className="flex items-center gap-4 mb-4 mt-4 text-sm text-gray-600">
-            {property.profile.bedrooms > 0 && (
-              <div className="flex items-center gap-1">
-                <Bed size={16} className="text-[#003366]" />
-                <span>{property.profile.bedrooms}</span>
-              </div>
-            )}
-            {property.profile.bathrooms > 0 && (
-              <div className="flex items-center gap-1">
-                <Bath size={16} className="text-[#003366]" />
-                <span>{property.profile.bathrooms}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-1">
-              <Maximize size={16} className="text-[#003366]" />
-              <span>
-                {property.profile.carpetArea} {property.profile.areaUnit}
-              </span>
-            </div>
-          </div>}
 
-          {property?.amenities && <div className="flex flex-wrap gap-4 mb-4 mt-4 text-sm text-gray-600">
-            {property?.amenities.map((item) => {
-              return (
+          {property?.profile && (
+            <div className="flex items-center gap-4 mb-4 mt-4 text-sm text-gray-600">
+              {property.profile.bedrooms > 0 && (
                 <div className="flex items-center gap-1">
-                  <PlayCircle size={16} className="text-[#003366]" />
-                  <span>{item}</span>
+                  <Bed size={16} className="text-[#003366]" />
+                  <span>{property.profile.bedrooms}</span>
                 </div>
-              )
-            })}
-
-          </div>}
-          {/* <button className="text-[#003366] hover:text-orange-600 font-semibold transition-colors">
-                    View Details →
-                  </button> */}
+              )}
+              {property.profile.bathrooms > 0 && (
+                <div className="flex items-center gap-1">
+                  <Bath size={16} className="text-[#003366]" />
+                  <span>{property.profile.bathrooms}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <Maximize size={16} className="text-[#003366]" />
+                <span>
+                  {property.profile.carpetArea} {property.profile.areaUnit}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
-
       </div>
     </article>
   );

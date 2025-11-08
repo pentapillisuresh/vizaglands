@@ -19,46 +19,47 @@ const Dashboard = () => {
   const [recentListings, setRecentListings] = useState([]);
   const [recentLeads, setRecentLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [clientDetails, setClientDetails] = useState(null);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      const clientToken = localStorage.getItem("token");
+  const fetchDashboardData = async () => {
+    const clientToken = localStorage.getItem("token");
 
-      try {
-        const response = await ApiService.get('/dashboard/client', {
-          headers: {
-            Authorization: `Bearer ${clientToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        console.log("Dashboard API Response:", response);
-
-        // ✅ Access nested response.data.data safely
-        if (response?.data) {
-          const data = response.data;
-
-          setStats({
-            totalListings: data.addedPropertiesCount || 0,
-            activeListings: data.verifiedPropertiesCount || 0,
-            totalViews: data.totalViews || 0,
-            totalInquiries: data.Inquiries || 0,
-            monthlyViews: data.totalThisMonthViews || 0
-          });
-
-          setRecentListings(data.properties || []);
-          setRecentLeads(data.leads || []);
-        } else {
-          console.warn("Unexpected response format:", response);
+    try {
+      const response = await ApiService.get('/dashboard/client', {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          'Content-Type': 'application/json'
         }
+      });
 
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
+      console.log("Dashboard API Response:", response);
+
+      // ✅ Access nested response.data.data safely
+      if (response?.data) {
+        const data = response.data;
+
+        setStats({
+          totalListings: data.addedPropertiesCount || 0,
+          activeListings: data.verifiedPropertiesCount || 0,
+          totalViews: data.totalViews || 0,
+          totalInquiries: data.Inquiries || 0,
+          monthlyViews: data.totalThisMonthViews || 0
+        });
+        const clientInfo = localStorage.setItem("clientDetails", JSON.stringify(data.clientDetails))
+        setClientDetails(clientInfo);
+        setRecentListings(data.properties || []);
+        setRecentLeads(data.leads || []);
+      } else {
+        console.warn("Unexpected response format:", response);
       }
-    };
 
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchDashboardData();
   }, []);
 
@@ -105,7 +106,8 @@ const Dashboard = () => {
               <p className="text-orange-100 mt-1">Reach more buyers by listing your properties with us</p>
             </div>
             <button
-              onClick={() => {
+              onClick={async () => {
+                await fetchDashboardData();
                 const clientDetails = JSON.parse(localStorage.getItem("clientDetails")); // ✅ use getItem + parse JSON
                 const postLimit = clientDetails?.postLimit || 0;
                 const propertyCount = stats.totalListings || 0;

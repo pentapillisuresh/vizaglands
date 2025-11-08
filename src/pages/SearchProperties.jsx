@@ -19,7 +19,7 @@ function Properties() {
   // 🔹 Filter form
   const [filters, setFilters] = useState({
     categoryId: categoryId || "",
-    marketType: "",
+    marketType: "sale",
     status: "",
     city: "",
     locality: "",

@@ -21,7 +21,8 @@ const PostProperty = () => {
     categoryId: '',
     propertyName: '',
     title: '',
-    description: '',
+    description: '', 
+    propertySubtype:'',
     marketType: 'sale', // sale, rent, lease
     propertyKind: 'residential', // residential or commercial
     catType: 'Residential',
@@ -61,7 +62,8 @@ const PostProperty = () => {
       plotAvailable: 0,
       facing: "East",
       carpetArea: "",
-      isParkingAvailable: false,
+      closedParking: 0,
+      openParking: 0,
       parkingType: "",
       status: "",
       areaUnit: "sqft",
