@@ -16,8 +16,8 @@ const Profile = () => {
     companyName: '',
     address: '',
     bio: '',
-    profilePic:
-      '',
+    profilePic:'',
+    area:'',
     kycProofName: 'ADHAR',
     kycProofNumber: '',
     kycUploadFile: '',
@@ -491,6 +491,21 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* Bio */}
+                <div className="pt-6 border-t border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Deal With Areas
+                  </label>
+                  <input
+                    value={profileData.area}
+                    placeholder='Deal with Area'
+                    onChange={(e) => handleInputChange('area', e.target.value)}
+                    disabled={!isEditing}
+                    rows="4"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                      }`}
+                  />
+                </div>
                 {/* Bio */}
                 <div className="pt-6 border-t border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
