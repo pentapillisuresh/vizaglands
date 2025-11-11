@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Home, Heart, Share2, Bed, Bath, Maximize,
-  Building, MapPin, CheckCircle, Phone, Mail, Calendar
+  Building, MapPin, CheckCircle, Phone, Mail, Calendar, ChevronDown, ChevronUp
 } from "lucide-react";
 import { propertiesData } from "../data/propertiesData";
 import ApiService from "../hooks/ApiService";
@@ -10,7 +10,26 @@ import AOS from "aos";
 import PropertyMap from "../components/PropertyMap";
 import getPhotoSrc from "../hooks/getPhotos";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// Social Media Icons
+const SocialIcons = {
+  whatsapp: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/whatsapp.svg",
+  facebook: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg",
+  twitter: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg",
+  linkedin: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg",
+  telegram: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg",
+  email: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg",
+  share: "https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/share-2.svg"
+};
+
 function PropertyDetail() {
+  const swiperRef = useRef(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,7 +39,6 @@ function PropertyDetail() {
   const [showContact, setShowContact] = useState(false);
   const [page, setPage] = useState(1);
   const fromUser = location.state?.from || null;
-  console.log(fromUser)
   const [similarProperties, setSimilarProperties] = useState(propertiesData);
   const [formData, setFormData] = useState({
     name: "",
@@ -28,8 +46,105 @@ function PropertyDetail() {
     phoneNumber: "",
     message: "",
   });
-
   const [status, setStatus] = useState("");
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
+  // ✅ Swiper configuration
+  const swiperConfig = {
+    modules: [Navigation, Pagination, Autoplay],
+    spaceBetween: 30,
+    slidesPerView: 1,
+    navigation: false,
+    pagination: { 
+      clickable: true,
+      dynamicBullets: true 
+    },
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+    },
+    breakpoints: {
+      640: {
+        slidesPerView: 1,
+      },
+      768: {
+        slidesPerView: 2,
+      },
+      1024: {
+        slidesPerView: 3,
+      },
+    },
+    onSwiper: (swiper) => {
+      swiperRef.current = swiper;
+    },
+  };
+
+  // Share functionality
+  const getShareUrl = () => {
+    return `${window.location.origin}/property/${id}`;
+  };
+
+  const getShareMessage = () => {
+    return `Check out this amazing property: ${property?.title} - ${formatPrice(property?.price)}`;
+  };
+
+  const shareOnWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(getShareMessage() + '\n' + getShareUrl())}`;
+    window.open(url, '_blank');
+  };
+
+  const shareOnFacebook = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`;
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const shareOnTwitter = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareMessage())}&url=${encodeURIComponent(getShareUrl())}`;
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const shareOnLinkedIn = () => {
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareUrl())}`;
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const shareOnTelegram = () => {
+    const url = `https://t.me/share/url?url=${encodeURIComponent(getShareUrl())}&text=${encodeURIComponent(getShareMessage())}`;
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const shareViaEmail = () => {
+    const subject = `Check out this property: ${property?.title}`;
+    const body = `${getShareMessage()}\n\nView more details: ${getShareUrl()}`;
+    const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = url;
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareUrl());
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const shareViaNative = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: property?.title,
+          text: getShareMessage(),
+          url: getShareUrl(),
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      copyToClipboard();
+    }
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -43,12 +158,12 @@ function PropertyDetail() {
     setLoading(true);
     setStatus("");
     const payload = {
-      propertyId: property.id || null, // fallback if not provided
+      propertyId: property.id || null,
       name: formData.name,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       message: formData.message,
-      leadType: "callback", // or "inquiry" / "callback" etc.
+      leadType: "callback",
     }
     try {
       const response = await ApiService.post("/leads", payload, {
@@ -58,15 +173,13 @@ function PropertyDetail() {
       });
 
       if (response) {
-        // setStatus("✅ ", request.message);
-
         setFormData({
           name: "",
           email: "",
           phoneNumber: "",
           message: "",
         });
-        alert("Thankyou for contacting us,our team will contact you very soon ")
+        alert("Thank you for contacting us, our team will contact you very soon ")
         setTimeout(() => {
           setStatus("")
         }, 2000);
@@ -81,7 +194,6 @@ function PropertyDetail() {
     }
   };
 
-
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
@@ -92,9 +204,6 @@ function PropertyDetail() {
     if (prop) {
       setProperty(prop);
       window.scrollTo(0, 0);
-    } else {
-      // Optional: fetch property from backend if not passed via navigate
-      // fetch(`/api/properties/${id}`).then(res => res.json()).then(data => setProperty(data));
     }
   }, [location.state, id]);
 
@@ -102,9 +211,7 @@ function PropertyDetail() {
     fetchPropertyDetails()
   }, [location.state, id]);
 
-
   const fetchPropertyDetails = async () => {
-
     try {
       const response = await ApiService.get(`/properties/${id}`, {
         headers: {
@@ -114,7 +221,6 @@ function PropertyDetail() {
 
       console.log("Dashboard API Response:", response);
 
-      // ✅ Access nested response.data.data safely
       if (response?.property) {
         const propertyDetails = response.property;
         setProperty(propertyDetails);
@@ -135,8 +241,6 @@ function PropertyDetail() {
       limit: 3,
       categoryId: property?.categoryId,
       marketType: property?.marketType,
-      // city:,
-      // locality,
     }
     try {
       const response = await ApiService.get('/properties', payload, {
@@ -147,11 +251,9 @@ function PropertyDetail() {
 
       console.log("Dashboard API Response:", response);
 
-      // ✅ Access nested response.data.data safely
       if (response?.properties) {
         const data = response.properties;
         const rrr = data.filter((item) => item.id !== property?.id)
-
         setSimilarProperties(data || []);
       } else {
         console.warn("Unexpected response format:", response);
@@ -167,18 +269,16 @@ function PropertyDetail() {
   const addViewProperty = async () => {
     try {
       const clientToken = localStorage.getItem("token");
-
       const response = await ApiService.post(
-        `/propertyView`,              // URL
-        { propertyId: id },           // Request body
-        {                             // Config (headers)
+        `/propertyView`,
+        { propertyId: id },
+        {
           headers: {
             Authorization: `Bearer ${clientToken}`,
             'Content-Type': 'application/json',
           },
         }
       );
-
       console.log('Property view recorded:', response.data);
     } catch (err) {
       console.log(err.response?.data?.message || err.message);
@@ -188,7 +288,6 @@ function PropertyDetail() {
   const updateViewCount = async () => {
     try {
       const clientToken = localStorage.getItem("token");
-
       const response = await ApiService.put(`/properties/updateView/${id}`,
         {
           headers: {
@@ -197,7 +296,6 @@ function PropertyDetail() {
           }
         },
       )
-
       if (response) {
         navigate('./')
       } else {
@@ -213,18 +311,17 @@ function PropertyDetail() {
     const isLogin = localStorage.getItem("isLogin");
     if (isLogin) {
       addViewProperty()
-    } else {
-
     }
-
     setTimeout(() => {
       updateViewCount()
     }, 5000);
   }, [id])
 
   useEffect(() => {
-    getpropertyByCategory()
-  }, [])
+    if (property) {
+      getpropertyByCategory()
+    }
+  }, [property])
 
   // ✅ Utility: Format price
   const formatPrice = (price) => {
@@ -233,6 +330,20 @@ function PropertyDetail() {
     if (num >= 10000000) return `₹${(num / 10000000).toFixed(2)} Cr`;
     if (num >= 100000) return `₹${(num / 100000).toFixed(2)} Lac`;
     return `₹${num.toLocaleString()}`;
+  };
+
+  // ✅ Description toggle functionality
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
+
+  // ✅ Function to truncate description
+  const getTruncatedDescription = (description, maxLength = 300) => {
+    if (!description) return "";
+    if (description.length <= maxLength || showFullDescription) {
+      return description;
+    }
+    return description.substring(0, maxLength) + "...";
   };
 
   // ✅ Simplify access
@@ -245,16 +356,12 @@ function PropertyDetail() {
 
   try {
     if (Array.isArray(property?.photos)) {
-      // Already an array
       galleryImages = property.photos;
     } else if (typeof property?.photos === 'string' && property.photos.startsWith('[')) {
-      // JSON string
       galleryImages = JSON.parse(property.photos);
     } else if (property?.photos) {
-      // Single image URL (not array)
       galleryImages = [property.photos];
     } else {
-      // Fallback
       galleryImages = [category?.photo];
     }
   } catch (err) {
@@ -264,18 +371,33 @@ function PropertyDetail() {
 
   const safeShow = (val) => val !== null && val !== undefined && val !== "" && val !== 0;
 
+  // ✅ FIXED: Improved back navigation function - Always go to properties-list
+  const handleBackToListings = () => {
+    navigate('/properties-list');
+  };
+
+  // ✅ Handle similar property click
+  const handleSimilarPropertyClick = (property) => {
+    navigate(`/property/${property.id}`, { 
+      state: { 
+        property,
+        from: fromUser
+      } 
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Bar */}
       <div className="bg-[#003366] text-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          {/* ✅ FIXED: Back Button - Always goes to properties-list */}
           <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-white hover:text-orange-400 transition-colors"
+            onClick={handleBackToListings}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
           >
-            <Home size={20} />
-            <span>Back to Listings</span>
+            <ArrowLeft size={20} />
+            Back to Listings
           </button>
           <h2 className="font-semibold text-lg">{category.name || "Property Details"}</h2>
         </div>
@@ -346,7 +468,6 @@ function PropertyDetail() {
                 <div className="text-right">
                   {property?.price ? (
                     <div className="text-3xl font-bold text-orange-600">{formatPrice(property?.price)}</div>
-
                   ) : (
                     <button
                       className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
@@ -355,6 +476,73 @@ function PropertyDetail() {
                       Contact Us for Price
                     </button>
                   )}
+                </div>
+              </div>
+
+              {/* Share Section */}
+              <div className="flex items-center justify-between py-4 border-y border-gray-200 mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-700 font-medium">Share this project:</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {/* Share Options */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={shareOnWhatsApp}
+                      className="w-10 h-10 flex items-center justify-center bg-green-500 hover:bg-green-600 rounded-full transition-colors"
+                      title="Share on WhatsApp"
+                    >
+                      <img src={SocialIcons.whatsapp} alt="WhatsApp" className="w-5 h-5 filter invert" />
+                    </button>
+                    
+                    <button
+                      onClick={shareOnFacebook}
+                      className="w-10 h-10 flex items-center justify-center bg-blue-600 hover:bg-blue-700 rounded-full transition-colors"
+                      title="Share on Facebook"
+                    >
+                      <img src={SocialIcons.facebook} alt="Facebook" className="w-5 h-5 filter invert" />
+                    </button>
+                    
+                    <button
+                      onClick={shareOnTwitter}
+                      className="w-10 h-10 flex items-center justify-center bg-blue-400 hover:bg-blue-500 rounded-full transition-colors"
+                      title="Share on Twitter"
+                    >
+                      <img src={SocialIcons.twitter} alt="Twitter" className="w-5 h-5 filter invert" />
+                    </button>
+                    
+                    <button
+                      onClick={shareOnLinkedIn}
+                      className="w-10 h-10 flex items-center justify-center bg-blue-800 hover:bg-blue-900 rounded-full transition-colors"
+                      title="Share on LinkedIn"
+                    >
+                      <img src={SocialIcons.linkedin} alt="LinkedIn" className="w-5 h-5 filter invert" />
+                    </button>
+                    
+                    <button
+                      onClick={shareOnTelegram}
+                      className="w-10 h-10 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
+                      title="Share on Telegram"
+                    >
+                      <img src={SocialIcons.telegram} alt="Telegram" className="w-5 h-5 filter invert" />
+                    </button>
+                    
+                    <button
+                      onClick={shareViaEmail}
+                      className="w-10 h-10 flex items-center justify-center bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+                      title="Share via Email"
+                    >
+                      <img src={SocialIcons.email} alt="Email" className="w-5 h-5 filter invert" />
+                    </button>
+
+                    <button
+                      onClick={shareViaNative}
+                      className="w-10 h-10 flex items-center justify-center bg-gray-600 hover:bg-gray-700 rounded-full transition-colors"
+                      title="Share"
+                    >
+                      <img src={SocialIcons.share} alt="Share" className="w-5 h-5 filter invert" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -378,12 +566,7 @@ function PropertyDetail() {
                 )}
               </div>
 
-              {/* Overview */}
-              {safeShow(property?.description) && (
-                <Section title="Overview">
-                  <p className="text-gray-700 leading-relaxed">{property?.description}</p>
-                </Section>
-              )}
+             
 
               {/* Property Details */}
               <Section title="Property Details">
@@ -402,26 +585,25 @@ function PropertyDetail() {
                   )}
                 </div>
               </Section>
-              {/* Nearby Details */}
+
+              {/* Nearby Details - Updated Design */}
               {Array.isArray(address?.near_by) && address.near_by.length > 0 && (
                 <Section title="Nearby Places">
-                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {address.near_by.map((place, idx) => (
-                      <li key={idx} className="flex justify-between">
-                        <span>{place.info}</span>
-                        {place.distance && (
-                          <span className="text-sm text-gray-500">{place.distance}</span>
-                        )}
-                      </li>
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                        <CheckCircle size={20} className="text-orange-600" />
+                        <div className="flex-1">
+                          <span className="text-[#003366] font-medium">{place.info}</span>
+                          {place.distance && (
+                            <span className="block text-sm text-gray-500 mt-1">{place.distance}</span>
+                          )}
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </Section>
               )}
-
-              {/* Map Section */}
-              <Section title="Location on Map">
-                <PropertyMap lat={address?.lat} lon={address?.lon} />
-              </Section>
 
               {/* Amenities */}
               {Array.isArray(property?.amenities) && property?.amenities.length > 0 && (
@@ -436,6 +618,41 @@ function PropertyDetail() {
                   </div>
                 </Section>
               )}
+
+
+ {/* Overview */}
+              {safeShow(property?.description) && (
+                <Section title="Overview">
+                  <div className="text-gray-700 leading-relaxed">
+                    <p className="whitespace-pre-line">
+                      {getTruncatedDescription(property?.description)}
+                    </p>
+                    {property?.description && property.description.length > 300 && (
+                      <button
+                        onClick={toggleDescription}
+                        className="mt-3 flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium transition-colors"
+                      >
+                        {showFullDescription ? (
+                          <>
+                            <ChevronUp size={16} />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown size={16} />
+                            Read More
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </Section>
+              )}
+
+              {/* Map Section */}
+              <Section title="Location on Map">
+                <PropertyMap lat={address?.lat} lon={address?.lon} />
+              </Section>
             </div>
           </div>
 
@@ -467,7 +684,7 @@ function PropertyDetail() {
                     {client.phoneNumber && (
                       <ContactCard icon={<Phone size={20} />} label="Call Now" value={client.phoneNumber} />
                     )}
-                    <ContactCard icon={<Mail size={20} />} label="Email" value="info@vizaglands.com" />
+                    <ContactCard icon={<Mail size={20} />} label="Email" value="info@vmrdaplots.com" />
                   </div>
                 )}
                 <div className="border-t pt-6">
@@ -528,86 +745,183 @@ function PropertyDetail() {
             </div>
           )}
         </div>
+
+        {/* Similar Properties Section */}
         {similarProperties?.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-[#003366] mb-6">Similar Properties</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {similarProperties?.map((property, idx) => (
-                <article
-                  key={property?.id}
-                  data-aos="fade-up"
-                  data-aos-delay={100 + idx * 100}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer group hover:shadow-2xl transition-shadow duration-300"
-                  onClick={() => navigate(`/property/${property?.id}`, { state: { property } })}
+          <section className="py-20 bg-white relative">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Heading */}
+              <div className="text-center mb-4">
+                <span className="inline-block bg-orange-50 text-orange-600 px-4 py-2 rounded-full font-medium text-sm uppercase tracking-wide">
+                  Similar Properties
+                </span>
+              </div>
+
+              <h2 className="text-4xl md:text-5xl font-serif font-extrabold text-center mb-12 text-gray-900">
+                Similar Properties You Might Like
+              </h2>
+
+              <div className="relative group">
+                {/* Custom Navigation Arrows */}
+                <button
+                  onClick={() => swiperRef.current?.slidePrev()}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white border border-gray-200 hover:border-orange-500 text-gray-600 hover:text-orange-600 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
+                  aria-label="Previous properties"
                 >
-                  {/* Image */}
-                  <div className="h-56 overflow-hidden">
-                    <img
-                      src={getPhotoSrc(property?.photos)}
-                      alt={property?.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
+                  <ChevronLeft size={24} className="stroke-2" />
+                </button>
+
+                <button
+                  onClick={() => swiperRef.current?.slideNext()}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white border border-gray-200 hover:border-orange-500 text-gray-600 hover:text-orange-600 w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
+                  aria-label="Next properties"
+                >
+                  <ChevronRight size={24} className="stroke-2" />
+                </button>
+
+                <Swiper {...swiperConfig} className="similar-properties-swiper">
+                  {similarProperties.map((property, idx) => (
+                    <SwiperSlide key={property?.id}>
+                      <article
+                        data-aos="fade-up"
+                        data-aos-delay={100 + idx * 100}
+                        className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer group-hover:shadow-2xl transition-all duration-300 mx-2 my-4 border border-gray-100 hover:border-orange-200"
+                        onClick={() => handleSimilarPropertyClick(property)}
+                      >
+                        {/* Image */}
+                        <div className="h-56 overflow-hidden relative">
+                          <img
+                            src={getPhotoSrc(property?.photos)}
+                            alt={property?.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                          {/* Overlay on hover */}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold text-[#003366] group-hover:text-orange-600 transition-colors mb-2 line-clamp-2">
+                            {property?.title}
+                          </h3>
+
+                          <div className="flex items-center gap-2 text-gray-600 mb-4">
+                            <MapPin size={16} className="text-orange-500 flex-shrink-0" />
+                            <span className="text-sm line-clamp-1">
+                              {property?.address?.city}, {property?.address?.locality}
+                            </span>
+                          </div>
+
+                          {property?.profile && (
+                            <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
+                              {property?.profile?.bedrooms > 0 && (
+                                <div className="flex items-center gap-1">
+                                  <Bed size={16} className="text-[#003366]" />
+                                  <span>{property?.profile?.bedrooms}</span>
+                                </div>
+                              )}
+                              {property?.profile?.bathrooms > 0 && (
+                                <div className="flex items-center gap-1">
+                                  <Bath size={16} className="text-[#003366]" />
+                                  <span>{property?.profile?.bathrooms}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1">
+                                <Maximize size={16} className="text-[#003366]" />
+                                <span>
+                                  {property?.profile?.carpetArea} {property?.profile?.areaUnit}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div className="text-right">
+                              {property?.price ? (
+                                <div className="text-2xl font-bold text-orange-600">
+                                  {formatPrice(property?.price)}
+                                </div>
+                              ) : (
+                                <button
+                                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-lg shadow-md transition-all"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    alert("Contact us for price!");
+                                  }}
+                                >
+                                  Contact Us
+                                </button>
+                              )}
+                            </div>
+                            <button className="text-[#003366] hover:text-orange-600 font-semibold transition-colors text-sm">
+                              View Details →
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+
+                {/* Bottom Navigation Dots - Enhanced */}
+                <div className="flex justify-center mt-8">
+                  <div className="bg-white rounded-full px-4 py-2 shadow-lg border border-gray-200">
+                    <div className="flex items-center gap-6">
+                      <button
+                        onClick={() => swiperRef.current?.slidePrev()}
+                        className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center group-hover:border-orange-500 group-hover:bg-orange-50 transition-all">
+                          <ChevronLeft size={16} />
+                        </div>
+                        <span className="text-sm font-medium">Prev</span>
+                      </button>
+                      
+                      <div className="h-4 w-px bg-gray-300"></div>
+                      
+                      <button
+                        onClick={() => swiperRef.current?.slideNext()}
+                        className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors group"
+                      >
+                        <span className="text-sm font-medium">Next</span>
+                        <div className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center group-hover:border-orange-500 group-hover:bg-orange-50 transition-all">
+                          <ChevronRight size={16} />
+                        </div>
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-xl font-bold text-[#003366] group-hover:text-orange-600 transition-colors">
-                        {property?.title}
-                      </h3>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-gray-600 mb-4">
-                      <MapPin size={16} className="text-orange-500" />
-                      <span className="text-sm">
-                        {property?.address?.city}, {property?.address?.locality}
-                      </span>
-                    </div>
-
-                    {property?.profile && <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
-                      {property?.profile?.bedrooms > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Bed size={16} className="text-[#003366]" />
-                          <span>{property?.profile?.bedrooms}</span>
-                        </div>
-                      )}
-                      {property?.profile?.bathrooms > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Bath size={16} className="text-[#003366]" />
-                          <span>{property?.profile?.bathrooms}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <Maximize size={16} className="text-[#003366]" />
-                        <span>
-                          {property?.profile?.carpetArea} {property?.profile?.areaUnit}
-                        </span>
-                      </div>
-                    </div>}
-
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      {property?.price ? (
-                        <div className="text-2xl font-bold text-orange-600">
-                          {formatPrice(property?.price)}
-                        </div>
-                      ) : (
-                        <button
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
-                          onClick={() => alert("Contact us for price!")}
-                        >
-                          Contact Us for Price
-                        </button>
-                      )}
-
-                    </div>
-                  </div>
-                </article>
-              ))}
+                </div>
+              </div>
             </div>
-          </div>
+
+            <style jsx>{`
+              .similar-properties-swiper {
+                padding: 10px 0 40px 0;
+              }
+              
+              .similar-properties-swiper .swiper-pagination-bullet {
+                background: #003366;
+                opacity: 0.5;
+                width: 8px;
+                height: 8px;
+                transition: all 0.3s ease;
+              }
+              
+              .similar-properties-swiper .swiper-pagination-bullet-active {
+                background: #ea580c;
+                opacity: 1;
+                width: 20px;
+                border-radius: 4px;
+              }
+              
+              /* Hide default navigation since we have custom buttons */
+              .similar-properties-swiper .swiper-button-next,
+              .similar-properties-swiper .swiper-button-prev {
+                display: none;
+              }
+            `}</style>
+          </section>
         )}
-
-
       </div>
     </div>
   );
@@ -630,7 +944,6 @@ const Section = ({ title, children }) => (
     {children}
   </div>
 );
-
 const Detail = ({ label, value }) => (
   <div className="flex justify-between py-3 border-b">
     <span className="text-gray-600">{label}</span>
@@ -649,4 +962,3 @@ const ContactCard = ({ icon, label, value }) => (
 );
 
 export default PropertyDetail;
-

@@ -30,7 +30,7 @@ const AuthModal = ({ isOpen, onClose }) => {
         <div className="grid md:grid-cols-2">
           {/* LEFT SIDE */}
           <div className="hidden md:flex bg-gradient-to-br from-blue-900 to-blue-700 text-white flex-col justify-center items-center text-center p-10">
-            <h2 className="text-3xl font-bold mb-2">Welcome to Vizaglands</h2>
+            <h2 className="text-3xl font-bold mb-2">Welcome to vmrdaplots</h2>
             <p className="text-sm opacity-90 max-w-xs">
               Your journey to finding the perfect property starts here.
             </p>

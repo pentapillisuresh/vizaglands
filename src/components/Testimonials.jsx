@@ -14,7 +14,7 @@ const Testimonials = () => {
       id: 2,
       name: 'Sneha R.',
       role: 'Investor',
-      image: 'https://i.pravatar.cc/150?img=45',
+      image: 'https://img.freepik.com/free-photo/side-view-smiley-woman-wearing-eye-patches_23-2149479355.jpg?t=st=1762748965~exp=1762752565~hmac=bfdf5f81f04a789616b55836ad5835271fbd8cce07a6caec8d7e82c6387e6caf&w=1060',
       rating: 5,
       text: 'Outstanding service! They guided me through everything and helped negotiate a fantastic deal on my property.'
     },
@@ -30,7 +30,7 @@ const Testimonials = () => {
       id: 4,
       name: 'Priya S.',
       role: 'Property Seller',
-      image: 'https://i.pravatar.cc/150?img=47',
+      image: 'https://img.freepik.com/free-photo/young-pretty-model-is-smiling_114579-13323.jpg?t=st=1762748877~exp=1762752477~hmac=7d402ef0260e4644f6dc6261cee138269cc2c358d00a7207eb6637530b75a32b&w=1060',
       rating: 5,
       text: 'Sold my property in record time! Professional service and great market insights from the team.'
     }

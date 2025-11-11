@@ -80,6 +80,60 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const needsUnitNumber = isFlat || isOfficeSpace || isShopShowroom;
   const canHaveCommercialAddons = isOfficeSpace || isShopShowroom;
 
+  // --- Validation functions ---
+  const validateClosedParking = (value) => {
+    const numValue = parseInt(value);
+    return numValue >= 0 && numValue <= 10;
+  };
+
+  const validateOpenParking = (value) => {
+    const numValue = parseInt(value);
+    return numValue >= 0 && numValue <= 10;
+  };
+
+  const validatePropertyOnFloor = (value) => {
+    const numValue = parseInt(value);
+    return numValue >= 0 && numValue <= 99;
+  };
+
+  const validateTotalFloors = (value) => {
+    const numValue = parseInt(value);
+    return numValue >= 1 && numValue <= 99;
+  };
+
+  // --- Handler functions with validation ---
+  const handleClosedParkingChange = (value) => {
+    const numValue = parseInt(value);
+    if (validateClosedParking(numValue)) {
+      setClosedParking(numValue);
+    }
+  };
+
+  const handleOpenParkingChange = (value) => {
+    const numValue = parseInt(value);
+    if (validateOpenParking(numValue)) {
+      setOpenParking(numValue);
+    }
+  };
+
+  const handlePropertyOnFloorChange = (value) => {
+    const numValue = parseInt(value);
+    if (validatePropertyOnFloor(numValue)) {
+      setPropertyOnFloor(numValue);
+    } else if (value === "") {
+      setPropertyOnFloor("");
+    }
+  };
+
+  const handleTotalFloorsChange = (value) => {
+    const numValue = parseInt(value);
+    if (validateTotalFloors(numValue)) {
+      setTotalFloors(numValue);
+    } else if (value === "") {
+      setTotalFloors("");
+    }
+  };
+
   // --- Initialize state on edit/add ---
   useEffect(() => {
     if (!data) return;
@@ -138,8 +192,10 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   // --- Payload creation for Add/Edit ---
   const handleContinue = () => {
     const payload = { propertySubtype, price };
-    if (data?.marketType.toLowerCase()!=='sale') {
-      payload.advance(advance)
+    
+    // Fixed: Use property assignment instead of function call
+    if (data?.marketType.toLowerCase() !== 'sale') {
+      payload.advance = advance;
     }
 
     if (isPlotOrLand) {
@@ -188,10 +244,9 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         } : {}),
       };
     }
-    payload.ageOfProperty = status === "Ready to Move" ? ageOfProperty : "",
+    payload.ageOfProperty = status === "Ready to Move" ? ageOfProperty : "";
 
-
-      updateData(payload);
+    updateData(payload);
     onNext();
   };
 
@@ -202,10 +257,22 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     bedrooms && bathrooms && balconies !== "" && poojaRoom !== "" &&
     hasAtLeastOneArea && areaUnit && parkingType && status &&
     ((status === "Ready to Move" && ageOfProperty) || (status === "Under Construction" && possession));
-  const floorDetailsValidation = !needsFloorDetails || (totalFloors && propertyOnFloor);
+  
+  // Updated floor details validation with new constraints
+  const floorDetailsValidation = !needsFloorDetails || (
+    totalFloors && 
+    propertyOnFloor !== "" && 
+    validateTotalFloors(totalFloors) && 
+    validatePropertyOnFloor(propertyOnFloor)
+  );
+  
   const unitNumberValidation =
     !needsUnitNumber || (isFlat && flatNumber) || (isOfficeSpace && officeNumber) || (isShopShowroom && shopNumber);
-  const allApartmentFieldsFilled = baseResidentialValidation && floorDetailsValidation && unitNumberValidation;
+  
+  // Updated parking validation
+  const parkingValidation = validateClosedParking(closedParking) && validateOpenParking(openParking);
+  
+  const allApartmentFieldsFilled = baseResidentialValidation && floorDetailsValidation && unitNumberValidation && parkingValidation;
   const isFormComplete = isPlotOrLand ? allPlotFieldsFilled : allApartmentFieldsFilled;
 
   // --- Unit field helpers ---
@@ -217,6 +284,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     if (isOfficeSpace) setOfficeNumber(value);
     if (isShopShowroom) setShopNumber(value);
   };
+  
   return (
     <div className="space-y-8">
       <div>
@@ -246,7 +314,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
           )} */}
           <div>
             <label className="block font-roboto text-sm font-medium text-gray-700 mt-8 mb-4">
-             { data?.marketType.toLowerCase()==='sale' ? "Price": "Rent"} (₹) <span className="text-red-500">*</span>
+             { data?.marketType?.toLowerCase()==='sale' ? "Price": "Rent"} (₹) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -661,7 +729,93 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               )}
             </div>
           </div>
-          {needsUnitNumber && (
+
+          {/* Moved Parking and Units section here */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+            <div className="flex items-center gap-6">
+              {/* Closed Parking */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Closed Parking <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => handleClosedParkingChange(Math.max(0, closedParking - 1))}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    readOnly
+                    value={closedParking}
+                    className="w-12 text-center border-x border-gray-200 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleClosedParkingChange(closedParking + 1)}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+                {!validateClosedParking(closedParking) && (
+                  <p className="text-red-500 text-xs mt-1">Maximum 10 allowed</p>
+                )}
+              </div>
+
+              {/* Open Parking */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Open Parking <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenParkingChange(Math.max(0, openParking - 1))}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="text"
+                    readOnly
+                    value={openParking}
+                    className="w-12 text-center border-x border-gray-200 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleOpenParkingChange(openParking + 1)}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+                {!validateOpenParking(openParking) && (
+                  <p className="text-red-500 text-xs mt-1">Maximum 10 allowed</p>
+                )}
+              </div>
+
+              {/* Total Units - Moved here beside parking */}
+              {isFlat && (
+                <div className="flex flex-col">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Total Units <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={units}
+                    onChange={(e) => setUnits(e.target.value)}
+                    placeholder="Enter total units"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {needsUnitNumber && !isFlat && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {getUnitNumberLabel()}
@@ -681,18 +835,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               <p className="text-sm text-gray-600">Total no of floors and your floor details</p>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Floors <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={totalFloors}
-                    onChange={(e) => setTotalFloors(e.target.value)}
-                    placeholder="Enter total floors"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
+              
                {!isVilla && <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Property on Floor <span className="text-red-500">*</span>
@@ -700,76 +843,36 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                   <input
                     type="number"
                     value={propertyOnFloor}
-                    onChange={(e) => setPropertyOnFloor(e.target.value)}
-                    placeholder="Enter floor number"
+                    onChange={(e) => handlePropertyOnFloorChange(e.target.value)}
+                    placeholder="Enter floor number (0-99)"
+                    min="0"
+                    max="99"
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
                   />
-                </div>}
+                  {propertyOnFloor !== "" && !validatePropertyOnFloor(propertyOnFloor) && (
+                    <p className="text-red-500 text-xs mt-1">Please enter a value between 0 and 99</p>
+                  )}
+                </div>}   
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Total Floors <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={totalFloors}
+                    onChange={(e) => handleTotalFloorsChange(e.target.value)}
+                    placeholder="Enter total floors (1-99)"
+                    min="1"
+                    max="99"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500"
+                  />
+                  {totalFloors !== "" && !validateTotalFloors(totalFloors) && (
+                    <p className="text-red-500 text-xs mt-1">Please enter a value between 1 and 99</p>
+                  )}
+                </div>
               </div>
             </div>
           )}
-
-<div className="flex flex-col sm:flex-row sm:items-center gap-6">
-<div className="flex items-center gap-6">
-  {/* Closed Parking */}
-  <div className="flex flex-col">
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      Closed Parking <span className="text-red-500">*</span>
-    </label>
-    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setClosedParking(Math.max(0, closedParking - 1))}
-        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
-      >
-        −
-      </button>
-      <input
-        type="text"
-        readOnly
-        value={closedParking}
-        className="w-12 text-center border-x border-gray-200 focus:outline-none"
-      />
-      <button
-        type="button"
-        onClick={() => setClosedParking(closedParking + 1)}
-        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
-      >
-        +
-      </button>
-    </div>
-  </div>
-
-  {/* Open Parking */}
-  <div className="flex flex-col">
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      Open Parking <span className="text-red-500">*</span>
-    </label>
-    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setOpenParking(Math.max(0, openParking - 1))}
-        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
-      >
-        −
-      </button>
-      <input
-        type="text"
-        readOnly
-        value={openParking}
-        className="w-12 text-center border-x border-gray-200 focus:outline-none"
-      />
-      <button
-        type="button"
-        onClick={() => setOpenParking(openParking + 1)}
-        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
-      >
-        +
-      </button>
-    </div>
-  </div>
-</div>
-</div>
 
           {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

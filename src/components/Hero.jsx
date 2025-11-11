@@ -4,22 +4,19 @@ import { motion, AnimatePresence } from "framer-motion";
 const slides = [
   {
     id: 1,
-    image:
-      "./images/image3.jpg",
+    image: "./images/vmrda2.jpg",
     title: "Luxury Homes Await",
     subtitle: "Discover timeless elegance in every corner.",
   },
   {
     id: 2,
-    image:
-      "./images/image2.jpg",
+    image: "./images/vmrda1.jpg",
     title: "Find Your Perfect Villa",
     subtitle: "Experience comfort and beauty like never before.",
   },
   {
     id: 3,
-    image:
-      "./images/image1.jpg",
+    image: "./images/vmrda3.jpg",
     title: "Modern Living Redefined",
     subtitle: "Step into homes designed for luxury and style.",
   },
@@ -27,6 +24,8 @@ const slides = [
 
 const Hero = () => {
   const [current, setCurrent] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState([]);
+  const [currentImageLoaded, setCurrentImageLoaded] = useState(false);
 
   // Auto-slide every 6 seconds
   useEffect(() => {
@@ -36,19 +35,106 @@ const Hero = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Preload next image and handle current image load state
+  useEffect(() => {
+    // Reset current image loaded state when slide changes
+    setCurrentImageLoaded(imagesLoaded.includes(current));
+
+    // Preload next image
+    const nextIndex = (current + 1) % slides.length;
+    if (!imagesLoaded.includes(nextIndex)) {
+      const img = new Image();
+      img.src = slides[nextIndex].image;
+      img.onload = () => {
+        setImagesLoaded(prev => [...prev, nextIndex]);
+      };
+    }
+  }, [current, imagesLoaded]);
+
+  // Preload first image on component mount
+  useEffect(() => {
+    const img = new Image();
+    img.src = slides[0].image;
+    img.onload = () => {
+      setImagesLoaded(prev => [...prev, 0]);
+      setCurrentImageLoaded(true);
+    };
+  }, []);
+
+  // Handle manual slide change
+  const handleSlideChange = (index) => {
+    setCurrent(index);
+    if (!imagesLoaded.includes(index)) {
+      const img = new Image();
+      img.src = slides[index].image;
+      img.onload = () => {
+        setImagesLoaded(prev => [...prev, index]);
+      };
+    }
+  };
+
+  // Optimize image loading with quality parameters (if using CDN)
+  const getOptimizedImageUrl = (imagePath) => {
+    // If you're using a CDN, you can add quality parameters here
+    // Example: return `${imagePath}?q=80&w=1920`; // 80% quality, 1920px width
+    return imagePath;
+  };
+
   return (
     <div className="relative h-screen overflow-hidden">
-      <AnimatePresence>
-        <motion.img
+      <AnimatePresence mode="wait">
+        <motion.div
           key={slides[current].id}
-          src={slides[current].image}
-          alt={slides[current].title}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+          className="absolute inset-0 w-full h-full"
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ 
+            opacity: 1, 
+            x: 0,
+            transition: {
+              duration: 1.2,
+              ease: "easeInOut"
+            }
+          }}
+          exit={{ 
+            opacity: 0, 
+            x: -100,
+            transition: {
+              duration: 1.2,
+              ease: "easeInOut"
+            }
+          }}
+        >
+          {/* Loading placeholder */}
+          {!currentImageLoaded && (
+            <motion.div 
+              className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 z-10 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-gray-600 text-lg">Loading...</div>
+            </motion.div>
+          )}
+          
+          <img
+            src={getOptimizedImageUrl(slides[current].image)}
+            alt={slides[current].title}
+            className={`w-full h-full object-cover transition-opacity duration-500 ${
+              currentImageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            onLoad={() => {
+              setCurrentImageLoaded(true);
+              if (!imagesLoaded.includes(current)) {
+                setImagesLoaded(prev => [...prev, current]);
+              }
+            }}
+            onError={() => {
+              // Fallback in case image fails to load
+              setCurrentImageLoaded(true);
+            }}
+            loading="eager"
+          />
+        </motion.div>
       </AnimatePresence>
 
       {/* Overlay */}
@@ -59,19 +145,93 @@ const Hero = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={slides[current].id}
-            initial={{ opacity: 0, y: -40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              transition: {
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.3
+              }
+            }}
+            exit={{ 
+              opacity: 0, 
+              y: -30,
+              transition: {
+                duration: 0.6,
+                ease: "easeIn"
+              }
+            }}
             className="text-white px-4"
           >
-            <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 drop-shadow-lg">
+            <motion.h1 
+              className="text-4xl md:text-6xl font-serif font-bold mb-4 drop-shadow-lg"
+              initial={{ opacity: 0, y: -30 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                  duration: 0.8,
+                  ease: "easeOut",
+                  delay: 0.5
+                }
+              }}
+              exit={{ 
+                opacity: 0, 
+                y: -20,
+                transition: {
+                  duration: 0.5,
+                  ease: "easeIn"
+                }
+              }}
+            >
               {slides[current].title}
-            </h1>
-            <p className="text-lg md:text-xl font-light text-gray-200 mb-8">
+            </motion.h1>
+            
+            <motion.p 
+              className="text-lg md:text-xl font-light text-gray-200 mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                  duration: 0.8,
+                  ease: "easeOut",
+                  delay: 0.7
+                }
+              }}
+              exit={{ 
+                opacity: 0, 
+                y: -15,
+                transition: {
+                  duration: 0.5,
+                  ease: "easeIn"
+                }
+              }}
+            >
               {slides[current].subtitle}
-            </p>
+            </motion.p>
+            
             <motion.button
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                  duration: 0.8,
+                  ease: "easeOut",
+                  delay: 0.9
+                }
+              }}
+              exit={{ 
+                opacity: 0, 
+                y: -10,
+                transition: {
+                  duration: 0.5,
+                  ease: "easeIn"
+                }
+              }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition"
@@ -82,17 +242,20 @@ const Hero = () => {
         </AnimatePresence>
       </div>
 
-      {/* Subtle dots at bottom */}
+      {/* Navigation Dots */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 flex space-x-3">
         {slides.map((_, index) => (
-          <div
+          <motion.button
             key={index}
+            onClick={() => handleSlideChange(index)}
             className={`w-3 h-3 rounded-full transition-all duration-500 ${
               current === index
                 ? "bg-white scale-125 shadow-md"
                 : "bg-white/40 hover:bg-white/60"
             }`}
-          ></div>
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+          />
         ))}
       </div>
     </div>

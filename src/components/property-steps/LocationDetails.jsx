@@ -17,6 +17,11 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [lon, setLon] = useState(data.address?.lon || "");
   const [advantages, setAdvantages] = useState(getAdvantages(data));
 
+  // ✅ Form validation states
+  const [errors, setErrors] = useState({
+    propertyName: "",
+    roadFacing: ""
+  });
 
   // ✅ Detect if property is land-like
   const subtype = (data.propertySubtype || "").trim().toLowerCase();
@@ -25,8 +30,23 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
     subtype.includes("plot") ||
     subtype === "farmhouse";
 
+  // ✅ Check if project name is required
+  const isProjectNameRequired = !((subtype || "").toLowerCase().includes("land") || (data?.marketType || "").toLowerCase() === "rent");
+
   // ✅ Label for apartment/society input
   const [apartmentLabel, setApartmentLabel] = useState("");
+
+  // ✅ Placeholders for advantages
+  const advantagePlaceholders = [
+    "e.g., Near Supermarket or Shopping Mall",
+    "e.g., Close to School or College",
+    "e.g., Near Hospital or Clinic",
+    "e.g., Bus Stop or Metro Station",
+    "e.g., Park or Recreation Area",
+    "e.g., Restaurant or Food Court",
+    "e.g., Highway or Main Road",
+    "e.g., Other nearby advantage"
+  ];
 
   useEffect(() => {
     switch (data.propertySubtype) {
@@ -114,8 +134,41 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
     });
   }, [city, locality]);
 
+  // ✅ Validate form
+  const validateForm = () => {
+    const newErrors = {
+      propertyName: "",
+      roadFacing: ""
+    };
+
+    // Validate project name if required
+    if (isProjectNameRequired) {
+      if (!propertyName.trim()) {
+        newErrors.propertyName = "Project name is required";
+      } else if (propertyName.trim().length < 10) {
+        newErrors.propertyName = "Project name must be at least 10 characters";
+      } else if (propertyName.trim().length > 50) {
+        newErrors.propertyName = "Project name cannot exceed 50 characters";
+      }
+    }
+
+    // Validate road facing
+    if (!roadFacing) {
+      newErrors.roadFacing = "Road facing is required";
+    } else if (parseInt(roadFacing) <= 0) {
+      newErrors.roadFacing = "Road facing must be greater than 0";
+    }
+
+    setErrors(newErrors);
+    return !newErrors.propertyName && !newErrors.roadFacing;
+  };
+
   // ✅ Handlers
   const handleContinue = () => {
+    if (!validateForm()) {
+      return;
+    }
+
     updateData({
       address: {
         city,
@@ -140,13 +193,45 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   };
 
   const handleAddMore = () => {
-    setAdvantages([...advantages, { info: "", distance: "250 m" }]);
+    if (advantages.length < 8) {
+      setAdvantages([...advantages, { info: "", distance: "250 m" }]);
+    }
   };
 
   const handleRemove = (index) => {
     const updated = advantages.filter((_, i) => i !== index);
     setAdvantages(updated);
   };
+
+  // ✅ Handle property name change with 50 character limit
+  const handlePropertyNameChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 50) {
+      setPropertyName(value);
+      // Clear error when user starts typing
+      if (errors.propertyName) {
+        setErrors(prev => ({ ...prev, propertyName: "" }));
+      }
+    }
+  };
+
+  // ✅ Handle road facing change
+  const handleRoadFacingChange = (e) => {
+    const value = e.target.value;
+    setRoadFacing(value);
+    // Clear error when user starts typing
+    if (errors.roadFacing) {
+      setErrors(prev => ({ ...prev, roadFacing: "" }));
+    }
+  };
+
+  // ✅ Check if can add more advantages
+  const canAddMore = advantages.length < 8;
+
+  // ✅ Check if continue button should be enabled
+  const isContinueEnabled = city && locality && 
+    (!isProjectNameRequired || (propertyName.trim().length >= 10 && propertyName.trim().length <= 50)) && 
+    roadFacing && parseInt(roadFacing) > 0;
 
   // ✅ Render
   return (
@@ -160,22 +245,46 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
         </p>
       </div>
 
-      {!((subtype || "").toLowerCase().includes("land") || (data?.marketType).toLowerCase() === "rent") && (
+      {isProjectNameRequired && (
         <div>
-          <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Project Name
-          </label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block font-roboto text-sm font-medium text-gray-700">
+              Project Name <span className="text-red-500">*</span>
+            </label>
+            <span className={`text-xs ${propertyName.length >= 50 ? 'text-red-500' : propertyName.length >= 10 ? 'text-green-500' : 'text-gray-500'}`}>
+              {propertyName.length}/50 {propertyName.length >= 10 && '(Minimum 10)'}
+            </span>
+          </div>
           <input
             type="text"
             value={propertyName}
-            onChange={(e) => setPropertyName(e.target.value)}
-            placeholder="e.g., D-201, Sunrise Apartments"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
+            onChange={handlePropertyNameChange}
+            placeholder="e.g., D-201, property name"
+            className={`w-full px-4 py-3 border rounded-lg
                  focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                 outline-none font-roboto"
+                 outline-none font-roboto ${
+                   errors.propertyName ? 'border-red-500' : 'border-gray-300'
+                 }`}
+            maxLength={50}
           />
+          {errors.propertyName && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.propertyName}
+            </p>
+          )}
+          {!errors.propertyName && propertyName.length > 0 && propertyName.length < 10 && (
+            <p className="text-yellow-500 text-xs mt-1">
+              Minimum 10 characters required ({10 - propertyName.length} more needed)
+            </p>
+          )}
+          {!errors.propertyName && propertyName.length >= 10 && (
+            <p className="text-green-500 text-xs mt-1">
+              ✓ Project name meets requirements
+            </p>
+          )}
         </div>
       )}
+
       {/* 🏙️ City Dropdown */}
       <div>
         <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
@@ -252,7 +361,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
             type="text"
             value={apartmentDoorNo}
             onChange={(e) => setApartmentDoorNo(e.target.value)}
-            placeholder="e.g., D-201, Sunrise Apartments"
+            placeholder="e.g., D-201, apartment/society name"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg
                        focus:ring-2 focus:ring-orange-500 focus:border-transparent
                        outline-none font-roboto"
@@ -262,26 +371,38 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
 
       {/* 🚗 Road Facing */}
       <div>
-      <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-    Road Facing <span className="text-red-500">*</span>
-  </label>
-  <input
-    type="number"
-    value={roadFacing}
-    onChange={(e) => setRoadFacing(e.target.value)}
-    placeholder="100 ft"
-    className="w-full px-4 py-3 border border-gray-300 rounded-lg
+        <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
+          Road Facing <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="number"
+          value={roadFacing}
+          onChange={handleRoadFacingChange}
+          placeholder="100 ft"
+          className={`w-full px-4 py-3 border rounded-lg
                focus:ring-2 focus:ring-orange-500 focus:border-transparent
-               outline-none font-roboto"
-    min="0"
-  />
+               outline-none font-roboto ${
+                 errors.roadFacing ? 'border-red-500' : 'border-gray-300'
+               }`}
+          min="1"
+        />
+        {errors.roadFacing && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.roadFacing}
+          </p>
+        )}
+        {!errors.roadFacing && roadFacing && (
+          <p className="text-green-500 text-xs mt-1">
+            ✓ Road facing entered
+          </p>
+        )}
       </div>
 
       {/* 🌍 Coordinates */}
       <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
         <div className="flex-1">
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Latitude (Optional)
+            Latitude (Location)
           </label>
           <input
             type="text"
@@ -295,7 +416,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
         </div>
         <div className="flex-1">
           <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Longitude (Optional)
+            Longitude (Location)
           </label>
           <input
             type="text"
@@ -309,11 +430,16 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
 
       {/* 🏫 Location Advantages */}
       <div className="pt-10 border-t border-gray-200">
-        <h2 className="font-serif text-2xl font-bold text-blue-900 mb-2">
-          Location Advantages
-        </h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-serif text-2xl font-bold text-blue-900">
+            Location Advantages
+          </h2>
+          <span className={`text-sm ${advantages.length >= 8 ? 'text-red-500' : 'text-gray-500'}`}>
+            {advantages.length}/8 advantages
+          </span>
+        </div>
         <p className="font-roboto text-gray-600 mb-6">
-          Add nearby landmarks and distances
+          Add nearby landmarks and distances (Maximum 8 advantages)
         </p>
 
         {Array.isArray(advantages) && advantages.map((item, index) => (
@@ -325,25 +451,30 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
               type="text"
               value={item.info}
               onChange={(e) => handleAdvantageChange(index, "info", e.target.value)}
-              placeholder="e.g., Near Hospital, Bus Stop"
+              placeholder={advantagePlaceholders[index] || "e.g., Nearby location advantage"}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg
-                         focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0"
+                         focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2 sm:mb-0
+                         outline-none font-roboto"
             />
             <select
               value={item.distance}
               onChange={(e) => handleAdvantageChange(index, "distance", e.target.value)}
-              className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="px-3 py-3 border border-gray-300 rounded-lg text-gray-600 
+                         focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                         outline-none font-roboto"
             >
-              <option>250 m</option>
-              <option>500 m</option>
-              <option>1 km</option>
-              <option>2 km</option>
-              <option>5 km</option>
+              <option value="250 m">250 m</option>
+              <option value="500 m">500 m</option>
+              <option value="1 km">1 km</option>
+              <option value="2 km">2 km</option>
+              <option value="5 km">5 km</option>
             </select>
             {advantages.length > 1 && (
               <button
+                type="button"
                 onClick={() => handleRemove(index)}
-                className="bg-red-600 hover:bg-red-500 text-white font-medium px-4 py-3 rounded-lg ml-0 sm:ml-2"
+                className="bg-red-600 hover:bg-red-500 text-white font-medium px-4 py-3 rounded-lg 
+                           ml-0 sm:ml-2 mt-2 sm:mt-0 transition-colors"
               >
                 Remove
               </button>
@@ -351,19 +482,27 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
           </div>
         ))}
 
-        <button
-          onClick={handleAddMore}
-          className="text-blue-900 font-medium mt-4 border border-blue-900 px-6 py-2 rounded-lg hover:bg-blue-900 hover:text-white transition"
-        >
-          + Add More
-        </button>
+        {canAddMore ? (
+          <button
+            type="button"
+            onClick={handleAddMore}
+            className="text-blue-900 font-medium mt-4 border border-blue-900 px-6 py-2 rounded-lg 
+                       hover:bg-blue-900 hover:text-white transition-colors"
+          >
+            + Add More Advantage
+          </button>
+        ) : (
+          <p className="text-red-500 text-sm mt-4">
+            Maximum 8 advantages reached. You cannot add more.
+          </p>
+        )}
       </div>
 
       {/* Continue Button */}
       <div className="pt-8">
         <button
           onClick={handleContinue}
-          disabled={!city || !locality}
+          disabled={!isContinueEnabled}
           className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium
                      px-10 py-3 rounded-lg transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed"
@@ -374,5 +513,5 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
     </div>
   );
 };
-
+ 
 export default LocationDetails;

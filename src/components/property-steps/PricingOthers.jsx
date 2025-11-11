@@ -2,18 +2,26 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ApiService from '../../hooks/ApiService';
+import Swal from 'sweetalert2';
+import Confetti from 'react-confetti';
 
 const PricingOthers = ({ data, updateData, isEditMode }) => {
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
   const [privateNotes, setPrivateNotes] = useState('');
-  const [approvedBy, setApprovedBy] = useState('');
+  const [approvedBy, setApprovedBy] = useState([]);
   const [amenities, setAmenities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  console.log("rrr::", data)
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  console.log("rrr::", data);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -30,30 +38,77 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     'Power Backup'
   ];
 
-  // Populate state in edit mode
+  // Handle window resize for confetti
   useEffect(() => {
-    if (isEditMode && data) {
-      setProjectName(data.projectName || '');
-      setDescription(data.description || '');
-      setPrivateNotes(data.privateNotes || '');
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
 
-      // 👇 Split comma-separated string into array
-      if (typeof data.approvedBy === 'string') {
-        setApprovedBy(data.approvedBy.split(',').map(item => item.trim()));
-      } else {
-        setApprovedBy(data.approvedBy || []);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Populate state from data - this runs whenever data changes
+  useEffect(() => {
+    // Only initialize if we have data and the fields are empty
+    if (data) {
+      if (data.projectName && !projectName) {
+        setProjectName(data.projectName || '');
+      }
+      
+      if (data.description && !description) {
+        setDescription(data.description || '');
+      }
+      
+      if (data.privateNotes && !privateNotes) {
+        setPrivateNotes(data.privateNotes || '');
       }
 
-      setAmenities(data.amenities || []);
-    }
-  }, [isEditMode, data]);
+      // Handle approvedBy - only set if we have data and current state is empty
+      if (data.approvedBy && approvedBy.length === 0) {
+        if (typeof data.approvedBy === 'string') {
+          setApprovedBy(data.approvedBy.split(',').map(item => item.trim()).filter(item => item !== ''));
+        } else if (Array.isArray(data.approvedBy)) {
+          setApprovedBy(data.approvedBy);
+        }
+      }
 
+      // Handle amenities - only set if we have data and current state is empty
+      if (data.amenities && amenities.length === 0) {
+        if (Array.isArray(data.amenities)) {
+          setAmenities(data.amenities);
+        } else if (typeof data.amenities === 'string') {
+          setAmenities(data.amenities.split(',').map(item => item.trim()).filter(item => item !== ''));
+        }
+      }
+    }
+  }, [data, projectName, description, privateNotes, approvedBy.length, amenities.length]);
+
+  // Update parent data whenever local state changes
+  useEffect(() => {
+    const updatedData = {
+      ...data,
+      projectName: projectName || null,
+      description: description || null,
+      privateNotes: privateNotes || null,
+      approvedBy: approvedBy.length ? approvedBy.join(',') : null,
+      amenities: amenities.length ? amenities : null,
+    };
+
+    // Only update if there are actual changes to avoid infinite loops
+    if (JSON.stringify(updatedData) !== JSON.stringify(data)) {
+      updateData(updatedData);
+    }
+  }, [projectName, description, privateNotes, approvedBy, amenities, data, updateData]);
 
   const handleApprovedChange = (value) => {
     setApprovedBy(prev =>
       prev.includes(value)
-        ? prev.filter(v => v !== value)  // deselect
-        : [...prev, value]               // select
+        ? prev.filter(v => v !== value)
+        : [...prev, value]
     );
   };
 
@@ -63,11 +118,38 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     );
   };
 
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setDescription(value);
+    if (validationErrors.description) {
+      setValidationErrors(prev => ({ ...prev, description: '' }));
+    }
+  };
+
+  const handlePrivateNotesChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 100) {
+      setPrivateNotes(value);
+    }
+  };
+
   const validateForm = () => {
     const errors = {};
+    
     if (!description || description.trim() === '') {
       errors.description = 'Description is required';
+    } else if (description.trim().length < 10) {
+      errors.description = 'Description must be at least 10 characters';
     }
+    
+    if (privateNotes && privateNotes.trim() !== '') {
+      if (privateNotes.length < 10) {
+        errors.privateNotes = 'Private notes must be at least 10 characters';
+      } else if (privateNotes.length > 100) {
+        errors.privateNotes = 'Private notes cannot exceed 100 characters';
+      }
+    }
+    
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -81,13 +163,81 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     if (data.propertyProfile) score += 20;
     if (data.price) score += 10;
     if (data.propertySubtype) score += 10;
-    if (description) score += 10;
+    if (description && description.trim().length >= 10) score += 10;
     return score;
+  };
+
+  // Enhanced success popup with confetti
+  const showSuccessPopup = () => {
+    setShowConfetti(true);
+    
+    Swal.fire({
+      title: '🎉 Success!',
+      html: `
+        <div class="text-center">
+          <div class="text-4xl mb-4">🎊</div>
+          <h3 class="text-xl font-bold text-green-600 mb-2">${isEditMode ? 'Property Updated!' : 'Property Published!'}</h3>
+          <p class="text-gray-600 mb-4">Your property has been ${isEditMode ? 'updated' : 'published'} successfully!</p>
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p class="text-sm text-gray-700"><span class="font-semibold">Property Score:</span> ${calculateScore()}%</p>
+            <p class="text-sm text-gray-700"><span class="font-semibold">Type:</span> ${data.propertySubtype || 'N/A'}</p>
+            <p class="text-sm text-gray-700"><span class="font-semibold">Location:</span> ${data.city || 'N/A'}</p>
+          </div>
+        </div>
+      `,
+      icon: 'success',
+      confirmButtonColor: '#1e3a8a',
+      confirmButtonText: 'Go to Dashboard',
+      showCancelButton: true,
+      cancelButtonText: 'Add Another Property',
+      cancelButtonColor: '#6b7280',
+    }).then((result) => {
+      setShowConfetti(false);
+      if (result.isConfirmed) {
+        navigate('../../vendor/dashboard');
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        window.location.reload();
+      }
+    });
+
+    // Auto-hide confetti after 5 seconds
+    setTimeout(() => {
+      setShowConfetti(false);
+    }, 5000);
+  };
+
+  // Enhanced error popup
+  const showErrorPopup = (errorMessage) => {
+    Swal.fire({
+      title: '❌ Error!',
+      html: `
+        <div class="text-center">
+          <div class="text-4xl mb-4">😞</div>
+          <div class="text-left bg-red-50 p-4 rounded-lg border border-red-200">
+            <p class="text-red-700 font-medium">${errorMessage}</p>
+          </div>
+        </div>
+      `,
+      icon: 'error',
+      confirmButtonColor: '#dc2626',
+      confirmButtonText: 'Try Again',
+    });
+  };
+
+  // Enhanced validation error popup
+  const showValidationErrorPopup = () => {
+    Swal.fire({
+      title: '⚠️ Validation Error',
+      text: 'Please fix the validation errors before publishing',
+      icon: 'warning',
+      confirmButtonColor: '#f59e0b',
+      confirmButtonText: 'OK',
+    });
   };
 
   const handleSubmit = async (status) => {
     if (status === 'published' && !validateForm()) {
-      setError('Please fill all mandatory fields');
+      showValidationErrorPopup();
       return;
     }
 
@@ -101,8 +251,6 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         projectName: projectName || null,
         description: description || null,
         privateNotes: privateNotes || null,
-
-        // 👇 Convert array → string
         approvedBy: approvedBy.length ? approvedBy.join(',') : null,
         amenities,
       };
@@ -131,79 +279,136 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
       if (response) {
         setSuccess(true);
-        navigate('../../vendor/dashboard');
+        showSuccessPopup();
       } else {
-        setError(response?.message || 'Something went wrong');
+        const errorMsg = response?.message || 'Something went wrong while saving the property';
+        setError(errorMsg);
+        showErrorPopup(errorMsg);
       }
     } catch (err) {
-      setError(err.message);
+      const errorMsg = err.message || 'Network error occurred. Please try again.';
+      setError(errorMsg);
+      showErrorPopup(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
-  const isPublishDisabled = loading || !description;
+  const isPublishDisabled = loading || !description || description.trim().length < 10 || (privateNotes && privateNotes.length < 10);
 
   return (
-    <div className="space-y-8 relative">
+    <div className="space-y-8 relative min-h-screen">
+      {/* Confetti Animation */}
+      {showConfetti && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          numberOfPieces={200}
+          gravity={0.3}
+          colors={['#1e3a8a', '#3b82f6', '#f59e0b', '#dc2626', '#8b5cf6']}
+          recycle={false}
+          style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999 }}
+        />
+      )}
+
       {/* Header */}
-      <div>
+      <div className="text-center animate-fade-in">
         <h2 className="font-serif text-3xl font-bold text-blue-900 mb-2">
           Amenities and Other Details
         </h2>
         <p className="font-roboto text-gray-600">
           Set your amenities and add additional details
         </p>
+        
+        {/* Progress Score */}
+        <div className="mt-6 inline-flex items-center gap-3 bg-blue-50 px-6 py-3 rounded-full border border-blue-200 animate-pulse">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-sm">{calculateScore()}%</span>
+            </div>
+            <span className="text-blue-800 font-medium">Property Completion Score</span>
+          </div>
+        </div>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-roboto text-sm">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-roboto text-sm animate-shake">
           {error}
-        </div>
-      )}
-
-      {/* Success */}
-      {success && (
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-4 bg-green-100 border border-green-300 text-green-800 px-6 py-4 rounded-lg shadow-lg font-roboto z-50">
-          🎉 Property saved successfully!
         </div>
       )}
 
       {/* Form Fields */}
       <div className="space-y-6">
         {/* Description */}
-        <div>
-          <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Property Description <span className="text-red-500">*</span>
-          </label>
+        <div className="animate-slide-up">
+          <div className="flex justify-between items-center mb-2">
+            <label className="block font-roboto text-sm font-medium text-gray-700">
+              Property Description <span className="text-red-500">*</span>
+            </label>
+            <span className={`text-xs ${
+              description.length > 0 && description.length < 10 ? 'text-red-500' : 
+              description.length >= 10 ? 'text-green-500' : 'text-gray-500'
+            }`}>
+              {description.length}/10+ characters
+            </span>
+          </div>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your property..."
+            onChange={handleDescriptionChange}
+            placeholder="Describe your property (minimum 10 characters)..."
             rows="5"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${validationErrors.description ? 'border-red-500' : 'border-gray-300'
-              }`}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none transition-all duration-300 ${
+              validationErrors.description ? 'border-red-500 animate-shake' : 'border-gray-300'
+            }`}
           />
           {validationErrors.description && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
+            <p className="text-red-500 text-xs mt-1 animate-fade-in">{validationErrors.description}</p>
+          )}
+          {description.length > 0 && description.length < 10 && (
+            <p className="text-orange-500 text-xs mt-1 animate-fade-in">
+              Minimum 10 characters required ({10 - description.length} more needed)
+            </p>
+          )}
+          {description.length >= 10 && (
+            <p className="text-green-500 text-xs mt-1 animate-fade-in">
+              ✓ Description meets requirements
+            </p>
           )}
         </div>
 
         {/* Private Notes */}
-        <div>
-          <label className="block font-roboto text-sm font-medium text-gray-700 mb-2">
-            Private Notes
-          </label>
+        <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block font-roboto text-sm font-medium text-gray-700">
+              Private Notes
+            </label>
+            <span className={`text-xs ${
+              privateNotes.length > 100 ? 'text-red-500' : 
+              privateNotes.length > 0 && privateNotes.length < 10 ? 'text-orange-500' : 
+              'text-gray-500'
+            }`}>
+              {privateNotes.length}/100 {privateNotes.length > 0 && privateNotes.length < 10 && '(min 10)'}
+            </span>
+          </div>
           <textarea
             value={privateNotes}
-            onChange={(e) => setPrivateNotes(e.target.value)}
+            onChange={handlePrivateNotesChange}
             placeholder="Enter private notes (visible only to owner)"
             rows="3"
-            className="w-full px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none transition-all duration-300 ${
+              validationErrors.privateNotes ? 'border-red-500 animate-shake' : 'border-gray-300'
+            }`}
+            maxLength={100}
           />
+          {validationErrors.privateNotes && (
+            <p className="text-red-500 text-xs mt-1 animate-fade-in">{validationErrors.privateNotes}</p>
+          )}
           <p className="text-xs text-gray-500 mt-1">
             Private notes are only visible to owner. They won't appear on the frontend.
+            {privateNotes.length > 0 && privateNotes.length < 10 && (
+              <span className="text-orange-500 ml-1">Minimum 10 characters required</span>
+            )}
           </p>
         </div>
       </div>
@@ -214,7 +419,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         data.propertySubtype === 'Independent House / Villa') &&
         data.marketType.toLowerCase() === "sale")
         && (
-          <div className="space-y-6 mt-8">
+          <div className="space-y-6 mt-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
             {/* Approved By */}
             <div>
               <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">Approved By</h3>
@@ -224,10 +429,11 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
                     key={opt}
                     type="button"
                     onClick={() => handleApprovedChange(opt)}
-                    className={`px-4 py-2.5 rounded-full border-2 transition-all ${approvedBy.includes(opt)
-                        ? 'bg-blue-900 border-blue-900 text-white'
+                    className={`px-4 py-2.5 rounded-full border-2 transition-all duration-300 transform hover:scale-105 ${
+                      approvedBy.includes(opt)
+                        ? 'bg-blue-900 border-blue-900 text-white animate-pulse'
                         : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                      }`}
+                    }`}
                   >
                     {opt}
                   </button>
@@ -242,15 +448,17 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
                 {amenitiesOptions.map((amenity) => (
                   <label
                     key={amenity}
-                    className="flex items-center gap-2 text-gray-700 cursor-pointer"
+                    className="flex items-center gap-2 text-gray-700 cursor-pointer transition-all duration-300 hover:bg-gray-50 p-2 rounded-lg"
                   >
                     <input
                       type="checkbox"
                       checked={amenities.includes(amenity)}
                       onChange={() => handleAmenitiesChange(amenity)}
-                      className="text-orange-500 focus:ring-orange-500"
+                      className="text-orange-500 focus:ring-orange-500 transition-all duration-300"
                     />
-                    {amenity}
+                    <span className="transition-all duration-300 hover:text-blue-700">
+                      {amenity}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -259,7 +467,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         )}
 
       {/* Property Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-10">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-10 animate-fade-in">
         <h3 className="font-serif text-lg font-bold text-blue-900 mb-4">Property Summary</h3>
         <div className="grid grid-cols-2 gap-4 font-roboto text-sm">
           <div>
@@ -275,7 +483,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
             <>
               <div>
                 <span className="text-gray-600">Approved By:</span>
-                <span className="ml-2 font-medium text-gray-900">{approvedBy || 'N/A'}</span>
+                <span className="ml-2 font-medium text-gray-900">{approvedBy.join(', ') || 'N/A'}</span>
               </div>
               <div className="col-span-2">
                 <span className="text-gray-600">Amenities:</span>
@@ -288,26 +496,68 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
           <div>
             <span className="text-gray-600">Property Score:</span>
-            <span className="ml-2 font-medium text-orange-500">{success ? 100 : calculateScore()}%</span>
+            <span className="ml-2 font-medium text-orange-500 animate-pulse">{calculateScore()}%</span>
           </div>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
         <button
           onClick={() => handleSubmit('published')}
           disabled={isPublishDisabled}
-          className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100 shadow-lg hover:shadow-xl"
         >
-          {loading ? 'Publishing...' : isEditMode ? 'Update Property' : 'Publish Property'}
+          {loading ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Publishing...
+            </span>
+          ) : (
+            isEditMode ? 'Update Property' : 'Publish Property'
+          )}
         </button>
       </div>
 
       {/* Mandatory fields note */}
-      <div className="text-xs text-gray-500 text-center mt-4">
+      <div className="text-xs text-gray-500 text-center mt-4 animate-fade-in">
         <span className="text-red-500">*</span> indicates mandatory fields
       </div>
+
+      {/* Add CSS animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { 
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-out;
+        }
+        .animate-slide-up {
+          animation: slideUp 0.6s ease-out;
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };

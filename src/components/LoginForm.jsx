@@ -66,7 +66,7 @@ const LoginForm = ({ onClose }) => {
         }}
       >
         <div className="bg-black bg-opacity-40 flex flex-col justify-center items-center w-full h-full text-white text-center p-10">
-          <h2 className="text-4xl font-bold mb-4">Welcome to VizagLands</h2>
+          <h2 className="text-4xl font-bold mb-4">Welcome to vmrdaplots</h2>
           <p className="text-lg text-gray-200 max-w-md">
             Find your dream property with the most trusted real estate platform in Vizag.
           </p>
@@ -78,7 +78,7 @@ const LoginForm = ({ onClose }) => {
         <div className="w-full max-w-md space-y-6">
           <h2 className="text-3xl font-bold text-blue-900 mb-2 text-center">Welcome Back</h2>
           <p className="text-gray-600 text-center">
-            Sign in to continue to your VizagLands account
+            Sign in to continue to your vmrdaplots account
           </p>
 
           {error && (

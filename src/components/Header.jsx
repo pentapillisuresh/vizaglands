@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-react";
-import BuyFormModal from "./BuyFormModal";
-import DevelopmentFormModal from "./DevelopmentFormModal";
 import SearchBar from "../hooks/searchBar";
 import ApiService from "../hooks/ApiService";
 
@@ -13,24 +11,23 @@ const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
-  
+  const [searchKey, setSearchKey] = useState(0);
+
   const searchRef = useRef(null);
   const vendorMenuRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Enhanced login state management with profile sync
   useEffect(() => {
     const checkLoginStatus = () => {
       const loginStatus = localStorage.getItem('isLogin');
       const clientDataStr = localStorage.getItem('clientData');
       const clientDetailsStr = localStorage.getItem('clientDetails');
-      
+
       setIsLogin(loginStatus === 'true');
-      
+
       if (loginStatus === 'true') {
         try {
-          // Try clientData first, then clientDetails as fallback
           let clientData = null;
           if (clientDataStr) {
             clientData = JSON.parse(clientDataStr);
@@ -47,15 +44,12 @@ const Header = () => {
       }
     };
 
-    // Check immediately
     checkLoginStatus();
 
-    // Listen for storage changes (for cross-tab synchronization)
     const handleStorageChange = () => {
       checkLoginStatus();
     };
 
-    // Listen for custom profile update events from Profile component
     const handleProfileUpdate = (event) => {
       if (event.detail) {
         setProfileData(event.detail);
@@ -64,8 +58,7 @@ const Header = () => {
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('profileUpdate', handleProfileUpdate);
-    
-    // Also check when page becomes visible again
+
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         checkLoginStatus();
@@ -81,20 +74,12 @@ const Header = () => {
     };
   }, []);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Close search
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsSearchOpen(false);
       }
-      
-      // Close mobile menu
-      if (isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-      
-      // Close vendor menu
+
       if (vendorMenuRef.current && !vendorMenuRef.current.contains(event.target)) {
         setIsVendorMenuOpen(false);
       }
@@ -102,7 +87,12 @@ const Header = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobileMenuOpen]);
+  }, []);
+
+  useEffect(() => {
+    setIsSearchOpen(false);
+    setSearchResults([]);
+  }, [location.pathname]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -129,17 +119,33 @@ const Header = () => {
     setIsVendorMenuOpen(!isVendorMenuOpen);
   };
 
-  const handleVendorMenuClose = () => {
-    setIsVendorMenuOpen(false);
-  };
-
   const handleNavigation = (path) => {
-    navigate(path);
-    handleVendorMenuClose();
     setIsMobileMenuOpen(false);
+    setIsVendorMenuOpen(false);
+    setIsSearchOpen(false);
+    setSearchResults([]);
+    setSearchKey(prevKey => prevKey + 1);
+    navigate(path);
   };
 
-  // Navigation items for reusability
+  const handleSearchToggle = () => {
+    const newSearchState = !isSearchOpen;
+    setIsSearchOpen(newSearchState);
+
+    if (newSearchState) {
+      setIsVendorMenuOpen(false);
+      setIsMobileMenuOpen(false);
+      setSearchResults([]);
+      setSearchKey(prevKey => prevKey + 1);
+    }
+  };
+
+  const handleSearchClose = () => {
+    setIsSearchOpen(false);
+    setSearchResults([]);
+    setSearchKey(prevKey => prevKey + 1);
+  };
+
   const navItems = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
@@ -156,49 +162,47 @@ const Header = () => {
 
   return (
     <div ref={searchRef}>
-      <header className="shadow-sm bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="shadow-sm bg-gray-50 relative z-50">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
             <div className="flex items-center">
-              <img 
-                src="/images/logo.jpg" 
-                alt="Vizaglands Logo" 
-                className="h-10 w-auto cursor-pointer"
+              <img
+                src="/images/logovizag.png"
+                alt="Vizaglands Logo"
+                className="h-20 w-auto cursor-pointer transform transition-transform duration-300 hover:scale-105"
                 onClick={() => navigate("/")}
               />
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-2">
               {navItems.map(({ path, label }) => (
-                <a
+                <button
                   key={path}
-                  href={path}
-                  className={`relative font-medium font-roboto transition-colors ${
+                  onClick={() => handleNavigation(path)}
+                  className={`relative font-medium font-roboto transition-all duration-300 px-4 py-2 rounded-full transform hover:scale-105 ${
                     isActive(path)
-                      ? "text-orange-500"
-                      : "text-gray-700 hover:text-orange-500"
+                      ? "text-white bg-orange-500 shadow-md scale-105"
+                      : "text-gray-700 bg-white hover:text-orange-500 hover:bg-orange-50 border border-gray-200"
                   }`}
                 >
                   {label}
-                  {isActive(path) && (
-                    <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded-full" />
-                  )}
-                </a>
+                </button>
               ))}
             </nav>
 
-            {/* Desktop Buttons */}
-            <div className="hidden lg:flex items-center space-x-3">
-              {/* Search Button */}
+            <div className="hidden lg:flex items-center space-x-2">
               <button
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                onClick={handleSearchToggle}
                 className={`${
                   isSearchOpen ? "bg-orange-600" : "bg-orange-500"
-                } text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2`}
+                } text-white font-roboto px-4 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2 shadow-md transform hover:scale-105 active:scale-95`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className={`w-4 h-4 transition-transform duration-300 ${isSearchOpen ? "rotate-90" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -209,29 +213,40 @@ const Header = () => {
                 <span>Buy Property</span>
               </button>
 
-              {/* Sell Button */}
               <button
-                onClick={clientDashboards}
-                className="bg-orange-100 text-orange-600 font-roboto px-5 py-2 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400"
+                onClick={() => {
+                  clientDashboards();
+                  setIsSearchOpen(false);
+                  setSearchResults([]);
+                }}
+                className="bg-orange-100 text-orange-600 font-roboto px-4 py-2 rounded-full hover:bg-orange-200 transition-all duration-300 flex items-center space-x-2 border border-orange-400 shadow-md transform hover:scale-105 active:scale-95"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 h-4 transition-transform duration-300 hover:rotate-90"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>Sell Property</span>
               </button>
 
-              {/* Vendor Dropdown */}
               <div className="relative" ref={vendorMenuRef}>
                 <button
-                  onClick={handleVendorMenuToggle}
-                  className="bg-orange-500 text-white font-roboto px-5 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2 min-w-[120px] justify-center"
+                  onClick={() => {
+                    handleVendorMenuToggle();
+                    setIsSearchOpen(false);
+                    setSearchResults([]);
+                  }}
+                  className="bg-orange-500 text-white font-roboto px-4 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 flex items-center space-x-2 min-w-[100px] justify-center shadow-md transform hover:scale-105 active:scale-95"
                 >
                   <User className="w-4 h-4" />
-                  <span className="truncate max-w-[80px]">
+                  <span className="truncate max-w-[70px]">
                     {isLogin && profileData?.fullName ? profileData.fullName : "Login"}
                   </span>
                   <svg
-                    className={`w-4 h-4 transform transition-transform ${
+                    className={`w-4 h-4 transform transition-transform duration-300 ${
                       isVendorMenuOpen ? "rotate-180" : ""
                     }`}
                     fill="none"
@@ -243,7 +258,7 @@ const Header = () => {
                 </button>
 
                 {isVendorMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg border border-gray-200 z-50 transform origin-top-right transition-all duration-300 animate-in fade-in-0 zoom-in-95">
                     <div className="py-2">
                       {isLogin ? (
                         <>
@@ -251,27 +266,27 @@ const Header = () => {
                             <button
                               key={path}
                               onClick={() => handleNavigation(path)}
-                              className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                              className="w-full text-left px-4 py-2 flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 transform hover:translate-x-1"
                             >
-                              <Icon className="w-4 h-4 mr-2" /> 
+                              <Icon className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
                               {label}
                             </button>
                           ))}
                           <hr className="my-1 border-gray-200" />
                           <button
                             onClick={handleLogout}
-                            className="w-full text-left px-4 py-2 flex items-center text-red-500 hover:bg-red-50 transition-colors"
+                            className="w-full text-left px-4 py-2 flex items-center text-red-500 hover:bg-red-50 transition-all duration-200 transform hover:translate-x-1"
                           >
-                            <LogOut className="w-4 h-4 mr-2" /> 
+                            <LogOut className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
                             Logout
                           </button>
                         </>
                       ) : (
                         <button
                           onClick={() => handleNavigation("/login-register")}
-                          className="w-full text-left px-4 py-2 flex items-center text-orange-600 hover:bg-orange-50 transition-colors"
+                          className="w-full text-left px-4 py-2 flex items-center text-orange-600 hover:bg-orange-50 transition-all duration-200 transform hover:translate-x-1"
                         >
-                          <User className="w-4 h-4 mr-2" /> 
+                          <User className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
                           Login / Register
                         </button>
                       )}
@@ -281,52 +296,61 @@ const Header = () => {
               </div>
             </div>
 
-            {/* Mobile Menu Toggle */}
             <button
-              className="lg:hidden text-gray-700 p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden text-gray-700 p-2 transform transition-transform duration-300 hover:scale-110 active:scale-95"
+              onClick={() => {
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+                setIsSearchOpen(false);
+                setSearchResults([]);
+              }}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className={`w-6 h-6 transition-transform duration-300 ${isMobileMenuOpen ? "rotate-90" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 py-3 space-y-3">
-              {/* Mobile Navigation */}
+          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg transform transition-all duration-300 ease-in-out animate-in slide-in-from-top-5">
+            <div className="px-4 py-3 space-y-2">
               {navItems.map(({ path, label }) => (
-                <a
+                <button
                   key={path}
-                  href={path}
-                  className={`block font-medium font-roboto transition-colors py-2 px-3 rounded-lg ${
+                  onClick={() => handleNavigation(path)}
+                  className={`w-full text-left font-medium font-roboto transition-all duration-300 py-2 px-3 rounded-full transform hover:scale-105 ${
                     isActive(path)
-                      ? "text-orange-500 bg-orange-50"
-                      : "text-gray-700 hover:text-orange-500 hover:bg-gray-50"
+                      ? "text-white bg-orange-500 scale-105"
+                      : "text-gray-700 bg-gray-100 hover:text-orange-500 hover:bg-orange-50"
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {label}
-                </a>
+                </button>
               ))}
 
-              <div className="border-t border-gray-200 pt-3 mt-3">
-                {/* Mobile Search Button */}
+              <div className="border-t border-gray-200 pt-2 mt-2">
                 <button
                   onClick={() => {
-                    setIsSearchOpen(!isSearchOpen);
+                    handleSearchToggle();
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`w-full text-left font-roboto py-2 px-3 rounded-lg flex items-center space-x-2 ${
-                    isSearchOpen 
-                      ? "text-white bg-orange-600" 
-                      : "text-gray-700 bg-orange-500 text-white"
+                  className={`w-full text-left font-roboto py-2 px-3 rounded-full flex items-center space-x-2 transform transition-all duration-300 hover:scale-105 ${
+                    isSearchOpen
+                      ? "text-white bg-orange-600 scale-105"
+                      : "text-white bg-orange-500"
                   }`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -337,51 +361,56 @@ const Header = () => {
                   <span>Buy Property</span>
                 </button>
 
-                {/* Mobile Sell Button */}
                 <button
                   onClick={() => {
                     clientDashboards();
                     setIsMobileMenuOpen(false);
+                    setIsSearchOpen(false);
+                    setSearchResults([]);
                   }}
-                  className="w-full text-left font-roboto py-2 px-3 rounded-lg flex items-center space-x-2 bg-orange-100 text-orange-600 border border-orange-400 mt-2"
+                  className="w-full text-left font-roboto py-2 px-3 rounded-full flex items-center space-x-2 bg-orange-100 text-orange-600 border border-orange-400 mt-2 transform transition-all duration-300 hover:scale-105"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                   </svg>
                   <span>Sell Property</span>
                 </button>
 
-                {/* Mobile Vendor Menu */}
-                <div className="mt-3 space-y-1">
+                <div className="mt-2 space-y-1">
                   {isLogin ? (
                     <>
-                      <div className="px-3 py-2 text-sm font-medium text-gray-500">
+                      <div className="px-3 py-1 text-sm font-medium text-gray-500 transform transition-all duration-300">
                         Welcome, {profileData?.fullName || "User"}
                       </div>
                       {vendorMenuItems.map(({ path, label, icon: Icon }) => (
                         <button
                           key={path}
                           onClick={() => handleNavigation(path)}
-                          className="w-full text-left py-2 px-3 rounded-lg flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                          className="w-full text-left py-2 px-3 rounded-lg flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 transform hover:translate-x-2"
                         >
-                          <Icon className="w-4 h-4 mr-2" />
+                          <Icon className="w-4 h-4 mr-2 transition-transform duration-200" />
                           {label}
                         </button>
                       ))}
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left py-2 px-3 rounded-lg flex items-center text-red-500 hover:bg-red-50 transition-colors"
+                        className="w-full text-left py-2 px-3 rounded-lg flex items-center text-red-500 hover:bg-red-50 transition-all duration-200 transform hover:translate-x-2"
                       >
-                        <LogOut className="w-4 h-4 mr-2" />
+                        <LogOut className="w-4 h-4 mr-2 transition-transform duration-200" />
                         Logout
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => handleNavigation("/login-register")}
-                      className="w-full text-left py-2 px-3 rounded-lg flex items-center text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="w-full text-left py-2 px-3 rounded-full flex items-center text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all duration-300 transform hover:scale-105"
                     >
-                      <User className="w-4 h-4 mr-2" />
+                      <User className="w-4 h-4 mr-2 transition-transform duration-200" />
                       Login / Register
                     </button>
                   )}
@@ -392,11 +421,14 @@ const Header = () => {
         )}
       </header>
 
-      {/* Search Bar */}
       {isSearchOpen && (
-        <div className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <SearchBar setResults={setSearchResults} />
+        <div className="bg-white border-b border-gray-200 shadow-sm w-full transform transition-all duration-500 ease-in-out animate-in slide-in-from-top-10 fade-in-50 relative z-40">
+          <div className="w-full">
+            <SearchBar
+              key={searchKey}
+              setResults={setSearchResults}
+              onSearchClose={handleSearchClose}
+            />
           </div>
         </div>
       )}

@@ -17,6 +17,25 @@ const ManageListings = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
 
+  // ✅ Fixed Sold Out Overlay - No height increase
+  const SoldOutOverlay = ({ isSold, children }) => {
+    if (!isSold) return children;
+
+    return (
+      <div className="relative w-full h-full">
+        {children}
+        {/* Clean SOLD badge only - no overlay that affects height */}
+        <div className="absolute top-3 right-3 z-10">
+          <div className="bg-red-600 text-white px-3 py-1 rounded-md shadow-lg border-2 border-white">
+            <span className="text-xs font-bold uppercase tracking-wider">
+              SOLD
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // ✅ Fetch listings from API
   const fetchListings = async () => {
     try {
@@ -102,13 +121,12 @@ const ManageListings = () => {
 
   // ✅ Handle Edit
   const handleEdit = (listing) => {
-    // setEditingProperty(listing)
     navigate(`/post-property?edit=${listing.id}`, {
       state: {
-        listing, // or any other data you want to send
+        listing,
         mode: 'edit',
       },
-    });    // setShowEditModal(true);
+    });
   };
 
   // ✅ Mark as Sold
@@ -152,7 +170,7 @@ const ManageListings = () => {
   const handleSold = async (id) => {
     if (
       window.confirm(
-        "Are you sure you want to make as SOLD this property? This action cannot be undone."
+        "Are you sure you want to mark as SOLD this property? This action cannot be undone."
       )
     ) {
       const clientToken = localStorage.getItem('token');
@@ -164,17 +182,14 @@ const ManageListings = () => {
           }
         });
         if (res) {
-
-          alert("Property update isSold successfully!");
+          alert("Property marked as SOLD successfully!");
           fetchListings();
         }
       } catch (err) {
-        alert("Failed to delete property.");
+        alert("Failed to update property status.");
       }
     }
   };
-
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -245,11 +260,19 @@ const ManageListings = () => {
               {filteredListings?.map((listing) => (
                 <div key={listing?.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
-                    <img
-                      src={getPhotoSrc(listing.photos)}
-                      alt={listing?.title}
-                      className="w-full lg:w-64 h-48 object-cover rounded-lg"
-                    />
+                    {/* Image with Fixed Sold Out Overlay */}
+                    <div className="w-full lg:w-64 h-48 flex-shrink-0 relative">
+                      <SoldOutOverlay isSold={listing?.isSold}>
+                        <img
+                          src={getPhotoSrc(listing.photos)}
+                          alt={listing?.title}
+                          className="w-full h-full object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                          }}
+                        />
+                      </SoldOutOverlay>
+                    </div>
                    
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
@@ -259,10 +282,10 @@ const ManageListings = () => {
                           </h3>
                           <div className="flex items-center text-gray-600 mb-2">
                             <MapPin className="w-4 h-4 mr-1" />
-                            <span className="text-sm">{listing?.address.city}-{listing?.address.locality}</span>
+                            <span className="text-sm">{listing?.address?.city}-{listing?.address?.locality}</span>
                           </div>
                           <p className="text-2xl font-bold text-orange-600">
-                            {listing?.price || "Contact For Price"}
+                            ₹{listing?.price ? listing.price.toLocaleString('en-IN') : "Contact For Price"}
                           </p>
                         </div>
                         <span
@@ -279,13 +302,10 @@ const ManageListings = () => {
                         >
                           {listing?.isSold ? 'Sold' : listing?.status?.charAt(0).toUpperCase() + listing?.status?.slice(1) || 'Unknown'}
                         </span>
-
                       </div>
 
-                      {/* <p className="text-gray-600 mb-4">{listing?.description}</p> */}
-
                       <div className="flex flex-wrap items-center gap-4 mb-4">
-                        {listing?.profile.bedrooms && (
+                        {listing?.profile?.bedrooms && (
                           <div className="flex items-center text-gray-700">
                             <Bed className="w-5 h-5 mr-2 text-orange-500" />
                             <span className="text-sm font-medium">
@@ -293,7 +313,7 @@ const ManageListings = () => {
                             </span>
                           </div>
                         )}
-                        {listing?.profile.bathrooms && (
+                        {listing?.profile?.bathrooms && (
                           <div className="flex items-center text-gray-700">
                             <Bath className="w-5 h-5 mr-2 text-orange-500" />
                             <span className="text-sm font-medium">
@@ -301,10 +321,12 @@ const ManageListings = () => {
                             </span>
                           </div>
                         )}
-                        {listing?.profile.carpetArea && (
+                        {listing?.profile?.carpetArea && (
                           <div className="flex items-center text-gray-700">
                             <Square className="w-5 h-5 mr-2 text-orange-500" />
-                            <span className="text-sm font-medium">{listing?.carpetArea}</span>
+                            <span className="text-sm font-medium">
+                              {listing?.profile.carpetArea} sq.ft
+                            </span>
                           </div>
                         )}
                         {listing?.viewCount && (
@@ -334,10 +356,12 @@ const ManageListings = () => {
                           Delete
                         </button>
 
-                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                        <button 
+                          className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
                           onClick={() => {
                             navigate(`../Client/property/${listing?.id}`, { state: { property: listing } })
-                          }}>
+                          }}
+                        >
                           <Eye className="w-4 h-4" />
                           View Details
                         </button>

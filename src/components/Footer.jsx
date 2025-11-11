@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {FiMail,FiPhone,FiMapPin,FiFacebook,FiTwitter,FiInstagram,FiLinkedin,} from "react-icons/fi";
+import { FiMail, FiPhone, FiMapPin, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, } from "react-icons/fi";
 import BuyFormModal from "./BuyFormModal";
 import DevelopmentFormModal from "./DevelopmentFormModal";
 
@@ -26,9 +26,9 @@ const Footer = () => {
 
   const popularCities = [
     { name: "Properties in Visakhapatnam", href: "#" },
-    { name: "Properties in Vijayawada", href: "#" },
-    { name: "Properties in Hyderabad", href: "#" },
-    { name: "Properties in Guntur", href: "#" },
+    { name: "Properties in srikakulam", href: "#" },
+    { name: "Properties in vizinagaram", href: "#" },
+    { name: "Properties in duvvada", href: "#" },
   ];
 
   return (
@@ -39,7 +39,7 @@ const Footer = () => {
           {/* Logo + Social */}
           <div className="animate-fadeIn">
             <div className="flex items-center mb-4">
-              <img src="/images/logo.jpg" alt="Vizaglands Logo" className="h-10 w-auto" />
+              <img src="/images/logovizag.png" alt="Vizaglands Logo" className="h-10 w-auto" />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               We are committed to connect quality homes to quality buyers.
@@ -153,7 +153,7 @@ const Footer = () => {
               <FiPhone className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
               <div>
                 <h4 className="text-white font-medium mb-1">Call Us</h4>
-                <p className="text-sm text-gray-400">+91 1234567890</p>
+                <p className="text-sm text-gray-400">+91 7989834055</p>
               </div>
             </div>
             <div
@@ -163,7 +163,7 @@ const Footer = () => {
               <FiMail className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
               <div>
                 <h4 className="text-white font-medium mb-1">Email Us</h4>
-                <p className="text-sm text-gray-400">info@vizagland.com</p>
+                <p className="text-sm text-gray-400">info@vmrdaplots</p>
               </div>
             </div>
           </div>
@@ -171,7 +171,7 @@ const Footer = () => {
           {/* --- Footer Bottom --- */}
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
-              © 2025 Vizagland.com. All rights reserved.
+              © 2025 vmrdaplots. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a

@@ -14,6 +14,8 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [title, setTitle] = useState(data.title || '');
   const [selectedCategoryId, setSelectedCategoryId] = useState(data?.categoryId || '');
   const [catLabel, setCatLabel] = useState("");
+  const [titleError, setTitleError] = useState('');
+  
   // Custom order for category sorting
   // const customOrder = data?.marketType === "sale" ? ["Plot", "Flat/Apartment", "IndependentHouse/Villa", "Land", "FarmHouse"] : ["Flat/Apartment", "IndependentHouse/Villa", "FarmHouse", "Plot", "Land",];
   useEffect(() => {
@@ -47,6 +49,7 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
     setTitle(data.title || '');
     setSelectedCategoryId(data.categoryId || '');
   }, [isEditMode, data, categories]);
+  
   // 🧭 Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -83,8 +86,37 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
     }
   }, [isEditMode, data]);
 
+  // Validate title
+  const validateTitle = (value) => {
+    if (!value.trim()) {
+      setTitleError('Property title is required');
+      return false;
+    }
+    if (value.trim().length < 5) {
+      setTitleError('Property title must be at least 5 characters long');
+      return false;
+    }
+    if (value.trim().length > 70) {
+      setTitleError('Property title cannot exceed 70 characters');
+      return false;
+    }
+    setTitleError('');
+    return true;
+  };
+
+  // Handle title change
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    setTitle(value);
+    validateTitle(value);
+  };
+
   // 🏁 Handle Continue button
   const handleContinue = () => {
+    if (!validateTitle(title)) {
+      return;
+    }
+
     // Find selected category from backend data
     const selectedCategory = categories.find(
       (cat) => cat.id === selectedCategoryId || cat.name === propertySubtype
@@ -93,7 +125,7 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
     updateData({
       categoryId: selectedCategory?.id || '',
       // propertyName: title,
-      title,
+      title: title.trim(),
       marketType: listingType,
       propertyKind: propertyType,
       propertySubtype,
@@ -226,24 +258,33 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
 
         {/* 🏠 Property Title */}
         <div className="mt-4">
-  <label className="block font-roboto text-base font-medium text-gray-700 mb-3">
-    {listingType.toLowerCase() === "sale" ? "Property Title" : catLabel }
-  </label>
-  <input
-    type="text"
-    placeholder={`Enter ${listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"} (${propertySubtype} for ${listingType.toLowerCase()})`}
-    value={title}
-    onChange={(e) => setTitle(e.target.value)}
-    className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"
-  />
-</div>
+          <label className="block font-roboto text-base font-medium text-gray-700 mb-3">
+            {listingType.toLowerCase() === "sale" ? "Property Title" : catLabel }
+          </label>
+          <input
+            type="text"
+            placeholder={`Enter ${listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"} (${propertySubtype} for ${listingType.toLowerCase()})`}
+            value={title}
+            onChange={handleTitleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"
+            maxLength={70}
+          />
+          <div className="flex justify-between mt-1">
+            {titleError && (
+              <p className="text-red-500 text-sm font-roboto">{titleError}</p>
+            )}
+            <p className={`text-sm font-roboto ml-auto ${title.length > 70 ? 'text-red-500' : 'text-gray-500'}`}>
+              {title.length}/70
+            </p>
+          </div>
+        </div>
 
       </div>
 
       {/* Continue */}
       <button
         onClick={handleContinue}
-        disabled={!propertySubtype || !title}
+        disabled={!propertySubtype || !title || title.trim().length < 5 || title.trim().length > 70 || titleError}
         className="bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isEditMode ? 'Save & Continue' : 'Continue'}

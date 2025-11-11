@@ -79,7 +79,7 @@ const RegisterForm = () => {
         }}
       >
         <div className="bg-black bg-opacity-40 flex flex-col justify-center items-center w-full h-full text-white text-center p-10">
-          <h2 className="text-4xl font-bold mb-4">Join VizagLands Today</h2>
+          <h2 className="text-4xl font-bold mb-4">Join vmrdaplots Today</h2>
           <p className="text-lg text-gray-200 max-w-md">
             Create your account to explore properties, connect with agents, and grow your real estate journey.
           </p>
@@ -91,9 +91,10 @@ const RegisterForm = () => {
         <div className="w-full max-w-md space-y-6">
           <div>
             <h2 className="text-3xl font-bold text-blue-900 mb-2 text-center">Sign Up</h2>
-            <p className="text-gray-600 text-center">
-              Join VizagLands to find your perfect property
-            </p>
+           <p className="text-gray-600 text-center">
+  Join <span className="text-orange-600 font-semibold">vmrdaplots</span> to find your perfect property
+</p>
+
           </div>
 
           {error && (

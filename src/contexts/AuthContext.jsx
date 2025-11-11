@@ -44,15 +44,15 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('clientDetails');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      setUserProfile(userData);
-    }
-    setLoading(false);
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem('clientDetails');
+  //   if (storedUser) {
+  //     const userData = JSON.parse(storedUser);
+  //     setUser(userData);
+  //     setUserProfile(userData);
+  //   }
+  //   setLoading(false);
+  // }, []);
 
   const signUp = async (email, password, fullName, phoneNumber, role) => {
     console.log("rrr::");

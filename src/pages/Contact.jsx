@@ -10,8 +10,8 @@ function Contact() {
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
-const [status,setStatus]=useState("")
-const [loading,setLoading]=useState(false)
+  const [status, setStatus] = useState("")
+  const [loading, setLoading] = useState(false)
   // ✅ Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -48,7 +48,7 @@ const [loading,setLoading]=useState(false)
           "Content-Type": "application/json"
         }
       });
-console.log("rrr::",response)
+      console.log("rrr::", response)
       if (response) {
         alert("lead updated successfully")
         setFormData({
@@ -184,9 +184,9 @@ console.log("rrr::",response)
                         Phone Number
                       </h3>
                       <p className="font-roboto text-gray-700 leading-relaxed">
-                        +91 891 234 5678
+                        +91 7989834055
                         <br />
-                        +91 891 234 5679
+                      
                       </p>
                     </div>
                   </div>
@@ -219,9 +219,9 @@ console.log("rrr::",response)
                         Email Address
                       </h3>
                       <p className="font-roboto text-gray-700 leading-relaxed">
-                        info@vizaglands.com
+                        info@vmrda plots
                         <br />
-                        sales@vizaglands.com
+                        sales@vmrda plots
                       </p>
                     </div>
                   </div>
