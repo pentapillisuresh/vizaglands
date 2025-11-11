@@ -13,9 +13,25 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState(data.title || '');
   const [selectedCategoryId, setSelectedCategoryId] = useState(data?.categoryId || '');
-
+  const [catLabel, setCatLabel] = useState("");
   // Custom order for category sorting
   // const customOrder = data?.marketType === "sale" ? ["Plot", "Flat/Apartment", "IndependentHouse/Villa", "Land", "FarmHouse"] : ["Flat/Apartment", "IndependentHouse/Villa", "FarmHouse", "Plot", "Land",];
+  useEffect(() => {
+    switch (propertySubtype) {
+      case "Flat/Apartment":
+        setCatLabel("Apartment Name");
+        break;
+      case "IndependentHouse/Villa":
+        setCatLabel("Society / Villa Name");
+        break;
+      case "Independent House / Villa":
+        setCatLabel("Society / Villa Name");
+        break;
+      default:
+        setCatLabel("Name");
+        break;
+    }
+  }, [propertySubtype]);
 
   // 🧩 Prefill once when data or categories change
   useEffect(() => {
@@ -210,17 +226,17 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
 
         {/* 🏠 Property Title */}
         <div className="mt-4">
-          <label className="block font-roboto text-base font-medium text-gray-700 mb-3">
-            {listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"}
-          </label>
-          <input
-            type="text"
-            placeholder={`Enter ${listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"} (${propertySubtype} for ${listingType.toLowerCase()})`}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
-        </div>
+  <label className="block font-roboto text-base font-medium text-gray-700 mb-3">
+    {listingType.toLowerCase() === "sale" ? "Property Title" : catLabel }
+  </label>
+  <input
+    type="text"
+    placeholder={`Enter ${listingType.toLowerCase() === "sale" ? "Property Title" : "Apartment Name"} (${propertySubtype} for ${listingType.toLowerCase()})`}
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg font-roboto focus:outline-none focus:ring-2 focus:ring-orange-400"
+  />
+</div>
 
       </div>
 

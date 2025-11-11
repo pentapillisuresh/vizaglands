@@ -13,11 +13,11 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-console.log("rrr::",data)
+  console.log("rrr::", data)
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const approvedOptions = ['VMRDA', 'VUDA', 'DTCP', 'RERA', 'GVMC', 'Bank Loan'];
+  const approvedOptions = ['VMRDA', 'VUDA', 'DTCP', 'LRS', 'GVMC', 'RERA', 'Bank Loan'];
   const amenitiesOptions = [
     'Security',
     'Maintenance Staff',
@@ -36,13 +36,25 @@ console.log("rrr::",data)
       setProjectName(data.projectName || '');
       setDescription(data.description || '');
       setPrivateNotes(data.privateNotes || '');
-      setApprovedBy(data.approvedBy || '');
+
+      // 👇 Split comma-separated string into array
+      if (typeof data.approvedBy === 'string') {
+        setApprovedBy(data.approvedBy.split(',').map(item => item.trim()));
+      } else {
+        setApprovedBy(data.approvedBy || []);
+      }
+
       setAmenities(data.amenities || []);
     }
   }, [isEditMode, data]);
 
+
   const handleApprovedChange = (value) => {
-    setApprovedBy(value);
+    setApprovedBy(prev =>
+      prev.includes(value)
+        ? prev.filter(v => v !== value)  // deselect
+        : [...prev, value]               // select
+    );
   };
 
   const handleAmenitiesChange = (value) => {
@@ -78,29 +90,30 @@ console.log("rrr::",data)
       setError('Please fill all mandatory fields');
       return;
     }
-  
+
     setLoading(true);
     setError('');
     setValidationErrors({});
-  
+
     try {
       const propertyDataToSave = {
         ...data,
         projectName: projectName || null,
         description: description || null,
         privateNotes: privateNotes || null,
-        approvedBy,
+
+        // 👇 Convert array → string
+        approvedBy: approvedBy.length ? approvedBy.join(',') : null,
         amenities,
       };
-  
+
       console.log('Property saved (mock):', propertyDataToSave);
       updateData(propertyDataToSave);
-  
+
       const clientToken = localStorage.getItem('token');
-  
       let response;
+
       if (isEditMode && data?.id) {
-        // Update existing property
         response = await ApiService.put(`/properties/${data.id}`, propertyDataToSave, {
           headers: {
             Authorization: `Bearer ${clientToken}`,
@@ -108,7 +121,6 @@ console.log("rrr::",data)
           },
         });
       } else {
-        // Add new property
         response = await ApiService.post('/properties', propertyDataToSave, {
           headers: {
             Authorization: `Bearer ${clientToken}`,
@@ -116,7 +128,7 @@ console.log("rrr::",data)
           },
         });
       }
-  
+
       if (response) {
         setSuccess(true);
         navigate('../../vendor/dashboard');
@@ -129,7 +141,7 @@ console.log("rrr::",data)
       setLoading(false);
     }
   };
-  
+
   const isPublishDisabled = loading || !description;
 
   return (
@@ -170,9 +182,8 @@ console.log("rrr::",data)
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your property..."
             rows="5"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${
-              validationErrors.description ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${validationErrors.description ? 'border-red-500' : 'border-gray-300'
+              }`}
           />
           {validationErrors.description && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
@@ -198,51 +209,54 @@ console.log("rrr::",data)
       </div>
 
       {/* Conditional: Approved By & Amenities */}
-      {(data.propertySubtype === 'Flat/Apartment' || data.propertySubtype === 'Plot'|| data.propertySubtype==='Independent House / Villa') && (
-        <div className="space-y-6 mt-8">
-          {/* Approved By */}
-          <div>
-            <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">Approved By</h3>
-            <div className="flex flex-wrap gap-3">
-              {approvedOptions.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => handleApprovedChange(opt)}
-                  className={`px-4 py-2.5 rounded-full border-2 transition-all ${
-                    approvedBy.includes(opt)
-                      ? 'bg-blue-900 border-blue-900 text-white'
-                      : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
+      {((data.propertySubtype === 'Flat/Apartment' ||
+        data.propertySubtype === 'Plot' ||
+        data.propertySubtype === 'Independent House / Villa') &&
+        data.marketType.toLowerCase() === "sale")
+        && (
+          <div className="space-y-6 mt-8">
+            {/* Approved By */}
+            <div>
+              <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">Approved By</h3>
+              <div className="flex flex-wrap gap-3">
+                {approvedOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => handleApprovedChange(opt)}
+                    className={`px-4 py-2.5 rounded-full border-2 transition-all ${approvedBy.includes(opt)
+                        ? 'bg-blue-900 border-blue-900 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
+                      }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Amenities */}
-          <div>
-            <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">Amenities</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {amenitiesOptions.map((amenity) => (
-                <label
-                  key={amenity}
-                  className="flex items-center gap-2 text-gray-700 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={amenities.includes(amenity)}
-                    onChange={() => handleAmenitiesChange(amenity)}
-                    className="text-orange-500 focus:ring-orange-500"
-                  />
-                  {amenity}
-                </label>
-              ))}
+            {/* Amenities */}
+            <div>
+              <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">Amenities</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {amenitiesOptions.map((amenity) => (
+                  <label
+                    key={amenity}
+                    className="flex items-center gap-2 text-gray-700 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={amenities.includes(amenity)}
+                      onChange={() => handleAmenitiesChange(amenity)}
+                      className="text-orange-500 focus:ring-orange-500"
+                    />
+                    {amenity}
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Property Summary */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-10">

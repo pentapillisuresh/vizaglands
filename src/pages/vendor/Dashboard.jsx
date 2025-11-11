@@ -45,9 +45,10 @@ const Dashboard = () => {
           totalInquiries: data.Inquiries || 0,
           monthlyViews: data.totalThisMonthViews || 0
         });
-        const clientInfo = localStorage.setItem("clientDetails", JSON.stringify(data.clientDetails))
-        setClientDetails(clientInfo);
-        setRecentListings(data.properties || []);
+        localStorage.setItem("clientDetails", JSON.stringify(data.clientDetails));
+        setClientDetails(data.clientDetails);
+        console.log("fullName::", data.clientDetails.fullName);
+                setRecentListings(data.properties || []);
         setRecentLeads(data.leads || []);
       } else {
         console.warn("Unexpected response format:", response);
@@ -95,7 +96,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Welcome back! Here's what's happening with your properties.</p>
+          <p className="text-gray-600 mt-2">Welcome back! <span style={{textTransform:'capitalize',color:"ThreeDHighlight",fontWeight:'bold',fontSize:18,marginLeft:5,marginRight:5}}>{clientDetails?.fullName}</span> Here's what's happening with your properties.</p>
         </div>
 
         {/* Add Property CTA */}

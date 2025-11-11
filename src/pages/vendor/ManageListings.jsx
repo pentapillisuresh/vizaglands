@@ -336,7 +336,7 @@ const ManageListings = () => {
 
                         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
                           onClick={() => {
-                            navigate(`../property/${listing?.id}`, { state: { property: listing } })
+                            navigate(`../Client/property/${listing?.id}`, { state: { property: listing } })
                           }}>
                           <Eye className="w-4 h-4" />
                           View Details

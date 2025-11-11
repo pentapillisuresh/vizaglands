@@ -18,6 +18,7 @@ import Analytics from './pages/vendor/Analytics';
 import Profile from './pages/vendor/Profile';
 import Leads from './pages/vendor/Leads';
 import Blog from './pages/Blog';
+import ClientPropertyDetail from './pages/ClientPropertyDetail';
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/post-property" element={<PostProperty />} />
           <Route path="/properties-list/" element={<Properties />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/Client/property/:id" element={<ClientPropertyDetail />} />
           <Route path="/vendor/dashboard" element={<Dashboard />} />
           <Route path="/vendor/manage-listings" element={<ManageListings />} />
           <Route path="/vendor/analytics" element={<Analytics />} />
