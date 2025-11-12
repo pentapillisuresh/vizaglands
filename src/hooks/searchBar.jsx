@@ -78,7 +78,7 @@ const SearchBar = ({ setResults }) => {
       if (!selectedCity?.locality.includes(locality)) {
         setLocality('');
       }
-    }
+    } 
   }, [city, cities]);
 
   // ✅ Handle Search
@@ -99,20 +99,25 @@ const SearchBar = ({ setResults }) => {
     if (minPrice) params.minPrice = minPrice;
     if (maxPrice) params.maxPrice = maxPrice;
 
-    try {
-      const response = await ApiService.get(`/properties/searchProperty`, { params });
-      setResults(response.data || []);
-      navigate("/properties-list", {
-        state: {
-          categoryId: propertyType,
-          city: city,
-          locality: locality,
-          priceRange: `${minPrice}-${maxPrice}`,
-        },
-      });
-    } catch (error) {
-      console.error('Search failed:', error);
-    }
+    navigate("/properties-list", {
+      replace: false,
+      state: {
+        categoryId: propertyType,
+        city,
+        locality,
+        ...(minPrice && maxPrice
+          ? { priceRange: `${minPrice}-${maxPrice}` }
+          : {})      },
+    });
+    
+
+    // try {
+    //   const response = await ApiService.get(`/properties/searchProperty`, { params });
+    //   setResults(response.data || []);
+      
+    // } catch (error) {
+    //   console.error('Search failed:', error);
+    // }
   };
 
   return (

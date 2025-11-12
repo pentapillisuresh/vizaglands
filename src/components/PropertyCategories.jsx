@@ -104,7 +104,7 @@ const PropertyCategories = ({ categories }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           
           <img
-            src="https://backendservice.vmrdaplots.in/uploads/category/commertial.png"
+            src="https://backendservice.vmrdaplots.in/uploads/category/commercial.png"
             alt="Commercial"
             className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
             loading="lazy"
@@ -123,60 +123,6 @@ const PropertyCategories = ({ categories }) => {
     </article>
   </div>
 </div>
-
-
-
-        {/* Commercial Section */}
-        {/* <div className="mb-16">
-          <h2
-            className="text-3xl font-serif font-bold text-center mb-12 text-gray-800 relative inline-block mx-auto"
-            data-aos="fade-up"
-          >
-            Commercial Properties
-            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
-          </h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {commercialCategories.map((cat, idx) => (
-              <article
-                key={cat.id}
-                data-aos="zoom-in"
-                data-aos-delay={100 + idx * 100}
-                className="group cursor-pointer flex flex-col h-full"
-                onClick={() =>
-                  navigate("/properties-list", {
-                    state: {
-                      categoryId: cat.id,
-                      categoryName: cat?.name,
-                    },
-                  })
-                }
-              >
-                <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-blue-200">
-                 
-                  <div className="relative w-full h-40 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <img
-                      src={cat.photo}
-                      alt={cat.name}
-                      className="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
-                      loading="lazy"
-                    />
-                  
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
-                  </div>
-
-                 
-                  <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
-                    <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                      {cat.name}
-                    </h3>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div> */}
 
         {/* Footer Section */}
         <div
