@@ -163,7 +163,7 @@ const Footer = () => {
               <FiMail className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
               <div>
                 <h4 className="text-white font-medium mb-1">Email Us</h4>
-                <p className="text-sm text-gray-400">info@vmrdaplots</p>
+                <p className="text-sm text-gray-400">info@vmrdaplots.com</p>
               </div>
             </div>
           </div>

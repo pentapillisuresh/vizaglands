@@ -215,7 +215,7 @@ const BasicDetails = ({ data, updateData, onNext, isEditMode }) => {
           ))}
         </div>
 
-        {/* 🏘️ Property Subtypes */}
+       
         {/* 🏘️ Property Subtypes */}
         {loading ? (
           <p className="text-gray-500">Loading property types...</p>

@@ -53,22 +53,14 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
   // Populate state from data - this runs whenever data changes
   useEffect(() => {
-    // Only initialize if we have data and the fields are empty
+    // Only initialize if we have data
     if (data) {
-      if (data.projectName && !projectName) {
-        setProjectName(data.projectName || '');
-      }
-      
-      if (data.description && !description) {
-        setDescription(data.description || '');
-      }
-      
-      if (data.privateNotes && !privateNotes) {
-        setPrivateNotes(data.privateNotes || '');
-      }
+      setProjectName(data.projectName || '');
+      setDescription(data.description || '');
+      setPrivateNotes(data.privateNotes || '');
 
-      // Handle approvedBy - only set if we have data and current state is empty
-      if (data.approvedBy && approvedBy.length === 0) {
+      // Handle approvedBy
+      if (data.approvedBy) {
         if (typeof data.approvedBy === 'string') {
           setApprovedBy(data.approvedBy.split(',').map(item => item.trim()).filter(item => item !== ''));
         } else if (Array.isArray(data.approvedBy)) {
@@ -76,8 +68,8 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         }
       }
 
-      // Handle amenities - only set if we have data and current state is empty
-      if (data.amenities && amenities.length === 0) {
+      // Handle amenities
+      if (data.amenities) {
         if (Array.isArray(data.amenities)) {
           setAmenities(data.amenities);
         } else if (typeof data.amenities === 'string') {
@@ -85,7 +77,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         }
       }
     }
-  }, [data, projectName, description, privateNotes, approvedBy.length, amenities.length]);
+  }, [data]);
 
   // Update parent data whenever local state changes
   useEffect(() => {
@@ -128,9 +120,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
   const handlePrivateNotesChange = (e) => {
     const value = e.target.value;
-    if (value.length <= 100) {
-      setPrivateNotes(value);
-    }
+    setPrivateNotes(value);
   };
 
   const validateForm = () => {
@@ -142,13 +132,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       errors.description = 'Description must be at least 10 characters';
     }
     
-    if (privateNotes && privateNotes.trim() !== '') {
-      if (privateNotes.length < 10) {
-        errors.privateNotes = 'Private notes must be at least 10 characters';
-      } else if (privateNotes.length > 100) {
-        errors.privateNotes = 'Private notes cannot exceed 100 characters';
-      }
-    }
+    // Private notes validation removed - no longer mandatory
     
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -294,7 +278,8 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     }
   };
 
-  const isPublishDisabled = loading || !description || description.trim().length < 10 || (privateNotes && privateNotes.length < 10);
+  // Updated: Removed private notes validation from publish disabled condition
+  const isPublishDisabled = loading || !description || description.trim().length < 10;
 
   return (
     <div className="space-y-8 relative min-h-screen">
@@ -377,38 +362,26 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
           )}
         </div>
 
-        {/* Private Notes */}
+        {/* Private Notes - Updated: No longer mandatory */}
         <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex justify-between items-center mb-2">
             <label className="block font-roboto text-sm font-medium text-gray-700">
               Private Notes
             </label>
-            <span className={`text-xs ${
-              privateNotes.length > 100 ? 'text-red-500' : 
-              privateNotes.length > 0 && privateNotes.length < 10 ? 'text-orange-500' : 
-              'text-gray-500'
-            }`}>
-              {privateNotes.length}/100 {privateNotes.length > 0 && privateNotes.length < 10 && '(min 10)'}
+            <span className="text-xs text-gray-500">
+              {privateNotes.length}/100 characters
             </span>
           </div>
           <textarea
             value={privateNotes}
             onChange={handlePrivateNotesChange}
-            placeholder="Enter private notes (visible only to owner)"
+            placeholder="Enter private notes (visible only to owner) - Optional"
             rows="3"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none transition-all duration-300 ${
-              validationErrors.privateNotes ? 'border-red-500 animate-shake' : 'border-gray-300'
-            }`}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none transition-all duration-300"
             maxLength={100}
           />
-          {validationErrors.privateNotes && (
-            <p className="text-red-500 text-xs mt-1 animate-fade-in">{validationErrors.privateNotes}</p>
-          )}
           <p className="text-xs text-gray-500 mt-1">
-            Private notes are only visible to owner. They won't appear on the frontend.
-            {privateNotes.length > 0 && privateNotes.length < 10 && (
-              <span className="text-orange-500 ml-1">Minimum 10 characters required</span>
-            )}
+            Private notes are only visible to owner. They won't appear on the frontend. This field is optional.
           </p>
         </div>
       </div>

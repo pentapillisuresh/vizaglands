@@ -112,7 +112,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
       setAdvantages(
         data.address.near_by?.length
           ? data.address.near_by
-          : [{ info: "", distance: "250 m" }]
+          : [{ info: "", distance: "250 meters" }]
       );
 
       const selectedCity = cities.find(
@@ -463,8 +463,8 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
                          focus:ring-2 focus:ring-orange-500 focus:border-transparent
                          outline-none font-roboto"
             >
-              <option value="250 m">250 m</option>
-              <option value="500 m">500 m</option>
+              <option value="250 m">250 meters</option>
+              <option value="500 m">500 meters</option>
               <option value="1 km">1 km</option>
               <option value="2 km">2 km</option>
               <option value="5 km">5 km</option>

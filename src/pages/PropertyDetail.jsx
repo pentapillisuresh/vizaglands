@@ -568,23 +568,51 @@ function PropertyDetail() {
 
              
 
-              {/* Property Details */}
-              <Section title="Property Details">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {safeShow(category.name) && (
-                    <Detail label="Property Type" value={category.name} />
-                  )}
-                  {safeShow(address?.locality) && (
-                    <Detail label="Locality" value={address?.locality} />
-                  )}
-                  {safeShow(address?.city) && (
-                    <Detail label="City" value={address?.city} />
-                  )}
-                  {safeShow(profile?.totalFloors) && (
-                    <Detail label="Total Floors" value={profile?.totalFloors} />
-                  )}
-                </div>
-              </Section>
+            {/* Property Details - Updated Design */}
+<Section title="Property Details">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    {safeShow(category.name) && (
+      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+        <CheckCircle size={20} className="text-orange-600" />
+        <div className="flex-1">
+           <span className="block text-sm text-gray-500 mt-1">Property Type</span>
+          <span className="text-[#003366] font-medium">{category.name}</span>
+         
+        </div>
+      </div>
+    )}
+    {safeShow(address?.locality) && (
+      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+        <CheckCircle size={20} className="text-orange-600" />
+        <div className="flex-1">
+          <span className="block text-sm text-gray-500 mt-1">Locality</span>
+          <span className="text-[#003366] font-medium">{address.locality}</span>
+          
+        </div>
+      </div>
+    )}
+    {safeShow(address?.city) && (
+      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+        <CheckCircle size={20} className="text-orange-600" />
+        <div className="flex-1">
+             <span className="block text-sm text-gray-500 mt-1">City</span>
+          <span className="text-[#003366] font-medium">{address.city}</span>
+       
+        </div>
+      </div>
+    )}
+    {safeShow(profile?.totalFloors) && (
+      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+        <CheckCircle size={20} className="text-orange-600" />
+        <div className="flex-1">
+           <span className="block text-sm text-gray-500 mt-1">Total Floors</span>
+          <span className="text-[#003366] font-medium">{profile.totalFloors}</span>
+         
+        </div>
+      </div>
+    )}
+  </div>
+</Section>
 
               {/* Nearby Details - Updated Design */}
               {Array.isArray(address?.near_by) && address.near_by.length > 0 && (

@@ -1,22 +1,23 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const slides = [
   {
     id: 1,
-    image: "./images/vmrda2.jpg",
+    image: "./images/vmrda12.jpg",
     title: "Luxury Homes Await",
     subtitle: "Discover timeless elegance in every corner.",
   },
   {
     id: 2,
-    image: "./images/vmrda1.jpg",
+    image: "./images/vmrda11.jpg",
     title: "Find Your Perfect Villa",
     subtitle: "Experience comfort and beauty like never before.",
   },
   {
     id: 3,
-    image: "./images/vmrda3.jpg",
+    image: "./images/vmrda13.jpg",
     title: "Modern Living Redefined",
     subtitle: "Step into homes designed for luxury and style.",
   },
@@ -26,6 +27,7 @@ const Hero = () => {
   const [current, setCurrent] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState([]);
   const [currentImageLoaded, setCurrentImageLoaded] = useState(false);
+   const navigate = useNavigate();
 
   // Auto-slide every 6 seconds
   useEffect(() => {
@@ -212,32 +214,33 @@ const Hero = () => {
             >
               {slides[current].subtitle}
             </motion.p>
-            
-            <motion.button
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0,
-                transition: {
-                  duration: 0.8,
-                  ease: "easeOut",
-                  delay: 0.9
-                }
-              }}
-              exit={{ 
-                opacity: 0, 
-                y: -10,
-                transition: {
-                  duration: 0.5,
-                  ease: "easeIn"
-                }
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition"
-            >
-              Explore Now
-            </motion.button>
+           
+          <motion.button
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0,
+        transition: {
+          duration: 0.8,
+          ease: "easeOut",
+          delay: 0.9
+        }
+      }}
+      exit={{ 
+        opacity: 0, 
+        y: -10,
+        transition: {
+          duration: 0.5,
+          ease: "easeIn"
+        }
+      }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition"
+      onClick={() => navigate("/properties-list")}  // ✅ Navigation added
+    >
+      Explore Now
+    </motion.button>
           </motion.div>
         </AnimatePresence>
       </div>
