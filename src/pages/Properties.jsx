@@ -9,7 +9,7 @@ import ApiService from "../hooks/ApiService";
 function Properties() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { categoryId, city, locality, propertyType } = location.state || {};
+  const { categoryId, city, locality, propertyType,priceRange } = location.state || {};
 
   // 🔹 States
   const [filteredProperties, setFilteredProperties] = useState([]);
@@ -32,7 +32,7 @@ function Properties() {
     city: city || "",
     locality: locality || "",
     clientId: "",
-    priceRange: "all",
+    priceRange: priceRange||"all",
   });
 
   const [activeFilters, setActiveFilters] = useState(filters);
@@ -66,6 +66,36 @@ function Properties() {
       setLocalities([]);
     }
   }, [filters.city, cities]);
+
+  useEffect(() => {
+    if (location.state) {
+      const { categoryId, city, locality, priceRange } = location.state;
+
+      setFilters((prev) => {
+        const updated = {
+          ...prev,
+          categoryId: categoryId || "",
+          city: city || "",
+          locality: locality || "",
+          priceRange: priceRange || "all",
+        };
+
+        // Prevent unnecessary rerender
+        if (JSON.stringify(prev) === JSON.stringify(updated)) return prev;
+        return updated;
+      });
+
+      setActiveFilters((prev) => ({
+        ...prev,
+        categoryId: categoryId || "",
+        city: city || "",
+        locality: locality || "",
+        priceRange: priceRange || "all",
+      }));
+
+      setPage(1);
+    }
+  }, [location.state]);
 
   // 🔹 Fetch Properties (core)
   useEffect(() => {

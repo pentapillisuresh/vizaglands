@@ -25,8 +25,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   const [balconies, setBalconies] = useState(null);
   const [poojaRoom, setPoojaRoom] = useState(true);
   const [carpetArea, setCarpetArea] = useState(null);
-  const [builtArea, setBuiltArea] = useState(0);
-  const [superBuiltArea, setSuperBuiltArea] = useState(0);
+  const [builtArea, setBuiltArea] = useState(null);
+  const [superBuiltArea, setSuperBuiltArea] = useState(null);
   const [areaUnit, setAreaUnit] = useState("sqft");
   const [parkingType, setParkingType] = useState("");
   const [closedParking, setClosedParking] = useState(0);
@@ -87,13 +87,13 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   };
 
   const validateOpenParking = (value) => {
-    const numValue = parseInt(value);
-    return numValue >= 0 && numValue <= 10;
+    const numValue = parseInt(value); 
+    return numValue > 0 && numValue <= 10;
   };
 
   const validatePropertyOnFloor = (value) => {
     const numValue = parseInt(value);
-    return numValue >= 0 && numValue <= 99;
+    return numValue > 0 && numValue <= 99;
   };
 
   const validateTotalFloors = (value) => {
@@ -152,8 +152,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     setBalconies(data?.propertyProfile?.balconies || null);
     setPoojaRoom(data?.propertyProfile?.poojaRoom ?? true);
     setCarpetArea(data?.propertyProfile?.carpetArea || null);
-    setBuiltArea(data?.propertyProfile?.buildArea || 0);
-    setSuperBuiltArea(data?.propertyProfile?.superBuildArea || 0);
+    setBuiltArea(data?.propertyProfile?.buildArea || null);
+    setSuperBuiltArea(data?.propertyProfile?.superBuildArea || null);
     setAreaUnit(data?.propertyProfile?.areaUnit || (isLand ? "acres" : "sqft"));
     setParkingType(data?.propertyProfile?.parkingType || "");
     setClosedParking(data?.propertyProfile?.closedParking || 0);
@@ -191,8 +191,9 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
 
   // --- Payload creation for Add/Edit ---
   const handleContinue = () => {
+
     const payload = { propertySubtype, price };
-    
+
     // Fixed: Use property assignment instead of function call
     if (data?.marketType.toLowerCase() !== 'sale') {
       payload.advance = advance;
@@ -251,29 +252,134 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   };
 
   // --- Form validations ---
-  const allPlotFieldsFilled = plotArea && plotAreaUnit && length && breadth && (isLand ? frontage : facing);
-  const hasAtLeastOneArea = carpetArea || builtArea || superBuiltArea;
-  const baseResidentialValidation =
-    bedrooms && bathrooms && balconies !== "" && poojaRoom !== "" &&
-    hasAtLeastOneArea && areaUnit && parkingType && status &&
-    ((status === "Ready to Move" && ageOfProperty) || (status === "Under Construction" && possession));
+  // Plot/Land validation
+  function validatePlotFields({
+    price,
+    plotAreaUnit,
+    length,
+    breadth,
+    isLand,
+    frontage,
+    landArea,
+    plotArea,
+    facing
+  }) {
+    const missing = [];
   
-  // Updated floor details validation with new constraints
-  const floorDetailsValidation = !needsFloorDetails || (
-    totalFloors && 
-    propertyOnFloor !== "" && 
-    validateTotalFloors(totalFloors) && 
-    validatePropertyOnFloor(propertyOnFloor)
-  );
+    // 🏷️ Common required fields
+    if (!price) missing.push("price");
+    if (!plotAreaUnit) missing.push("plotAreaUnit");
   
-  const unitNumberValidation =
-    !needsUnitNumber || (isFlat && flatNumber) || (isOfficeSpace && officeNumber) || (isShopShowroom && shopNumber);
+    // 📏 Plot-only fields (not required for land)
+    if (!isLand) {
+      if (!length) missing.push("length");
+      if (!breadth) missing.push("breadth");
+    }
   
-  // Updated parking validation
-  const parkingValidation = validateClosedParking(closedParking) && validateOpenParking(openParking);
+    // 🧱 Conditional validation
+    if (isLand) {
+      // Land: frontage & landArea required
+      if (!frontage) missing.push("frontage");
+      if (!landArea) missing.push("landArea");
+    } else {
+      // Plot: plotArea & facing required
+      if (!plotArea) missing.push("plotArea");
+      if (!facing) missing.push("facing");
+    }
   
-  const allApartmentFieldsFilled = baseResidentialValidation && floorDetailsValidation && unitNumberValidation && parkingValidation;
-  const isFormComplete = isPlotOrLand ? allPlotFieldsFilled : allApartmentFieldsFilled;
+    return {
+      isValid: missing.length === 0,
+      missing,
+    };
+  }
+    
+  // Example usage:
+  const { isValid: allPlotFieldsFilled, missing } = validatePlotFields({
+    price,
+    plotAreaUnit,
+    length,
+    breadth,
+    isLand,
+    frontage,
+    landArea,
+    plotArea,
+    facing,
+  });
+  
+  console.log("allPlotFieldsFilled:", allPlotFieldsFilled);
+  console.log("Missing fields:", missing);
+  
+  // At least one area must be provided
+
+  function validateBaseResidential({
+    bedrooms,
+    bathrooms,
+    balconies,
+    carpetArea,
+    builtArea,
+    totalFloors,
+    superBuiltArea,
+    areaUnit,
+    status,
+    ageOfProperty,
+    possession
+  }) {
+    const missing = [];
+  
+    // 🏠 Required core fields
+    if (!bedrooms) missing.push("bedrooms");
+    if (!bathrooms) missing.push("bathrooms");
+    if (!balconies) missing.push("balconies");
+    if (!areaUnit) missing.push("areaUnit");
+    if (!totalFloors) missing.push("totalFloors");
+    if (!status) missing.push("status");
+  
+    // 📐 At least one area required
+    const hasAtLeastOneArea = [carpetArea, builtArea, superBuiltArea].some(
+      area => area != null && area !== ""
+    );
+    if (!hasAtLeastOneArea) missing.push("Area (carpet/built/superBuilt)");
+  
+    // 🧱 Conditional checks based on property status
+    if (status === "Ready to Move" && !ageOfProperty) {
+      missing.push("ageOfProperty (for Ready to Move)");
+    }
+    if (status === "Under Construction" && !possession) {
+      missing.push("possession (for Under Construction)");
+    }
+  
+    // ✅ Optional fields (balconies, poojaRoom) are skipped intentionally
+  
+    const isValid = missing.length === 0;
+  
+    return { isValid, missing };
+  }
+  const formValues = {
+    bedrooms,
+    bathrooms,
+    balconies,
+    carpetArea,
+    builtArea,
+    superBuiltArea,
+    areaUnit,
+    totalFloors,
+    status,
+    ageOfProperty,
+    possession,
+  };
+  
+  const allApartmentFieldsFilled = validateBaseResidential(formValues);
+      
+  // Final form validation
+  const isFormComplete = isPlotOrLand
+    ? (() => {
+      console.log("allPlotFieldsFilled::", allPlotFieldsFilled);
+      return allPlotFieldsFilled;
+    })()
+    : (() => {
+      console.log("allApartmentFieldsFilled::", allApartmentFieldsFilled.isValid);
+      return allApartmentFieldsFilled.isValid;
+    })();
 
   // --- Unit field helpers ---
   const getUnitNumberLabel = () => isFlat ? "Total Units" : isOfficeSpace ? "Office Number" : isShopShowroom ? "Shop Number" : "Unit Number";
@@ -284,7 +390,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     if (isOfficeSpace) setOfficeNumber(value);
     if (isShopShowroom) setShopNumber(value);
   };
-  
+
   return (
     <div className="space-y-8">
       <div>
@@ -314,7 +420,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
           )} */}
           <div>
             <label className="block font-roboto text-sm font-medium text-gray-700 mt-8 mb-4">
-             { data?.marketType?.toLowerCase()==='sale' ? "Price": "Rent"} (₹) <span className="text-red-500">*</span>
+              {data?.marketType?.toLowerCase() === 'sale' ? "Price" : "Rent"} (₹) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -835,8 +941,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
               <p className="text-sm text-gray-600">Total no of floors and your floor details</p>
 
               <div className="grid grid-cols-2 gap-4">
-              
-               {!isVilla && <div>
+
+                {!isVilla && <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Property on Floor <span className="text-red-500">*</span>
                   </label>
@@ -852,7 +958,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                   {propertyOnFloor !== "" && !validatePropertyOnFloor(propertyOnFloor) && (
                     <p className="text-red-500 text-xs mt-1">Please enter a value between 0 and 99</p>
                   )}
-                </div>}   
+                </div>}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Total Floors <span className="text-red-500">*</span>
@@ -1131,10 +1237,33 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
           )}
         </div>
       )}
+<div className="m-3">
+  <p className="text-green-500 text-xs font-semibold mb-2">
+    ✓ Missing Fields
+  </p>
 
+  {/* Determine which list to show */}
+  {(isPlotOrLand ? missing : allApartmentFieldsFilled?.missing)?.length ? (
+    (isPlotOrLand ? missing : allApartmentFieldsFilled?.missing)?.map((item, index) => (
+      <span
+        key={index}
+        className="text-white text-xs capitalize ml-2 border rounded bg-red-500 px-2 py-1 mb-1 inline-block"
+      >
+        ✕ {item}
+      </span>
+    ))
+  ) : (
+    <p className="text-gray-400 text-xs ml-2 italic">
+      All required fields are filled ✔️
+    </p>
+  )}
+</div>
       {<button
         onClick={handleContinue}
-        className={`bg-blue-900 text-white font-roboto font-medium px-10 py-3 rounded-lg transition-colors`}
+        disabled={!isFormComplete}
+        className={`bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium
+                     px-10 py-3 rounded-lg transition-colors
+                     disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         Continue
       </button>}
