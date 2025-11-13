@@ -324,6 +324,108 @@ const Header = () => {
         </button>
       </div>
       </div>
+      {isMobileMenuOpen && (
+          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg transform transition-all duration-300 ease-in-out animate-in slide-in-from-top-5">
+            <div className="px-4 py-3 space-y-2">
+              {navItems.map(({ path, label }) => (
+                <button
+                  key={path}
+                  onClick={() => handleNavigation(path)}
+                  className={`w-full text-left font-medium font-roboto transition-all duration-300 py-2 px-3 rounded-full transform hover:scale-105 ${
+                    isActive(path)
+                      ? "text-white bg-orange-500 scale-105"
+                      : "text-gray-700 bg-gray-100 hover:text-orange-500 hover:bg-orange-50"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+
+              <div className="border-t border-gray-200 pt-2 mt-2">
+                <button
+                  onClick={() => {
+                    setIsSearchOpen(!isSearchOpen);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full text-left font-roboto py-2 px-3 rounded-full flex items-center space-x-2 transform transition-all duration-300 hover:scale-105 ${
+                    isSearchOpen
+                      ? "text-white bg-orange-600 scale-105"
+                      : "text-white bg-orange-500"
+                  }`}
+                >
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <span>Buy Property</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    clientDashboards();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left font-roboto py-2 px-3 rounded-full flex items-center space-x-2 bg-orange-100 text-orange-600 border border-orange-400 mt-2 transform transition-all duration-300 hover:scale-105"
+                >
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Sell Property</span>
+                </button>
+
+                <div className="mt-2 space-y-1">
+                  {isLogin ? (
+                    <>
+                      <div className="px-3 py-1 text-sm font-medium text-gray-500 transform transition-all duration-300">
+                        Welcome, {profileData?.fullName || "User"}
+                      </div>
+                      {vendorMenuItems.map(({ path, label, icon: Icon }) => (
+                        <button
+                          key={path}
+                          onClick={() => handleNavigation(path)}
+                          className="w-full text-left py-2 px-3 rounded-lg flex items-center text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 transform hover:translate-x-2"
+                        >
+                          <Icon className="w-4 h-4 mr-2 transition-transform duration-200" />
+                          {label}
+                        </button>
+                      ))}
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left py-2 px-3 rounded-lg flex items-center text-red-500 hover:bg-red-50 transition-all duration-200 transform hover:translate-x-2"
+                      >
+                        <LogOut className="w-4 h-4 mr-2 transition-transform duration-200" />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleNavigation("/login-register")}
+                      className="w-full text-left py-2 px-3 rounded-full flex items-center text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all duration-300 transform hover:scale-105"
+                    >
+                      <User className="w-4 h-4 mr-2 transition-transform duration-200" />
+                      Login / Register
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </header>
       {isSearchOpen && (
         <div className="bg-white border-b border-gray-200 shadow-sm w-full transform transition-all duration-500 ease-in-out animate-in slide-in-from-top-10 fade-in-50">
