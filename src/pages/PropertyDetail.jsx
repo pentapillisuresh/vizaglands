@@ -548,7 +548,7 @@ function PropertyDetail() {
 
               {/* Key Features */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-y">
-                {category.name !== "Flat/Apartment" ? (
+                {category.name === "plot" || category.name === "Land" ? (
                   <>
                     {/* Plot-specific fields */}
                     <>
@@ -563,8 +563,8 @@ function PropertyDetail() {
                       ) : (
                         <FeatureCard
                           icon={<Maximize size={24} />}
-                          label="Plot Area"
-                          value={`${profile?.plotArea} ${profile?.areaUnit || "sqft"}`}
+                          label="Land Area"
+                          value={`${profile?.landArea} ${profile?.areaUnit || "sqft"}`}
                         />
                       )}
                     </>
@@ -740,7 +740,7 @@ function PropertyDetail() {
           {/* Right Section - Contact */}
           {fromUser !== 'client' && (
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-lg p-6 sticky top-8">
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-5 sticky top-8">
                 {showContact && (<div className="text-center mb-6">
                   <div className="w-20 h-20 bg-gradient-to-br from-[#003366] to-[#004d99] rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Building size={36} className="text-white" />
@@ -823,10 +823,10 @@ function PropertyDetail() {
                   </form>
                 </div>
 
-                <div className="border-t mt-6 pt-6 text-sm text-gray-500">
+                {/* <div className="border-t mt-6 pt-6 text-sm text-gray-500">
                   <Calendar size={16} className="inline text-orange-500 mr-1" />
                   Posted on: {new Date(property?.createdAt).toLocaleDateString()}
-                </div>
+                </div> */}
               </div>
             </div>
           )}

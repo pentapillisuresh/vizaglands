@@ -173,7 +173,7 @@ const StatCard = ({ icon: Icon, title, value, change, color, onClick, className 
                 </button>
               </div>
 
-              {filteredListings.length === 0 ? (
+              {filteredListings.length === 0 ? ( 
                 <p className="text-gray-500 text-center py-6">No properties found.</p>
               ) : (
                 <div className="space-y-4">
@@ -181,6 +181,9 @@ const StatCard = ({ icon: Icon, title, value, change, color, onClick, className 
                     <div
                       key={listing._id || listing.id}
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
+                      onClick={() => {
+                        navigate(`/property/${listing.id}`, { state: { property:listing } });
+                      }}
                     >
                       <img
                         src={getPhotoSrc(listing.photos)}
