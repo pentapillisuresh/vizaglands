@@ -72,6 +72,18 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
             'Content-Type': 'application/json'
           }
         });
+
+        if (!isEditMode && !city) {
+          const defaultCity = res.find(
+            (c) => c.city.toLowerCase() === "visakhapatnam"
+          );
+  
+          if (defaultCity) {
+            setCity(defaultCity.city);          // store city name
+            setLocalities(defaultCity.locality);
+          }
+        }
+  
         setCities(res);
       } catch (error) {
         console.error("Error fetching cities:", error);
@@ -83,18 +95,37 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   }, []);
 
   // ✅ Populate localities when city changes
+  // useEffect(() => {
+  //   if (city && cities.length > 0) {
+  //     const selectedCity = cities.find(
+  //       (c) => c.city.toLowerCase() === city.toLowerCase()
+  //     );
+  //     setLocalities(selectedCity ? selectedCity.locality : []);
+  //     // Keep locality if it exists in selected city's locality list
+  //     if (!selectedCity?.locality.includes(locality)) {
+  //       setLocality("");
+  //     }
+  //   }
+  // }, [city, cities]);
+
   useEffect(() => {
     if (city && cities.length > 0) {
       const selectedCity = cities.find(
         (c) => c.city.toLowerCase() === city.toLowerCase()
       );
-      setLocalities(selectedCity ? selectedCity.locality : []);
-      // Keep locality if it exists in selected city's locality list
-      if (!selectedCity?.locality.includes(locality)) {
-        setLocality("");
+  
+      if (selectedCity) {
+        setLocalities(selectedCity.locality);
+  
+        // ⭐ If locality is empty, DO NOT reset it — just leave it empty.
+        // ⭐ Only clear locality if it was previously selected and now invalid.
+        if (locality && !selectedCity.locality.includes(locality)) {
+          setLocality("");
+        }
       }
     }
   }, [city, cities]);
+  
 
   // ✅ Prefill data in edit mode (once cities are loaded)
   useEffect(() => {

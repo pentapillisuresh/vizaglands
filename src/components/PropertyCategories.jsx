@@ -49,47 +49,62 @@ const PropertyCategories = ({ categories }) => {
   </h2> */}
 
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-    {residentialCategories.map((cat, idx) => (
-      <article
-        key={cat.id}
-        data-aos="zoom-in"
-        data-aos-delay={100 + idx * 100}
-        className="group cursor-pointer flex flex-col h-full"
-        onClick={() =>
-          navigate("/properties-list", {
-            state: {
-              categoryId: cat.id,
-            },
-          })
-        }
-      >
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-orange-200">
-          {/* Image Container */}
-          <div className="relative w-full h-48 flex items-center justify-center bg-gray-50">
-            {/* Hover Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
-            {/* Full Image Visible */}
-            <img
-              src={cat.photo}
-              alt={cat.name}
-              className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
-              loading="lazy"
-            />
+  {residentialCategories
+  .slice()
+  .sort((a, b) => {
+    // Custom sorting order based on category name
+    const customOrder = [
+      "Plot",
+      "Flat/Apartment",
+      "IndependentHouse/Villa",
+      "Land",
+      "FarmHouse"
+    ];
 
-            {/* Hover Overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
-          </div>
+    const indexA = customOrder.indexOf(a.name);
+    const indexB = customOrder.indexOf(b.name);
 
-          {/* Content Section */}
-          <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
-            <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
-              {cat.name}
-            </h3>
-          </div>
+    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  })
+  .map((cat, idx) => (
+    <article
+      key={cat.id}
+      data-aos="zoom-in"
+      data-aos-delay={100 + idx * 100}
+      className="group cursor-pointer flex flex-col h-full"
+      onClick={() =>
+        navigate("/properties-list", {
+          state: {
+            categoryId: cat.id,
+          },
+        })
+      }
+    >
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-orange-200">
+        
+        {/* Image Container */}
+        <div className="relative w-full h-48 flex items-center justify-center bg-gray-50">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+          <img
+            src={cat.photo}
+            alt={cat.name}
+            className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
+            loading="lazy"
+          />
+
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
         </div>
-      </article>
-    ))}
+
+        {/* Content */}
+        <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
+          <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+            {cat.name}
+          </h3>
+        </div>
+      </div>
+    </article>
+))}
 
     {/* Additional Commercial Card */}
     <article

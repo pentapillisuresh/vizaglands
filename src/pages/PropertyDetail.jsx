@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
-  ArrowLeft, ArrowRight, Home, Heart, Share2, Bed, Bath, Maximize,
+  ArrowLeft, ArrowRight, Home, Compass, Share2, Bed, Bath, Maximize,
   Building, MapPin, CheckCircle, Phone, Mail, Calendar, ChevronDown, ChevronUp
 } from "lucide-react";
 import { propertiesData } from "../data/propertiesData";
@@ -56,9 +56,9 @@ function PropertyDetail() {
     spaceBetween: 30,
     slidesPerView: 1,
     navigation: false,
-    pagination: { 
+    pagination: {
       clickable: true,
-      dynamicBullets: true 
+      dynamicBullets: true
     },
     autoplay: {
       delay: 5000,
@@ -378,11 +378,11 @@ function PropertyDetail() {
 
   // ✅ Handle similar property click
   const handleSimilarPropertyClick = (property) => {
-    navigate(`/property/${property.id}`, { 
-      state: { 
+    navigate(`/property/${property.id}`, {
+      state: {
         property,
         from: fromUser
-      } 
+      }
     });
   };
 
@@ -494,7 +494,7 @@ function PropertyDetail() {
                     >
                       <img src={SocialIcons.whatsapp} alt="WhatsApp" className="w-5 h-5 filter invert" />
                     </button>
-                    
+
                     <button
                       onClick={shareOnFacebook}
                       className="w-10 h-10 flex items-center justify-center bg-blue-600 hover:bg-blue-700 rounded-full transition-colors"
@@ -502,7 +502,7 @@ function PropertyDetail() {
                     >
                       <img src={SocialIcons.facebook} alt="Facebook" className="w-5 h-5 filter invert" />
                     </button>
-                    
+
                     <button
                       onClick={shareOnTwitter}
                       className="w-10 h-10 flex items-center justify-center bg-blue-400 hover:bg-blue-500 rounded-full transition-colors"
@@ -510,7 +510,7 @@ function PropertyDetail() {
                     >
                       <img src={SocialIcons.twitter} alt="Twitter" className="w-5 h-5 filter invert" />
                     </button>
-                    
+
                     <button
                       onClick={shareOnLinkedIn}
                       className="w-10 h-10 flex items-center justify-center bg-blue-800 hover:bg-blue-900 rounded-full transition-colors"
@@ -518,7 +518,7 @@ function PropertyDetail() {
                     >
                       <img src={SocialIcons.linkedin} alt="LinkedIn" className="w-5 h-5 filter invert" />
                     </button>
-                    
+
                     <button
                       onClick={shareOnTelegram}
                       className="w-10 h-10 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
@@ -526,7 +526,7 @@ function PropertyDetail() {
                     >
                       <img src={SocialIcons.telegram} alt="Telegram" className="w-5 h-5 filter invert" />
                     </button>
-                    
+
                     <button
                       onClick={shareViaEmail}
                       className="w-10 h-10 flex items-center justify-center bg-red-500 hover:bg-red-600 rounded-full transition-colors"
@@ -548,71 +548,124 @@ function PropertyDetail() {
 
               {/* Key Features */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-y">
-                {safeShow(profile?.bedrooms) && (
-                  <FeatureCard icon={<Bed size={24} />} label="Bedrooms" value={profile?.bedrooms} />
-                )}
-                {safeShow(profile?.bathrooms) && (
-                  <FeatureCard icon={<Bath size={24} />} label="Bathrooms" value={profile?.bathrooms} />
-                )}
-                {safeShow(profile?.carpetArea) && (
-                  <FeatureCard
-                    icon={<Maximize size={24} />}
-                    label="Carpet Area"
-                    value={`${profile?.carpetArea} ${profile?.areaUnit || "sqft"}`}
-                  />
-                )}
-                {safeShow(profile?.status) && (
-                  <FeatureCard icon={<Building size={24} />} label="Status" value={profile?.status} />
+                {category.name !== "Flat/Apartment" ? (
+                  <>
+                    {/* Plot-specific fields */}
+                    <>
+                      {category.name !== "Land" ? (
+                        safeShow(profile?.plotArea) && (
+                          <FeatureCard
+                            icon={<Maximize size={24} />}
+                            label="Plot Area"
+                            value={`${profile?.plotArea} ${profile?.areaUnit || "sqft"}`}
+                          />
+                        )
+                      ) : (
+                        <FeatureCard
+                          icon={<Maximize size={24} />}
+                          label="Plot Area"
+                          value={`${profile?.plotArea} ${profile?.areaUnit || "sqft"}`}
+                        />
+                      )}
+                    </>
+
+                    {safeShow(profile?.facing) && (
+                      <FeatureCard
+                        icon={<Compass size={24} />}
+                        label="Facing"
+                        value={profile?.facing}
+                      />
+                    )}
+
+                    {/* {safeShow(profile?.plotWidth) && (
+        <FeatureCard
+          icon={<Maximize size={24} />}
+          label="Width"
+          value={`${profile?.plotWidth} ft`}
+        />
+      )}
+
+      {safeShow(profile?.plotDepth) && (
+        <FeatureCard
+          icon={<Maximize size={24} />}
+          label="Depth"
+          value={`${profile?.plotDepth} ft`}
+        />
+      )} */}
+                  </>
+                ) : (
+                  <>
+                    {/* Non-plot property fields */}
+                    {safeShow(profile?.bedrooms) && (
+                      <FeatureCard icon={<Bed size={24} />} label="Bedrooms" value={profile?.bedrooms} />
+                    )}
+
+                    {safeShow(profile?.bathrooms) && (
+                      <FeatureCard icon={<Bath size={24} />} label="Bathrooms" value={profile?.bathrooms} />
+                    )}
+
+                    {safeShow(profile?.carpetArea) && (
+                      <FeatureCard
+                        icon={<Maximize size={24} />}
+                        label="Carpet Area"
+                        value={`${profile?.carpetArea} ${profile?.areaUnit || "sqft"}`}
+                      />
+                    )}
+
+                    {safeShow(profile?.status) && (
+                      <FeatureCard icon={<Building size={24} />} label="Status" value={profile?.status} />
+                    )}
+                  </>
                 )}
               </div>
 
-             
 
-            {/* Property Details - Updated Design */}
-<Section title="Property Details">
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-    {safeShow(category.name) && (
-      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-        <CheckCircle size={20} className="text-orange-600" />
-        <div className="flex-1">
-           <span className="block text-sm text-gray-500 mt-1">Property Type</span>
-          <span className="text-[#003366] font-medium">{category.name}</span>
-         
-        </div>
-      </div>
-    )}
-    {safeShow(address?.locality) && (
-      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-        <CheckCircle size={20} className="text-orange-600" />
-        <div className="flex-1">
-          <span className="block text-sm text-gray-500 mt-1">Locality</span>
-          <span className="text-[#003366] font-medium">{address.locality}</span>
-          
-        </div>
-      </div>
-    )}
-    {safeShow(address?.city) && (
-      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-        <CheckCircle size={20} className="text-orange-600" />
-        <div className="flex-1">
-             <span className="block text-sm text-gray-500 mt-1">City</span>
-          <span className="text-[#003366] font-medium">{address.city}</span>
-       
-        </div>
-      </div>
-    )}
-    {safeShow(profile?.totalFloors) && (
-      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-        <CheckCircle size={20} className="text-orange-600" />
-        <div className="flex-1">
-           <span className="block text-sm text-gray-500 mt-1">Total Floors</span>
-          <span className="text-[#003366] font-medium">{profile.totalFloors}</span>
-         
-        </div>
-      </div>
-    )}
-  </div>
-</Section>
+
+              {/* Property Details - Updated Design */}
+              <Section title="Property Details">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {safeShow(category.name) && (
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <CheckCircle size={20} className="text-orange-600" />
+                      <div className="flex-1">
+                        <span className="block text-sm text-gray-500 mt-1">Property Type</span>
+                        <span className="text-[#003366] font-medium">{category.name}</span>
+
+                      </div>
+                    </div>
+                  )}
+                  {safeShow(address?.locality) && (
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <CheckCircle size={20} className="text-orange-600" />
+                      <div className="flex-1">
+                        <span className="block text-sm text-gray-500 mt-1">Locality</span>
+                        <span className="text-[#003366] font-medium">{address.locality}</span>
+
+                      </div>
+                    </div>
+                  )}
+                  {safeShow(address?.city) && (
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <CheckCircle size={20} className="text-orange-600" />
+                      <div className="flex-1">
+                        <span className="block text-sm text-gray-500 mt-1">City</span>
+                        <span className="text-[#003366] font-medium">{address.city}</span>
+
+                      </div>
+                    </div>
+                  )}
+                  {safeShow(profile?.totalFloors) && (
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <CheckCircle size={20} className="text-orange-600" />
+                      <div className="flex-1">
+                        <span className="block text-sm text-gray-500 mt-1">Total Floors</span>
+                        <span className="text-[#003366] font-medium">{profile.totalFloors}</span>
+
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Section>
 
               {/* Nearby Details - Updated Design */}
               {Array.isArray(address?.near_by) && address.near_by.length > 0 && (
@@ -648,7 +701,7 @@ function PropertyDetail() {
               )}
 
 
- {/* Overview */}
+              {/* Overview */}
               {safeShow(property?.description) && (
                 <Section title="Overview">
                   <div className="text-gray-700 leading-relaxed">
@@ -688,33 +741,38 @@ function PropertyDetail() {
           {fromUser !== 'client' && (
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-lg p-6 sticky top-8">
-                <div className="text-center mb-6">
+                {showContact && (<div className="text-center mb-6">
                   <div className="w-20 h-20 bg-gradient-to-br from-[#003366] to-[#004d99] rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Building size={36} className="text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-[#003366] mb-1" style={{ textTransform: 'capitalize' }}>
-                    {client.fullName || "Property Advisor"}
+                    {/* {client.fullName || "Property Advisor"} */}
+                    {"VMRDA Plots"}
                   </h3>
                   {client.phoneNumber && (
                     <p className="text-sm text-gray-600">📞 {client.phoneNumber}</p>
                   )}
-                </div>
 
-                {!showContact ? (
-                  <button
-                    onClick={() => setShowContact(true)}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 mb-4"
-                  >
-                    <Phone size={20} /> Show Contact Details
-                  </button>
-                ) : (
-                  <div className="space-y-4 mb-4">
-                    {client.phoneNumber && (
-                      <ContactCard icon={<Phone size={20} />} label="Call Now" value={client.phoneNumber} />
-                    )}
-                    <ContactCard icon={<Mail size={20} />} label="Email" value="info@vmrdaplots.com" />
-                  </div>
-                )}
+                </div>)}
+                < button
+                  onClick={() => setShowContact(!showContact)}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 mb-4"
+                >
+                  <Phone size={20} /> {!showContact ? "Show Contact Details" : "Hide Contact Details"}
+                </button>
+
+
+                {/* {!showContact ? (
+                  
+                )
+                : (
+                  // <div className="space-y-4 mb-4"> 
+                  //   {client.phoneNumber && (
+                  //     <ContactCard icon={<Phone size={20} />} label="Call Now" value={client.phoneNumber} />
+                  //   )}
+                  //   <ContactCard icon={<Mail size={20} />} label="Email" value="info@vmrdaplots.com" />
+                  // </div>
+                )}*/}
                 <div className="border-t pt-6">
                   <h4 className="font-bold text-[#003366] mb-4">Schedule a Visit</h4>
                   <form className="space-y-4" onSubmit={handleSubmit}>
@@ -904,9 +962,9 @@ function PropertyDetail() {
                         </div>
                         <span className="text-sm font-medium">Prev</span>
                       </button>
-                      
+
                       <div className="h-4 w-px bg-gray-300"></div>
-                      
+
                       <button
                         onClick={() => swiperRef.current?.slideNext()}
                         className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors group"
@@ -951,7 +1009,7 @@ function PropertyDetail() {
           </section>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

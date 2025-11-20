@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-react";
 import SearchBar from "../hooks/searchBar";
-import ApiService from "../hooks/ApiService";
 
 const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -169,7 +168,7 @@ const Header = () => {
         {/* 🔹 Left section: Logo + Nav Items */}
         <div className="flex items-center space-x-20">
           <img
-            src="/images/logovizag.png"
+            src="/images/vizaglogo.jpeg"
             alt="Vizaglands Logo"
             className="h-20 w-auto cursor-pointer transform transition-transform duration-300 hover:scale-105"
             onClick={() => navigate("/")}

@@ -39,7 +39,7 @@ const Footer = () => {
           {/* Logo + Social */}
           <div className="animate-fadeIn">
             <div className="flex items-center mb-4">
-              <img src="/images/logovizag.png" alt="Vizaglands Logo" className="h-10 w-auto" />
+              <img src="/images/vizaglogo.jpeg" alt="Vizaglands Logo" className="h-15 w-auto rounded" />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               We are committed to connect quality homes to quality buyers.

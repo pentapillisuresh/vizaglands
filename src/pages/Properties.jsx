@@ -9,8 +9,8 @@ import ApiService from "../hooks/ApiService";
 function Properties() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { categoryId, city, locality, propertyType,priceRange } = location.state || {};
-
+  const { categoryId, city, locality, propertyType, priceRange } = location.state || {};
+  const [categories, setCategories] = useState([])
   // 🔹 States
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [category, setCategory] = useState(null);
@@ -32,10 +32,35 @@ function Properties() {
     city: city || "",
     locality: locality || "",
     clientId: "",
-    priceRange: priceRange||"all",
+    priceRange: priceRange || "all",
   });
 
   const [activeFilters, setActiveFilters] = useState(filters);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // const clientToken = localStorage.getItem('token');
+
+      try {
+        const response = await ApiService.get('/categories', {
+          headers: {
+            // Authorization: `Bearer ${clientToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response?.categories) {
+          setCategories(response.categories);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // 🏙️ Fetch Cities
   useEffect(() => {
@@ -59,11 +84,12 @@ function Properties() {
         (c) => c.city.toLowerCase() === filters.city.toLowerCase()
       );
       setLocalities(selectedCity ? selectedCity.locality : []);
-      if (!selectedCity?.locality.includes(filters.locality)) {
-        setFilters((prev) => ({ ...prev, locality: "" }));
+      if (!selectedCity || !Array.isArray(selectedCity.locality)) {
+        setLocalities([]);
+        setFilters(prev => ({ ...prev, locality: "" }));
+      } else if (!selectedCity.locality.includes(filters.locality)) {
+        setFilters(prev => ({ ...prev, locality: "" }));
       }
-    } else {
-      setLocalities([]);
     }
   }, [filters.city, cities]);
 
@@ -247,7 +273,23 @@ function Properties() {
                 <option value="rent">For Rent</option>
               </select>
             </div>
+            {/* category */}            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-1">Category</label>
 
+              <select
+                value={filters.categoryId}
+                onChange={handleChange}
+                name="categoryId"
+                className="border rounded-lg px-3 py-2 text-sm w-full"
+              >
+                <option value="">Select Category</option>
+                {categories.map((cat, inx) => (
+                  <option key={inx} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             {/* City Dropdown */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">City</label>
@@ -276,9 +318,8 @@ function Properties() {
                 value={filters.locality}
                 onChange={handleChange}
                 disabled={!filters.city}
-                className={`w-full px-3 py-2 border rounded-lg ${
-                  !filters.city ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg ${!filters.city ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 <option value="">
                   {filters.city ? "Select Locality" : "Select City first"}

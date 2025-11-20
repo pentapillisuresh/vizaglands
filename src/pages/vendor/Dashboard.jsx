@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Home, TrendingUp, Eye, Phone, Heart } from 'lucide-react';
+import { Home, TrendingUp, Eye, Phone, Heart, Store } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
 import getPhotoSrc from '../../hooks/getPhotos';
 
@@ -15,8 +15,9 @@ const Dashboard = () => {
     // savedByUsers: 0,
     monthlyViews: 0
   });
-
-  const [recentListings, setRecentListings] = useState([]);
+  const [filteredListings, setFilteredListings] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all"); // track current filter
+    const [recentListings, setRecentListings] = useState([]);
   const [recentLeads, setRecentLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [clientDetails, setClientDetails] = useState(null);
@@ -47,9 +48,11 @@ const Dashboard = () => {
         });
         localStorage.setItem("clientDetails", JSON.stringify(data.clientDetails));
         setClientDetails(data.clientDetails);
-        console.log("fullName::", data.clientDetails.fullName);
-                setRecentListings(data.properties || []);
-        setRecentLeads(data.leads || []);
+       
+                const properties = data.properties || [];
+                setRecentListings(properties);
+                setFilteredListings(properties); // initially show all properties
+                setRecentLeads(data.leads || []);
       } else {
         console.warn("Unexpected response format:", response);
       }
@@ -60,28 +63,47 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  const StatCard = ({ icon: Icon, title, value, change, color }) => (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-500 text-sm font-medium">{title}</p>
-          <h3 className="text-3xl font-bold text-gray-800 mt-2">{value}</h3>
-          {change && (
-            <p className={`text-sm mt-2 ${change > 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {change > 0 ? '↑' : '↓'} {Math.abs(change)}% from last month
-            </p>
-          )}
-        </div>
-        <div className={`${color} p-4 rounded-full`}>
-          <Icon className="w-8 h-8 text-white" />
-        </div>
+const handleFilter = (filterType) => {
+  setActiveFilter(filterType);
+
+  if (filterType === "verified") {
+    setFilteredListings(recentListings.filter(listing => listing.status === "verified"));
+  } else if (filterType === "pending") {
+    setFilteredListings(recentListings.filter(listing => listing.status === "pending"));
+  }
+  else{
+    setFilteredListings(recentListings); // "all" or reset
+  }
+};
+
+
+
+const StatCard = ({ icon: Icon, title, value, change, color, onClick, className }) => (
+  <div
+    onClick={onClick}
+    className={`bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow ${className || ""}`}
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-500 text-sm font-medium">{title}</p>
+        <h3 className="text-3xl font-bold text-gray-800 mt-2">{value}</h3>
+        {change && (
+          <p className={`text-sm mt-2 ${change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {change > 0 ? '↑' : '↓'} {Math.abs(change)}% from last month
+          </p>
+        )}
+      </div>
+      <div className={`${color} p-4 rounded-full`}>
+        <Icon className="w-8 h-8 text-white" />
       </div>
     </div>
-  );
+  </div>
+);
 
   if (loading) {
     return (
@@ -128,10 +150,11 @@ const Dashboard = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <StatCard icon={Home} title="Total Listings" value={stats.totalListings} color="bg-blue-500" />
-          <StatCard icon={TrendingUp} title="Verified Listings" value={stats.activeListings} color="bg-green-500" />
-          <StatCard icon={Eye} title="Total Views" value={stats.totalViews.toLocaleString()} color="bg-orange-500" />
+          <StatCard icon={Home} title="Total Listings" value={stats.totalListings} color="bg-blue-500" onClick={() => handleFilter("all")} className="cursor-pointer"/>
+          <StatCard icon={TrendingUp} title="Verified Listings" value={stats.activeListings} color="bg-green-500" onClick={() => handleFilter("verified")} className="cursor-pointer" />
+          <StatCard icon={Store} title="Pending Listings" value={parseInt(stats.totalListings)-parseInt(stats.activeListings)} color="bg-green-500" onClick={() => handleFilter("pending")} className="cursor-pointer" />
           <StatCard icon={Phone} title="Inquiries" value={stats.totalInquiries} color="bg-purple-500" />
+          <StatCard icon={Eye} title="Total Views" value={stats.totalViews.toLocaleString()} color="bg-orange-500" />
           <StatCard icon={TrendingUp} title="This Month Views" value={stats.monthlyViews.toLocaleString()} color="bg-indigo-500" />
         </div>
 
@@ -150,11 +173,11 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {recentListings.length === 0 ? (
+              {filteredListings.length === 0 ? (
                 <p className="text-gray-500 text-center py-6">No properties found.</p>
               ) : (
                 <div className="space-y-4">
-                  {recentListings.map((listing) => (
+                  {filteredListings.map((listing) => (
                     <div
                       key={listing._id || listing.id}
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
