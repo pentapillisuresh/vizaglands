@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Home, BarChart3, User, LogOut, Users } from "lucide-react";
+import { LayoutDashboard, Home, BarChart3, User, LogOut, Users, Heart } from "lucide-react";
 import SearchBar from "../hooks/searchBar";
 
 const Header = () => {
@@ -149,14 +149,16 @@ const Header = () => {
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
     { path: "/contact", label: "Contact" },
-    { path: "/blog", label: "Blog" }
+    { path: "/blog", label: "Blog" },
+    { path: "/project", label: "Projects" }
   ];
 
   const vendorMenuItems = [
     { path: "/vendor/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/vendor/manage-listings", label: "Manage Listings", icon: Home },
     { path: "/vendor/leads", label: "Leads", icon: Users },
-    { path: "/vendor/profile", label: "Profile", icon: User }
+    { path: "/vendor/profile", label: "Profile", icon: User },
+    { path: "/favorites", label: "Favorites", icon: Heart }
   ];
 
   return (

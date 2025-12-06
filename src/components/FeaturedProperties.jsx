@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Bed, Bath, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
@@ -16,6 +16,29 @@ const FeaturedProperties = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [translateX, setTranslateX] = useState(0);
   const carouselRef = useRef(null);
+
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem("favorites");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const isFavorite = (id) => favorites.some(item => item.id === id);
+
+  const toggleFavorite = (listing) => {
+    let updatedFavs = [...favorites];
+
+    const exists = updatedFavs.find(item => item.id === listing.id);
+
+    if (exists) {
+      // remove
+      updatedFavs = updatedFavs.filter(item => item.id !== listing.id);
+    } else {
+      // add
+      updatedFavs.push(listing);
+    }
+
+    setFavorites(updatedFavs);
+    localStorage.setItem("favorites", JSON.stringify(updatedFavs));
+  };
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -218,7 +241,24 @@ const FeaturedProperties = () => {
                       }
                     }}
                   >
-                    <div className="h-56 overflow-hidden">
+                    <div className="relative h-56 overflow-hidden">
+
+                      {/* ❤️ Favorite Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent navigation
+                          toggleFavorite(property);
+                        }}
+                        className="absolute top-3 right-3 z-10"
+                      >
+                        <Heart
+                          className={`w-7 h-7 drop-shadow-md transition ${isFavorite(property.id)
+                              ? "text-red-600 fill-red-600"
+                              : "text-white hover:text-red-400"
+                            }`}
+                        />
+                      </button>
+
                       <img
                         src={getPhotoSrc(property.photos)}
                         alt={property.title}
@@ -226,6 +266,7 @@ const FeaturedProperties = () => {
                         draggable="false"
                       />
                     </div>
+
 
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-3">
@@ -319,11 +360,10 @@ const FeaturedProperties = () => {
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`h-2 rounded-full transition-all ${
-                idx === currentIndex
+              className={`h-2 rounded-full transition-all ${idx === currentIndex
                   ? "bg-orange-600 w-8"
                   : "bg-gray-300 w-2 hover:bg-gray-400"
-              }`}
+                }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
           ))}

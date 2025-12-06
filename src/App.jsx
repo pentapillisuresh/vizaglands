@@ -18,7 +18,9 @@ import Analytics from './pages/vendor/Analytics';
 import Profile from './pages/vendor/Profile';
 import Leads from './pages/vendor/Leads';
 import Blog from './pages/Blog';
+import Project from './pages/Project';
 import ClientPropertyDetail from './pages/ClientPropertyDetail';
+import Favorites from './pages/vendor/Favorites';
 
 function App() {
 
@@ -33,10 +35,11 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login-register" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
-
+          <Route path="/favorites" element={<Favorites />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path='/blog' element={<Blog />} />
+          <Route path='/project' element={<Project />} />
           <Route path="/select-user-type" element={<SelectUserType />} />
           <Route path="/post-property" element={<PostProperty />} />
           <Route path="/properties-list/" element={<Properties />} />
