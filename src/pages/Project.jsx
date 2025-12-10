@@ -150,7 +150,7 @@ function Projects() {
         if (city) params.append("city", city);
         if (locality) params.append("locality", locality);
         if (clientId) params.append("clientId", clientId);
-
+ 
         // Price Range
         if (priceRange !== "all") {
           const [min, max] = priceRange.split("-").map(Number);
@@ -159,8 +159,8 @@ function Projects() {
         }
 
         // API Call
-        const res = await ApiService.get(`/projects?${params.toString()}`);
-        const data = res?.projects || [];
+        const res = await ApiService.get(`/properties/getAllProjects/?${params.toString()}`);
+        const data = res?.properties || [];
         const total = res?.totalPages || data.length;
 
         let sorted = [...data];
