@@ -14,6 +14,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
 import RecentViewProperties from "../components/RecentViewProperties";
+import FeaturedProjects from "../components/FeaturedProjects";
 
 function Home() {
   const [loading, setLoading] = useState(false);
@@ -62,6 +63,7 @@ function Home() {
       {/* Header is already rendered in App.js, you can remove it here if duplicated */}
       <Hero />
       <PropertyCategories categories={categories} />
+      <FeaturedProjects />
       <FeaturedProperties />
       <ViewedProperties />
       {/* <HowItWorks /> */}
