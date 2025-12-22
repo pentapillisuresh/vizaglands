@@ -53,9 +53,9 @@ const RecentViewProperties = () => {
     spaceBetween: 30,
     slidesPerView: 1,
     navigation: false, // Disable default navigation since we're using custom buttons
-    pagination: { 
+    pagination: {
       clickable: true,
-      dynamicBullets: true 
+      dynamicBullets: true
     },
     autoplay: {
       delay: 5000,
@@ -87,7 +87,7 @@ const RecentViewProperties = () => {
           </span>
         </div>
 
-        <h2 className="text-4xl md:text-5xl font-serif font-extrabold text-center mb-12 text-gray-900">
+        <h2 className="text-4xl md:text-4xl font-serif font-extrabold text-center mb-12 text-gray-900">
           Recently Viewed Properties
         </h2>
 
@@ -216,9 +216,9 @@ const RecentViewProperties = () => {
                     </div>
                     <span className="text-sm font-medium">Prev</span>
                   </button>
-                  
+
                   <div className="h-4 w-px bg-gray-300"></div>
-                  
+
                   <button
                     onClick={() => swiperRef.current?.slideNext()}
                     className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors group"

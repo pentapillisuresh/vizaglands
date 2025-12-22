@@ -7,7 +7,7 @@ const PropertyCategories = ({ categories }) => {
   const residentialCategories = categories.filter(
     (cat) => cat.catType === "Residential"
   );
-  
+
   const commercialCategories = categories.filter(
     (cat) => cat.catType === "Commercial"
   );
@@ -23,7 +23,7 @@ const PropertyCategories = ({ categories }) => {
         </div>
 
         <h2
-          className="text-4xl md:text-5xl font-serif font-bold text-center mb-4 text-gray-900"
+          className="text-4xl md:text-4xl font-serif font-bold text-center mb-4 text-gray-900"
           data-aos="fade-up"
           data-aos-delay="100"
         >
@@ -34,13 +34,13 @@ const PropertyCategories = ({ categories }) => {
           data-aos="fade-up"
           data-aos-delay="200"
         >
-          Discover exceptional real estate opportunities crafted for your lifestyle
+          vmrdaplots.com is a trusted real estate platform offering
         </p>
 
         {/* Residential Section */}
-    {/* Residential Section */}
-<div className="mb-20">
-  {/* <h2
+        {/* Residential Section */}
+        <div className="mb-20">
+          {/* <h2
     className="text-3xl font-serif font-bold text-center mb-12 text-gray-800 relative inline-block mx-auto"
     data-aos="fade-up"
   >
@@ -48,96 +48,96 @@ const PropertyCategories = ({ categories }) => {
     <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"></span>
   </h2> */}
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-  {residentialCategories
-  .slice()
-  .sort((a, b) => {
-    // Custom sorting order based on category name
-    const customOrder = [
-      "Plot",
-      "Flat/Apartment",
-      "IndependentHouse/Villa",
-      "Land",
-      "FarmHouse"
-    ];
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {residentialCategories
+              .slice()
+              .sort((a, b) => {
+                // Custom sorting order based on category name
+                const customOrder = [
+                  "Plot",
+                  "Flat/Apartment",
+                  "IndependentHouse/Villa",
+                  "Land",
+                  "FarmHouse"
+                ];
 
-    const indexA = customOrder.indexOf(a.name);
-    const indexB = customOrder.indexOf(b.name);
+                const indexA = customOrder.indexOf(a.name);
+                const indexB = customOrder.indexOf(b.name);
 
-    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-  })
-  .map((cat, idx) => (
-    <article
-      key={cat.id}
-      data-aos="zoom-in"
-      data-aos-delay={100 + idx * 100}
-      className="group cursor-pointer flex flex-col h-full"
-      onClick={() =>
-        navigate("/properties-list", {
-          state: {
-            categoryId: cat.id,
-          },
-        })
-      }
-    >
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-orange-200">
-        
-        {/* Image Container */}
-        <div className="relative w-full h-48 flex items-center justify-center bg-gray-50">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+              })
+              .map((cat, idx) => (
+                <article
+                  key={cat.id}
+                  data-aos="zoom-in"
+                  data-aos-delay={100 + idx * 100}
+                  className="group cursor-pointer flex flex-col h-full"
+                  onClick={() =>
+                    navigate("/properties-list", {
+                      state: {
+                        categoryId: cat.id,
+                      },
+                    })
+                  }
+                >
+                  <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-orange-200">
 
-          <img
-            src={cat.photo}
-            alt={cat.name}
-            className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
-            loading="lazy"
-          />
+                    {/* Image Container */}
+                    <div className="relative w-full h-48 flex items-center justify-center bg-gray-50">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
+                      <img
+                        src={cat.photo}
+                        alt={cat.name}
+                        className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
+                        loading="lazy"
+                      />
+
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
+                      <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+                        {cat.name}
+                      </h3>
+                    </div>
+                  </div>
+                </article>
+              ))}
+
+            {/* Additional Commercial Card */}
+            <article
+              data-aos="zoom-in"
+              data-aos-delay={100 + residentialCategories.length * 100}
+              className="group cursor-pointer flex flex-col h-full"
+              onClick={() => navigate("/properties-commertial")}
+            >
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-orange-200">
+                {/* Image Container */}
+                <div className="relative w-full h-48 flex items-center justify-center bg-gray-50">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                  <img
+                    src="https://backendservice.vmrdaplots.in/uploads/category/commercial.png"
+                    alt="Commercial"
+                    className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
+                    loading="lazy"
+                  />
+
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
+                </div>
+
+
+                <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
+                  <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+                    Commercial
+                  </h3>
+                </div>
+              </div>
+            </article>
+          </div>
         </div>
-
-        {/* Content */}
-        <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
-          <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
-            {cat.name}
-          </h3>
-        </div>
-      </div>
-    </article>
-))}
-
-    {/* Additional Commercial Card */}
-    <article
-      data-aos="zoom-in"
-      data-aos-delay={100 + residentialCategories.length * 100}
-      className="group cursor-pointer flex flex-col h-full"
-      onClick={() => navigate("/properties-commertial")}
-    >
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl flex flex-col h-full border border-gray-200 hover:border-orange-200">
-        {/* Image Container */}
-        <div className="relative w-full h-48 flex items-center justify-center bg-gray-50">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          
-          <img
-            src="https://backendservice.vmrdaplots.in/uploads/category/commercial.png"
-            alt="Commercial"
-            className="max-w-full max-h-full object-contain transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1"
-            loading="lazy"
-          />
-
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 z-20"></div>
-        </div>
-
-       
-        <div className="px-5 py-4 text-center flex flex-col flex-grow justify-center">
-          <h3 className="text-sm font-serif font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
-            Commercial
-          </h3>
-        </div>
-      </div>
-    </article>
-  </div>
-</div>
 
         {/* Footer Section */}
         <div

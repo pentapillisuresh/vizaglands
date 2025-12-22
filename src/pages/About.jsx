@@ -20,7 +20,7 @@ function About() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center" data-aos="fade-up">
-              <h1 className="text-5xl md:text-6xl font-serif font-bold mb-6">
+              <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">
                 About VMRDA Plots
               </h1>
               <p className="font-roboto text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
@@ -36,18 +36,13 @@ function About() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div data-aos="fade-right">
                 <h2 className="text-4xl font-serif font-bold text-[#001F3F] mb-6">
-                  Who We Are
+                  About VMRDA Plots in Vizag
                 </h2>
                 <p className="font-roboto text-lg text-gray-700 leading-relaxed mb-4">
-                  VMRDA Plots is a leading real estate company specializing in VMRDA-approved 
-                  plots and commercial properties in Visakhapatnam and surrounding areas. 
-                  With 15 years of experience and deep local market knowledge, we specialize 
-                  in connecting buyers with exceptional VMRDA plot opportunities.
+                  VMRDA Plots specializes in offering safe, transparent, and affordable VMRDA-approved plots in Visakhapatnam. With years of experience in the Vizag real estate market, we provide complete legal verification and help customers find the best plots in prime and developing areas.
                 </p>
                 <p className="font-roboto text-lg text-gray-700 leading-relaxed">
-                  Our team of experienced professionals is committed to providing personalized 
-                  service, expert guidance on plot investments, and seamless transactions with 
-                  100% legal bank loan support for all VMRDA plot deals.
+                  As a leading company with 15 years of deep local knowledge, we are committed to personalized service, expert investment guidance, and seamless transactions backed by 100% legal and bank loan support for all VMRDA plot deals.
                 </p>
               </div>
 
@@ -57,8 +52,8 @@ function About() {
                     Our Mission
                   </h3>
                   <p className="font-roboto text-lg text-white leading-relaxed">
-                    To deliver exceptional VMRDA plot services that exceed expectations, 
-                    building lasting relationships based on trust, integrity, and outstanding 
+                    To deliver exceptional VMRDA plot services that exceed expectations,
+                    building lasting relationships based on trust, integrity, and outstanding
                     results with complete legal and financial support.
                   </p>
                 </div>
@@ -103,7 +98,7 @@ function About() {
                   VMRDA Plot Expertise
                 </h3>
                 <p className="font-roboto text-gray-700 leading-relaxed">
-                  Deep understanding of VMRDA plot regulations and commercial land 
+                  Deep understanding of VMRDA plot regulations and commercial land
                   opportunities with 15 years of specialized experience.
                 </p>
               </div>
@@ -133,7 +128,7 @@ function About() {
                   Bank Loan Support
                 </h3>
                 <p className="font-roboto text-gray-700 leading-relaxed">
-                  100% legal bank loan support for all VMRDA plot and commercial 
+                  100% legal bank loan support for all VMRDA plot and commercial
                   land deals with streamlined financial assistance.
                 </p>
               </div>
@@ -163,7 +158,7 @@ function About() {
                   Quick Process
                 </h3>
                 <p className="font-roboto text-gray-700 leading-relaxed">
-                  Streamlined procedures for VMRDA plot approvals and efficient 
+                  Streamlined procedures for VMRDA plot approvals and efficient
                   handling ensure smooth and timely property transactions.
                 </p>
               </div>
@@ -178,7 +173,7 @@ function About() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-4 gap-8 text-center">
               <div data-aos="zoom-in" data-aos-delay="100">
-                <h3 className="text-5xl font-serif font-bold text-[#FF6B35] mb-2">
+                <h3 className="text-4xl font-serif font-bold text-[#FF6B35] mb-2">
                   500+
                 </h3>
                 <p className="font-roboto text-lg text-gray-300">
@@ -186,13 +181,13 @@ function About() {
                 </p>
               </div>
               <div data-aos="zoom-in" data-aos-delay="200">
-                <h3 className="text-5xl font-serif font-bold text-[#FF6B35] mb-2">
+                <h3 className="text-4xl font-serif font-bold text-[#FF6B35] mb-2">
                   1000+
                 </h3>
                 <p className="font-roboto text-lg text-gray-300">Happy Clients</p>
               </div>
               <div data-aos="zoom-in" data-aos-delay="300">
-                <h3 className="text-5xl font-serif font-bold text-[#FF6B35] mb-2">
+                <h3 className="text-4xl font-serif font-bold text-[#FF6B35] mb-2">
                   15+
                 </h3>
                 <p className="font-roboto text-lg text-gray-300">
@@ -200,7 +195,7 @@ function About() {
                 </p>
               </div>
               <div data-aos="zoom-in" data-aos-delay="400">
-                <h3 className="text-5xl font-serif font-bold text-[#FF6B35] mb-2">
+                <h3 className="text-4xl font-serif font-bold text-[#FF6B35] mb-2">
                   100%
                 </h3>
                 <p className="font-roboto text-lg text-gray-300">Legal Bank Loan Support</p>
@@ -224,7 +219,7 @@ function About() {
                   Legal Compliance
                 </h3>
                 <p className="font-roboto text-lg text-gray-700 leading-relaxed">
-                  We ensure 100% legal compliance in all VMRDA plot transactions 
+                  We ensure 100% legal compliance in all VMRDA plot transactions
                   with complete documentation and bank loan support.
                 </p>
               </div>
@@ -234,7 +229,7 @@ function About() {
                   Plot Expertise
                 </h3>
                 <p className="font-roboto text-lg text-gray-700 leading-relaxed">
-                  15 years of specialized experience in VMRDA plots, commercial 
+                  15 years of specialized experience in VMRDA plots, commercial
                   lands, and industrial properties in Vizag.
                 </p>
               </div>
@@ -244,7 +239,7 @@ function About() {
                   Financial Support
                 </h3>
                 <p className="font-roboto text-lg text-gray-700 leading-relaxed">
-                  We are committed to providing complete bank loan support and 
+                  We are committed to providing complete bank loan support and
                   financial guidance for all your plot investment needs.
                 </p>
               </div>

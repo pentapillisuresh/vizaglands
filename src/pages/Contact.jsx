@@ -89,11 +89,11 @@ function Contact() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center" data-aos="fade-up">
-              <h1 className="text-5xl md:text-6xl font-serif font-bold mb-6">
+              <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">
                 Contact Us
               </h1>
               <p className="font-roboto text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
-                Let's discuss your real estate needs
+                VMRDA Plots in Vizag
               </p>
             </div>
           </div>
@@ -109,9 +109,10 @@ function Contact() {
                   Get In Touch
                 </h2>
                 <p className="font-roboto text-lg text-gray-700 mb-12 leading-relaxed">
-                  We would love to hear from you. Whether you're looking to buy,
-                  sell, or invest in property, our team is here to help you every
-                  step of the way.
+                  Looking for VMRDA approved plots in Vizag?
+                  Contact vmrdaplots.com today for the best deals on
+                  VMRDA open plots in Visakhapatnam.
+
                 </p>
 
                 <div className="space-y-8">
@@ -186,7 +187,7 @@ function Contact() {
                       <p className="font-roboto text-gray-700 leading-relaxed">
                         +91 7989834055
                         <br />
-                      
+
                       </p>
                     </div>
                   </div>

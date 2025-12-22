@@ -192,7 +192,7 @@ const FeaturedProperties = () => {
         </div>
 
         <h2
-          className="text-4xl md:text-5xl font-serif font-extrabold text-center mb-2 text-gray-900"
+          className="text-4xl md:text-4xl font-serif font-extrabold text-center mb-2 text-gray-900"
           data-aos="fade-up"
           data-aos-delay="100"
         >
@@ -203,7 +203,7 @@ const FeaturedProperties = () => {
           data-aos="fade-up"
           data-aos-delay="200"
         >
-          Handpicked properties that offer exceptional value
+          VMRDA approved plots in Vizag at prime and fast-developing locations.
         </p>
 
         <div className="relative">
@@ -253,8 +253,8 @@ const FeaturedProperties = () => {
                       >
                         <Heart
                           className={`w-7 h-7 drop-shadow-md transition ${isFavorite(property.id)
-                              ? "text-red-600 fill-red-600"
-                              : "text-white hover:text-red-400"
+                            ? "text-red-600 fill-red-600"
+                            : "text-white hover:text-red-400"
                             }`}
                         />
                       </button>
@@ -361,8 +361,8 @@ const FeaturedProperties = () => {
               key={idx}
               onClick={() => setCurrentIndex(idx)}
               className={`h-2 rounded-full transition-all ${idx === currentIndex
-                  ? "bg-orange-600 w-8"
-                  : "bg-gray-300 w-2 hover:bg-gray-400"
+                ? "bg-orange-600 w-8"
+                : "bg-gray-300 w-2 hover:bg-gray-400"
                 }`}
               aria-label={`Go to slide ${idx + 1}`}
             />

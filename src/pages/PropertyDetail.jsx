@@ -843,7 +843,7 @@ function PropertyDetail() {
                 </span>
               </div>
 
-              <h2 className="text-4xl md:text-5xl font-serif font-extrabold text-center mb-12 text-gray-900">
+              <h2 className="text-4xl md:text-4xl font-serif font-extrabold text-center mb-12 text-gray-900">
                 Similar Properties You Might Like
               </h2>
 

@@ -68,7 +68,7 @@
 //   return (
 //     <div className="min-h-screen bg-white">
 //       {/* Hero Section */}
-    
+
 
 // <section
 //   className="relative bg-cover bg-center bg-no-repeat text-white h-[500px]"
@@ -85,7 +85,7 @@
 //       <span className="inline-block bg-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-6">
 //         Welcome to Realty Insights
 //       </span>
-//       <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+//       <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
 //         Discover Real Estate Stories That Inspire
 //       </h2>
 //       <p className="text-xl text-gray-300 leading-relaxed">
@@ -137,7 +137,7 @@
 //       {/* Blog Grid */}
 //       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
 //         <div className="text-center mb-16">
-//           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+//           <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">
 //             Latest Real Estate Articles
 //           </h2>
 //           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -188,7 +188,7 @@
 //       {/* Newsletter Section */}
 //       <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20">
 //         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-//           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+//           <h2 className="text-4xl md:text-4xl font-bold text-white mb-6">
 //             Stay Ahead in Real Estate
 //           </h2>
 //           <p className="text-xl text-gray-300 mb-10 leading-relaxed">
@@ -208,7 +208,7 @@
 //         </div>
 //       </section>
 
-    
+
 //     </div>
 //   );
 // }
@@ -229,10 +229,12 @@ export default function Blog() {
   const fetchBlogs = async () => {
     try {
       const adminToken = localStorage.getItem('token');
-      const res = await ApiService.get("/blogs",{headers: {
-        Authorization: `Bearer ${adminToken}`,
-        'Content-Type': 'application/json',
-      },});
+      const res = await ApiService.get("/blogs", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
       setBlogs(res.blogs);
     } catch (err) {
       console.error("Error fetching blogs:", err);
@@ -261,7 +263,7 @@ export default function Blog() {
             <span className="inline-block bg-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               Welcome to Realty Insights
             </span>
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               Discover Real Estate Stories That Inspire
             </h2>
             <p className="text-xl text-gray-300 leading-relaxed">
@@ -276,7 +278,7 @@ export default function Blog() {
       {/* Blog Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">
             Latest Real Estate Articles
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -340,7 +342,7 @@ export default function Blog() {
       {/* Newsletter Section */}
       <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-4xl font-bold text-white mb-6">
             Stay Ahead in Real Estate
           </h2>
           <p className="text-xl text-gray-300 mb-10 leading-relaxed">

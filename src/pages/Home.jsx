@@ -15,6 +15,7 @@ import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
 import RecentViewProperties from "../components/RecentViewProperties";
 import FeaturedProjects from "../components/FeaturedProjects";
+import AboutVMRDA from "../components/AboutVMRDA";
 
 function Home() {
   const [loading, setLoading] = useState(false);
@@ -62,6 +63,7 @@ function Home() {
     <div className="min-h-screen">
       {/* Header is already rendered in App.js, you can remove it here if duplicated */}
       <Hero />
+      <AboutVMRDA />
       <PropertyCategories categories={categories} />
       <FeaturedProjects />
       <FeaturedProperties />

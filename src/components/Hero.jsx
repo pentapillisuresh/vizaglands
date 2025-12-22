@@ -6,8 +6,8 @@ const slides = [
   {
     id: 1,
     image: "./images/vmrda12.jpg",
-    title: "Luxury Homes Await",
-    subtitle: "Discover timeless elegance in every corner.",
+    title: "VMRDA Approved Plots in Vizag – Best Open Plots for Sale",
+    subtitle: "Trusted VMRDA Plots in Visakhapatnam at Prime Locations.",
   },
   {
     id: 2,
@@ -168,7 +168,7 @@ const Hero = () => {
             className="text-white px-4"
           >
             <motion.h1 
-              className="text-4xl md:text-6xl font-serif font-bold mb-4 drop-shadow-lg"
+              className="text-4xl md:text-4xl font-serif font-bold mb-4 drop-shadow-lg"
               initial={{ opacity: 0, y: -30 }}
               animate={{ 
                 opacity: 1, 
