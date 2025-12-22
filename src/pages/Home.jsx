@@ -63,9 +63,9 @@ function Home() {
     <div className="min-h-screen">
       {/* Header is already rendered in App.js, you can remove it here if duplicated */}
       <Hero />
-      <AboutVMRDA />
       <PropertyCategories categories={categories} />
       <FeaturedProjects />
+      <AboutVMRDA />
       <FeaturedProperties />
       <ViewedProperties />
       {/* <HowItWorks /> */}

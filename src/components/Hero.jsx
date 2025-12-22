@@ -12,14 +12,14 @@ const slides = [
   {
     id: 2,
     image: "./images/vmrda11.jpg",
-    title: "Find Your Perfect Villa",
-    subtitle: "Experience comfort and beauty like never before.",
+    title: "Residential Plots Near Bhogapuram Airport",
+    subtitle: "Best investment opportunity near upcoming Vizag International Airport",
   },
   {
     id: 3,
     image: "./images/vmrda13.jpg",
-    title: "Modern Living Redefined",
-    subtitle: "Step into homes designed for luxury and style.",
+    title: "100% VMRDA Approved Layouts",
+    subtitle: "Clear documentation • Bank-loan friendly • Secure investment",
   },
 ];
 

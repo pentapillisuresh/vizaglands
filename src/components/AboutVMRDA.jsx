@@ -3,11 +3,27 @@ import React from "react";
 
 function AboutVMRDA() {
   return (
-    <section className="py-12 md:py-20 bg-white">
+    <section className="md:py-10 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-4" data-aos="fade-up">
+          <span className="inline-block bg-orange-50 text-orange-600 px-4 py-2 rounded-full font-medium text-sm uppercase tracking-wide">
+          Trusted Real Estate Platform
+          </span>
+        </div>
+
+      <div className="mb-6">
+              <span className="inline-block px-3 py-1.5 bg-orange-50 text-orange-600 font-medium rounded-md mb-3 text-xs tracking-wide uppercase">
+                
+              </span>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-snug">
+                Premium <span className="text-orange-600">VMRDA Approved Plots</span> in Prime Vizag
+              </h2>
+              <div className="h-1 w-16 bg-orange-500 mb-6 rounded-full"></div>
+            </div>
+
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
           {/* Left Side Image with Animation */}
-          <div 
+          <div
             className="w-full lg:w-1/2"
             data-aos="fade-right"
             data-aos-duration="800"
@@ -20,7 +36,7 @@ function AboutVMRDA() {
                 loading="lazy"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-orange-50/80 to-transparent h-32"></div>
-              
+
               {/* Orange Badge */}
               <div className="absolute top-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md border border-orange-100">
                 <span className="text-orange-600 font-bold text-sm flex items-center gap-2">
@@ -34,42 +50,33 @@ function AboutVMRDA() {
           </div>
 
           {/* Right Side Content */}
-          <div 
+          <div
             className="w-full lg:w-1/2"
             data-aos="fade-left"
             data-aos-duration="800"
             data-aos-delay="200"
           >
-            <div className="mb-6">
-              <span className="inline-block px-3 py-1.5 bg-orange-50 text-orange-600 font-medium rounded-md mb-3 text-xs tracking-wide uppercase">
-                Trusted Real Estate Platform
-              </span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-snug">
-                Premium <span className="text-orange-600">VMRDA Approved Plots</span> in Prime Vizag
-              </h2>
-              <div className="h-1 w-16 bg-orange-500 mb-6 rounded-full"></div>
-            </div>
 
             <div className="space-y-5">
               <p className="text-base text-gray-700 leading-relaxed">
                 <strong className="text-gray-900">vmrdaplots.com</strong> is a trusted real estate platform offering{" "}
                 <span className="text-orange-600 font-medium">VMRDA approved plots in Vizag</span> at prime and fast-developing locations.
-                We provide legally approved <span className="text-orange-600 font-medium">VMRDA open plots in Visakhapatnam</span> with 
+                We provide legally approved <span className="text-orange-600 font-medium">VMRDA open plots in Visakhapatnam</span> with
                 clear title, DTCP & VMRDA approvals.
               </p>
 
               <p className="text-base text-gray-700 leading-relaxed">
                 Our <span className="text-orange-600 font-medium">VMRDA plots in Vizag</span> are ideal for residential and investment purposes.
-                We offer <span className="text-orange-600 font-medium">VMRDA approved plots Vizag</span> with excellent road connectivity, 
+                We offer <span className="text-orange-600 font-medium">VMRDA approved plots Vizag</span> with excellent road connectivity,
                 infrastructure and future growth potential.
               </p>
 
               <p className="text-base text-gray-700 leading-relaxed">
-                If you are looking for <span className="text-orange-600 font-medium">VMRDA approved layouts in Vizag</span>, 
+                If you are looking for <span className="text-orange-600 font-medium">VMRDA approved layouts in Vizag</span>,
                 vmrdaplots.com is the right choice for safe and secure land investment.
               </p>
 
-            
+
 
               {/* Key Features Grid - Orange Theme */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
@@ -107,9 +114,9 @@ function AboutVMRDA() {
 
               {/* CTA Button - Orange Theme */}
               <div className="pt-6">
-                <button onClick={() => window.location.href = '/projects'}
+                <button onClick={() => window.location.href = '/project'}
 
-className="group px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg text-base inline-flex items-center gap-2">
+                  className="group px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg text-base inline-flex items-center gap-2">
                   Explore VMRDA Plots in Vizag
                   <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
