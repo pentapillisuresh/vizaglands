@@ -5,21 +5,18 @@ function AboutVMRDA() {
   return (
     <section className="md:py-10 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-4" data-aos="fade-up">
-          <span className="inline-block bg-orange-50 text-orange-600 px-4 py-2 rounded-full font-medium text-sm uppercase tracking-wide">
-          Trusted Real Estate Platform
+        <div className="text-center mb-10" data-aos="fade-up">
+          <span className="inline-block bg-orange-50 text-orange-600 px-4 py-1 rounded-full font-medium text-sm  tracking-wide">
+            Why Choose Us
           </span>
         </div>
 
-      <div className="mb-6">
-              <span className="inline-block px-3 py-1.5 bg-orange-50 text-orange-600 font-medium rounded-md mb-3 text-xs tracking-wide uppercase">
-                
-              </span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-snug">
-                Premium <span className="text-orange-600">VMRDA Approved Plots</span> in Prime Vizag
-              </h2>
-              <div className="h-1 w-16 bg-orange-500 mb-6 rounded-full"></div>
-            </div>
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-snug">
+            Premium <span className="text-orange-600">VMRDA Approved Plots</span> in Prime Vizag
+          </h2>
+          <div className="h-1 w-16 bg-orange-500 mb-6 rounded-full"></div>
+        </div>
 
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
           {/* Left Side Image with Animation */}
@@ -56,6 +53,9 @@ function AboutVMRDA() {
             data-aos-duration="800"
             data-aos-delay="200"
           >
+            <span className="inline-block px-3 py-1.5 bg-orange-50 text-orange-600 font-medium rounded-md mb-3 text-xs tracking-wide uppercase">
+              Trusted Real Estate Platform
+            </span>
 
             <div className="space-y-5">
               <p className="text-base text-gray-700 leading-relaxed">
@@ -85,7 +85,7 @@ function AboutVMRDA() {
                     <span className="text-orange-600 font-bold text-sm">✓</span>
                   </div>
                   <span className="text-sm text-gray-800">
-                    <span className="font-medium">VMRDA plots in Vizag</span>
+                    <span className="font-medium">VMRDA approved plots in Bhogapuram</span>
                   </span>
                 </div>
                 <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-orange-200 transition-colors duration-300">
@@ -93,7 +93,7 @@ function AboutVMRDA() {
                     <span className="text-orange-600 font-bold text-sm">✓</span>
                   </div>
                   <span className="text-sm text-gray-800">
-                    <span className="font-medium">VMRDA approved plots Vizag</span>
+                    <span className="font-medium">VMRDA approved plots in Vizag</span>
                   </span>
                 </div>
                 <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-orange-200 transition-colors duration-300">
@@ -101,7 +101,7 @@ function AboutVMRDA() {
                     <span className="text-orange-600 font-bold text-sm">✓</span>
                   </div>
                   <span className="text-sm text-gray-800">
-                    <span className="font-medium">VMRDA open plots in Visakhapatnam</span>
+                    <span className="font-medium">VMRDA residential plots in vizag</span>
                   </span>
                 </div>
                 <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-orange-200 transition-colors duration-300">
