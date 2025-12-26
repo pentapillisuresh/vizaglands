@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, Bed, Bath, MapPin, IndianRupee } from 'lucide-react';
+import { Eye, Bed, Bath, MapPin, IndianRupee, Compass } from 'lucide-react';
 import { useViewedProperties } from '../hooks/useViewedProperties';
 import { propertiesData } from '../data/propertiesData';
 
@@ -82,9 +82,31 @@ const ViewedProperties = () => {
                       <span>{property.bathrooms} Bath</span>
                     </div>
                   )}
-                  <div className="text-gray-600 text-sm">
-                    {property.area} {property.areaUnit}
-                  </div>
+                                              {property.profile.carpetArea > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Maximize size={16} className="text-[#003366]" />
+                            <span>
+                              {property.profile.carpetArea} {property.profile.areaUnit}
+                            </span>
+                          </div>
+                            )}
+                            {property.profile.plotArea > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Maximize size={16} className="text-[#003366]" />
+                            <span>
+                              {property.profile.plotArea} {property.profile.areaUnit}
+                            </span>
+                          </div>
+                            )}
+                            {property.profile.facing  && (
+                          <div className="flex items-center gap-1">
+                            <Compass size={16} className="text-[#003366]" />
+                            <span>
+                              {property.profile.facing}
+                            </span>
+                          </div>
+                            )}
+
                 </div>
 
                 <div className="flex items-center justify-between">

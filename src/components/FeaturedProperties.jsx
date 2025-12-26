@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight, Compass } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
@@ -296,12 +296,28 @@ const FeaturedProperties = () => {
                               <span>{property.profile.bathrooms}</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.carpetArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
+                          {property.profile.carpetArea > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Bath size={16} className="text-[#003366]" />
+                              <span>{property.profile.carpetArea}{property.profile.areaUnit}</span>
+                            </div>
+                          )}
+                          {property.profile.plotArea > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Maximize size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.plotArea} {property.profile.areaUnit}
+                              </span>
+                            </div>
+                          )}
+                          {property.profile.facing && (
+                            <div className="flex items-center gap-1">
+                              <Compass size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.facing}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 

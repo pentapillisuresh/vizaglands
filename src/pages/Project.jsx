@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   Home, MapPin, Bath, Bed, Maximize,
   ChevronLeft, ChevronRight, PlayCircle,
+  Compass,
 } from "lucide-react";
 import ApiService from "../hooks/ApiService";
 
@@ -520,12 +521,31 @@ function PropertyCard({ property, formatPrice }) {
                   <span>{property.profile.bathrooms}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1">
-                <Maximize size={16} className="text-[#003366]" />
-                <span>
-                  {property.profile.carpetArea} {property.profile.areaUnit}
-                </span>
-              </div>
+                                         {property.profile.carpetArea > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Maximize size={16} className="text-[#003366]" />
+                            <span>
+                              {property.profile.carpetArea} {property.profile.areaUnit}
+                            </span>
+                          </div>
+                            )}
+                            {property.profile.plotArea > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Maximize size={16} className="text-[#003366]" />
+                            <span>
+                              {property.profile.plotArea} {property.profile.areaUnit}
+                            </span>
+                          </div>
+                            )}
+                            {property.profile.facing  && (
+                          <div className="flex items-center gap-1">
+                            <Compass size={16} className="text-[#003366]" />
+                            <span>
+                              {property.profile.facing}
+                            </span>
+                          </div>
+                            )}
+
             </div>
           )}
         </div>

@@ -67,8 +67,8 @@ function Home() {
       <Hero />
       <PropertyCategories categories={categories} />
       <FeaturedProjects />
-      <AboutVMRDA />
       <FeaturedProperties />
+      <AboutVMRDA />
       <ViewedProperties />
       {/* <HowItWorks /> */}
       <CommercialAdSection />
