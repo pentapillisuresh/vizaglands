@@ -6,7 +6,7 @@ const slides = [
   {
     id: 1,
     image: "./images/vmrda12.jpg",
-    title: "VMRDA Approved Plots in Vizag – Best Open Plots for Sale",
+    title: "VMRDA Approved Plots in Vizag – Best Open Plots for Sale Vizag",
     subtitle: "Trusted VMRDA Plots in Visakhapatnam at Prime Locations.",
   },
   {
@@ -18,7 +18,7 @@ const slides = [
   {
     id: 3,
     image: "./images/vmrda13.jpg",
-    title: "100% VMRDA Approved Layouts",
+    title: "VMRDA Approved Layouts",
     subtitle: "Clear documentation • Bank-loan friendly • Secure investment",
   },
 ];

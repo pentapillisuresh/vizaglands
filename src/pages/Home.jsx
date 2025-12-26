@@ -9,6 +9,8 @@ import LocationsSection from "../components/LocationsSection";
 import Footer from "../components/Footer";
 import CommercialAdSection from "../components/CommercialAdSection";
 import ViewedProperties from "../components/ViewedProperties";
+import AreaSelector from '../components/AreaSelector';
+
 
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -74,6 +76,8 @@ function Home() {
       <Testimonials />
       <LocationsSection cityLocalities={cityLocalities} />
       {/* <Footer /> */}
+      <AreaSelector />
+      
     </div>
   );
 }

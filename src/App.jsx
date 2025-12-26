@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { useState } from 'react';
-import Header from './components/Header';  // import here to use globally
+import Header from './components/Header';
 import Home from './pages/Home';
 import SelectUserType from './pages/SelectUserType';
 import PostProperty from './pages/PostProperty';
@@ -18,19 +18,17 @@ import Analytics from './pages/vendor/Analytics';
 import Profile from './pages/vendor/Profile';
 import Leads from './pages/vendor/Leads';
 import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail'; // Add this import
 import Project from './pages/Project';
 import ClientPropertyDetail from './pages/ClientPropertyDetail';
 import Favorites from './pages/vendor/Favorites';
+import AreaDetail from './pages/AreaDetail';
 
 function App() {
-
-
   return (
     <AuthProvider>
       <Router>
-        {/* Header is global so Get Started works from any page */}
         <Header />
-
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login-register" element={<LoginForm />} />
@@ -39,6 +37,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path='/blog' element={<Blog />} />
+          <Route path='/blog/:id' element={<BlogDetail />} /> {/* Add blog detail route */}
           <Route path='/project' element={<Project />} />
           <Route path="/select-user-type" element={<SelectUserType />} />
           <Route path="/post-property" element={<PostProperty />} />
@@ -50,7 +49,7 @@ function App() {
           <Route path="/vendor/analytics" element={<Analytics />} />
           <Route path="/vendor/profile" element={<Profile />} />
           <Route path="/vendor/leads" element={<Leads />} />
-
+          <Route path="/area/:areaName" element={<AreaDetail />} />
         </Routes>
         <Footer />
       </Router>
