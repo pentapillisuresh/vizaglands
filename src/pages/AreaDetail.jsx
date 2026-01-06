@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import areaData from '../data/areaData';
-import { ArrowLeft, MapPin, TrendingUp, IndianRupee, Home, Target } from 'lucide-react';
+import { ArrowLeft, MapPin, TrendingUp, IndianRupee, Home, Target, Check } from 'lucide-react';
 
 const AreaDetail = () => {
   const { areaName } = useParams();
   const [area, setArea] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Convert URL parameter back to area name
@@ -23,6 +24,126 @@ const AreaDetail = () => {
     setArea(foundArea);
     setLoading(false);
   }, [areaName]);
+
+  // Investment reasons based on area name
+  const getInvestmentReasons = (areaName) => {
+    const reasons = {
+      "Madhurawada": [
+        "Rapid Development Area (fastest-growing areas in Visakhapatnam)",
+        "IT & Educational Hub (near to IT SEZs, software companies)",
+        "Excellent Connectivity (good road connectivity to NH-16)",
+        "High Appreciation Potential (population and development)",
+        "Growing Infrastructure (schools, colleges, hospitals, shopping centers, and entertainment zones)",
+        "Safe Long-Term Investment",
+        "Near to highway"
+      ],
+      "Kommadi": [
+        "Prime Location Near Madhurawada (very close to Madhurawada)",
+        "Excellent Connectivity (Easy access to NH-16, IT SEZs)",
+        "High Demand Residential Area (families, IT professionals)",
+        "Well-Planned Layouts (approved layouts, wide roads, proper drainage)",
+        "Close to Educational Institutions & Hospitals",
+        "Safe Long-Term Investment",
+        "Near to highway"
+      ],
+      "Rushikonda": [
+        "Prime Coastal Location (very close to highway)",
+        "Very close to IT SEZ",
+        "High-End Residential Demand (professionals, NRIs, and luxury home buyers)",
+        "Excellent Connectivity (IT SEZs, Vizag city, and NH-16)",
+        "Tourism & Lifestyle Advantage",
+        "Close to IT Hub & Educational Institutions",
+        "Safe & Prestigious Investment"
+      ],
+      "Kapuluppada": [
+        "Strategic Location Near Madhurawada & Bheemili",
+        "Close to IT & Educational Zones",
+        "Excellent Road Connectivity (NH-16, Madhurawada, Rushikonda, and Vizag city)",
+        "Emerging Residential Hub",
+        "Peaceful & Green Surroundings",
+        "Growing Social Infrastructure (Schools, hospitals, supermarkets)",
+        "Near to highway"
+      ],
+      "Anandapuram": [
+        "Near to International Airport and Highway",
+        "Excellent Connectivity (Madhurawada, IT SEZs, Rushikonda, Bheemili, and NH-16)",
+        "Upcoming Infrastructure Projects (Flyovers, widened roads)",
+        "Large Approved Layouts Available",
+        "Ideal for Long-Term Investment",
+        "Peaceful Living Environment",
+        "Good Resale & Future Construction Value"
+      ],
+      "Bheemili": [
+        "Near to Hospitals, Schools, Market, Road",
+        "Near to Highway",
+        "Near to International Airport",
+        "Beautiful Coastal Location",
+        "High Lifestyle & Second-Home Demand",
+        "Excellent Road Connectivity (Anandapuram, Madhurawada, and Rushikonda)",
+        "Tourism Development Boost",
+        "Peaceful & Pollution-Free Environment",
+        "Safe Long-Term Investment"
+      ],
+      "Tagarapuvalasa": [
+        "Very Close to International Highway",
+        "Very Close to Bhogapuram International Airport",
+        "Very Close to Schools, Hospitals, Market",
+        "Strategic Location on NH-16",
+        "Rapid Infrastructure Development (Flyovers, road expansions)",
+        "Growing Residential & Commercial Demand",
+        "Close to Anandapuram & Bheemili",
+        "Ideal for Long-Term Investment"
+      ],
+      "Bhogapuram": [
+        "Upcoming International Airport",
+        "High Future Appreciation Potential",
+        "Strategic Location (Vizianagaram, Srikakulam, and NH-16)",
+        "Rapid Infrastructure Development (Roads, commercial zones, and supporting infrastructure)",
+        "Future Commercial & Residential Hub (hotels, warehouses, apartments near airport)",
+        "Very Close to Schools, Hospitals, Market",
+        "Very Close to Highway",
+        "Affordable Plot Prices",
+        "Peaceful & Open Environment"
+      ],
+      "Boyapalem": [
+        "Close to Upcoming Bhogapuram Airport",
+        "Excellent Connectivity (Easy access to NH-16)",
+        "Affordable Plot Prices",
+        "High Appreciation Potential (With airport-related development)",
+        "Ideal for Long-Term Investment",
+        "Peaceful & Open Environment",
+        "Future Commercial Opportunities",
+        "Good Resale Demand in Future"
+      ],
+      "Polipalli": [
+        "Upcoming Bhogapuram Airport Proximity",
+        "Excellent Connectivity – Close to NH-16; easy road access to Visakhapatnam & Vizianagaram",
+        "Affordable Prices",
+        "High Appreciation Potential – Airport and infrastructure developments",
+        "Long-Term Investment",
+        "Peaceful & Open Environment",
+        "Future Commercial Opportunities – Potential for warehouses, hotels, and commercial ventures near airport",
+        "Good Resale Potential",
+        "Very Close to Highway",
+        "Very Close to Schools, Hospitals, Market etc"
+      ]
+    };
+    return reasons[areaName] || [];
+  };
+
+  // Function to handle keyword click - navigate to projects page
+  const handleKeywordClick = (keyword) => {
+    // You can pass the keyword as a query parameter or state
+    navigate('/project', { 
+      state: { 
+        searchKeyword: keyword,
+        areaName: area.name
+      }
+    });
+    
+    // Alternative: If you want to use query parameters
+    // navigate(`/projects?search=${encodeURIComponent(keyword)}&area=${encodeURIComponent(area.name)}`);
+  };
 
   if (loading) {
     return (
@@ -42,6 +163,8 @@ const AreaDetail = () => {
       </div>
     );
   }
+
+  const investmentReasons = getInvestmentReasons(area.name);
 
   return (
     <div className="min-h-screen bg-white">
@@ -124,52 +247,48 @@ const AreaDetail = () => {
             </div>
           </div>
 
-          {/* SEO Keywords */}
+          {/* Search Keywords - Clickable to navigate to projects */}
           <div className="mb-10">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-[#001F3F]"> {area.name}</h2>
-              <span className="bg-orange-100 text-orange-800 text-sm font-semibold px-4 py-2 rounded-full">
-                High Search Volume
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <h2 className="text-2xl font-bold text-[#001F3F] mb-6">Search Keywords</h2> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {area.keywords.map((keyword, index) => (
-                <div
+                <button
                   key={index}
-                  className="bg-gray-50 hover:bg-orange-50 transition-all duration-300 p-5 rounded-xl border border-gray-200 hover:border-orange-300 group"
+                  onClick={() => handleKeywordClick(keyword)}
+                  className="flex items-center bg-gray-50 hover:bg-gray-100 p-4 rounded-xl border border-gray-200 transition-all duration-300 group hover:border-orange-300 hover:shadow-md cursor-pointer text-left w-full focus:outline-none focus:ring-2 focus:ring-[#001F3F] focus:ring-opacity-50"
                 >
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-3 h-3 bg-[#001F3F] rounded-full group-hover:scale-125 transition-transform"></div>
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-[#001F3F] font-medium text-lg group-hover:text-orange-600 transition-colors">
-                        {keyword}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Monthly searches: 100-1K
-                      </p>
+                  <div className="flex-shrink-0 mr-3">
+                    <div className="w-6 h-6 rounded-full bg-[#001F3F] flex items-center justify-center group-hover:bg-orange-500 transition-all duration-300">
+                      <Check className="w-3 h-3 text-white" />
                     </div>
                   </div>
-                </div>
+                  <div className="flex-1">
+                    <p className="text-[#001F3F] font-medium text-sm group-hover:text-orange-600 transition-colors line-clamp-2">
+                      {keyword}
+                    </p>
+                  </div>
+                </button>
               ))}
+            </div>
+            <div className="mt-4 text-sm text-gray-500 italic">
+              Click on any keyword to explore related projects
             </div>
           </div>
 
           {/* Investment Analysis */}
           <div className="bg-[#001F3F] rounded-2xl p-6 mb-10 text-white">
-            <h2 className="text-2xl font-bold mb-6">Investment Analysis</h2>
+            <h2 className="text-2xl font-bold mb-6">Why Invest in {area.name}?</h2>
             <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold text-white mb-2">Why Invest in {area.name}?</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-300">
-                  <li>VMRDA-approved layouts ensure legal security</li>
-                  <li>Excellent connectivity to major landmarks</li>
-                  <li>Growing social infrastructure (schools, hospitals, malls)</li>
-                  <li>Proximity to employment hubs</li>
-                  <li>Stable appreciation with {area.growth} growth rate</li>
-                </ul>
-              </div>
+              <ul className="space-y-3">
+                {investmentReasons.map((reason, index) => (
+                  <li key={index} className="flex items-start">
+                    <svg className="w-5 h-5 text-orange-400 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-gray-300">{reason}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 

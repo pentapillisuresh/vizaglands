@@ -5,17 +5,23 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Residential Hub",
     demand: "High",
-    avgPrice: "₹6,000-8,000/sq.yd",
+    avgPrice: "₹60,000-1,00,000/sq.yd",
     growth: "15% annually",
     bestFor: "Family Living",
-    description: "Madhurawada is one of the fastest-growing residential hubs in Vizag, known for its proximity to IT hubs, educational institutions, and excellent connectivity. The area features VMRDA-approved plots with modern amenities.",
+    description: "Madhurawada is one of the fastest-growing areas in Visakhapatnam, with continuous infrastructure and real estate development. The area is close to IT SEZs, software companies, and reputed educational institutions, which increases land demand. Madhurawada has good road connectivity to NH-16, Visakhapatnam city, and nearby areas, making travel easy.",
     image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots in madhurawada",
-      "plots for sale in Madhurawada",
-      "VMRDA plots in Madhurawada",
-      "residential plots near Madhurawada",
-      "gated community plots Madhurawada"
+      "Madhurawada plots for sale",
+      "Land for sale in Madhurawada Vizag",
+      "Residential plots in Madhurawada",
+      "Buy plots in Madhurawada Andhra Pradesh",
+      "Open plots Madhurawada near Rushikonda",
+      "Affordable plots in Madhurawada",
+      "VMRDA approved plots in Madhurawada",
+      "Gated community plots Madhurawada",
+      "Best Madhurawada plots for investment 2026",
+      "Plots for sale near me",
+      "VMRDA plot near Madhurawada"
     ]
   },
   {
@@ -24,16 +30,24 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Premium Location",
     demand: "High",
-    avgPrice: "₹7,000-9,000/sq.yd",
+    avgPrice: "₹45,000-80,000/sq.yd",
     growth: "18% annually",
     bestFor: "Premium Investment",
-    description: "Kommadi is a premium residential area with VMRDA-approved plots, offering scenic views and proximity to major landmarks. Known for its upscale developments and excellent infrastructure.",
+    description: "Kommadi is very close to Madhurawada, benefiting from the same rapid growth and development corridor. Easy access to NH-16, IT SEZs, and Visakhapatnam city makes Kommadi a convenient residential choice. Kommadi is preferred by families, IT professionals, and investors due to its planned layouts and peaceful surroundings. Plot prices in Kommadi have shown steady growth and are expected to rise further due to increasing demand. The area offers approved layouts, wide roads, proper drainage, and good civic planning.",
     image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Kommadi Vizag",
+      "Kommadi plots for sale",
       "VMRDA approved plots in Kommadi",
-      "plots in kommadi",
-      "residential plots near Kommadi"
+      "Land for sale in Kommadi, Visakhapatnam",
+      "Residential plots near Kommadi",
+      "Kommadi VMRDA residential plots",
+      "Plots for sale near me",
+      "Buy land in Kommadi Visakhapatnam",
+      "Best VMRDA plots for investment in Kommadi",
+      "Residential plots near Kommadi",
+      "VMRDA approved plots in Kommadi",
+      "Plots in kommadi",
+      "Plots for sale in Kommadi Vizag"
     ]
   },
   {
@@ -42,16 +56,29 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Beachfront",
     demand: "Medium",
-    avgPrice: "₹8,000-12,000/sq.yd",
+    avgPrice: "₹75,000-1,00,000/sq.yd",
     growth: "20% annually",
     bestFor: "Luxury Living",
-    description: "Rushikonda offers breathtaking beach views and is famous for its golden sands. The area is perfect for luxury residential plots with VMRDA approvals, attracting both investors and homebuyers.",
+    description: "Rushikonda is a premium area close to the beach, making it one of the most desirable locations in Visakhapatnam. The area attracts professionals, NRIs, and luxury home buyers, increasing plot value. Well-connected to Madhurawada, IT SEZs, Vizag city, and NH-16. Near IT parks, universities, and reputed colleges, driving residential demand.",
     image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Rushikonda",
-      "residential plots near Rushikonda beach",
-      "VMRDA plots Rushikonda Vizag",
-      "plots in Rushikonda"
+      "Rushikonda plots for sale",
+      "Land for sale in Rushikonda, Vizag",
+      "Residential plots in Rushikonda",
+      "Rushikonda VMRDA approved plots",
+      "Buy plots near Rushikonda beach",
+      "Rushikonda real estate",
+      "Affordable plots in Rushikonda",
+      "Plots near Visakhapatnam city",
+      "Investment plots near Rushikonda beach",
+      "Residential land with good connectivity",
+      "Sea-facing plots in Rushikonda",
+      "Upcoming residential zone Rushikonda",
+      "VMRDA approved plots in Rushikonda for sale",
+      "Plots for sale near me",
+      "Rushikonda residential land seller",
+      "Buy Rushikonda plots online",
+      "VMRDA approved plots nearby"
     ]
   },
   {
@@ -60,15 +87,26 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Gated Community",
     demand: "Medium",
-    avgPrice: "₹5,000-7,000/sq.yd",
+    avgPrice: "₹25,000-45,000/sq.yd",
     growth: "12% annually",
     bestFor: "Secure Living",
-    description: "Kapuluppada is emerging as a preferred destination for gated community plots, offering secure living with modern amenities and excellent connectivity to the city center.",
+    description: "Kapuluppada is well-positioned between fast-developing residential and coastal areas. Easy access to IT SEZs, engineering colleges, and universities increases housing demand. Good connectivity to NH-16, Madhurawada, Rushikonda, and Vizag city.",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Kapuluppada",
-      "residential plots Kapuluppada Vizag",
-      "gated community plots Kapuluppada"
+      "Kapuluppada plots for sale",
+      "Land for sale in Kapuluppada",
+      "Buy plots in Kapuluppada Vizag",
+      "Kapuluppada real estate",
+      "Residential land in Kapuluppada",
+      "Kapuluppada Vizag plots",
+      "Affordable plots in Kapuluppada",
+      "VMRDA approved plots near Kapuluppada",
+      "Best plots for investment in Kapuluppada Vizag",
+      "Kapuluppada plots near NH16",
+      "Plots for sale near me",
+      "Real estate agent Kapuluppada",
+      "Kapuluppada land seller Vizag",
+      "Residential plots nearby"
     ]
   },
   {
@@ -77,15 +115,24 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Developing Area",
     demand: "Medium",
-    avgPrice: "₹4,500-6,500/sq.yd",
+    avgPrice: "₹22,000-40,000/sq.yd",
     growth: "10% annually",
     bestFor: "Budget Investment",
-    description: "Anandapuram offers affordable VMRDA plots with great growth potential. The area is well-connected and perfect for budget-conscious investors looking for good returns.",
+    description: "Anandapuram is located on the Vizag–Bheemili–Bheemunipatnam corridor, one of the fastest-developing zones. Well-connected to Madhurawada, IT SEZs, Rushikonda, Bheemili, and NH-16. Flyovers, widened roads, and proposed developments are boosting real estate value. Close to upcoming international airport and highway.",
     image: "https://images.unsplash.com/photo-1570125909517-53cb21c89ff2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Anandapuram Vizag",
-      "VMRDA plots Anandapuram",
-      "residential plots near Anandapuram"
+      "Anandapuram plots for sale",
+      "Land for sale in Anandapuram Vizag",
+      "Residential plots Anandapuram",
+      "Buy plots in Anandapuram Visakhapatnam",
+      "VMRDA approved plots in Anandapuram",
+      "Anandapuram real estate",
+      "Affordable plots in Anandapuram",
+      "Plots near Bhogapuram Airport from Anandapuram",
+      "VMRDA approved residential land in Anandapuram",
+      "Open plots near Anandapuram junction",
+      "Plots for sale near me",
+      "Real estate agent Anandapuram Vizag"
     ]
   },
   {
@@ -94,15 +141,26 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Coastal Area",
     demand: "Medium",
-    avgPrice: "₹5,500-7,500/sq.yd",
+    avgPrice: "₹22,000-35,000/sq.yd",
     growth: "14% annually",
     bestFor: "Retirement Homes",
-    description: "Bheemili is a serene coastal town with beautiful beaches and a relaxed lifestyle. Ideal for retirement homes and vacation properties with VMRDA-approved plots.",
+    description: "Bheemili is a scenic beach town with a calm lifestyle and strong tourism appeal. Preferred for weekend homes, retirement living, and luxury villas. Well-connected to Visakhapatnam city, Anandapuram, Madhurawada, and Rushikonda via coastal roads. Near to hospitals, schools, market, and highway. Close to upcoming international airport.",
     image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Bheemili Vizag",
-      "residential plots near Bheemili beach",
-      "VMRDA plots in Bheemili"
+      "Bheemili plots for sale",
+      "Land for sale in Bheemili Vizag",
+      "Bheemili residential plots",
+      "Bheemili beach road plots",
+      "Buy land in Bheemili Visakhapatnam",
+      "Bheemili real estate properties",
+      "Open plots in Bheemili",
+      "Residential land Bheemili",
+      "Affordable plots in Bheemili",
+      "VMRDA approved plots in Bheemili",
+      "Premium gated community plots Bheemili",
+      "Best Bheemili plots for investment in 2026",
+      "Plots for sale near me",
+      "Real estate agent Bheemili Visakhapatnam"
     ]
   },
   {
@@ -111,15 +169,24 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Industrial Corridor",
     demand: "Low",
-    avgPrice: "₹3,500-5,000/sq.yd",
+    avgPrice: "₹22,000-35,000/sq.yd",
     growth: "8% annually",
     bestFor: "Industrial Investment",
-    description: "Located in the industrial corridor, Tagarapuvalasa offers affordable plots with potential for industrial and residential development, attracting both investors and businesses.",
+    description: "Tagarapuvalasa lies directly on National Highway-16, offering excellent connectivity to Visakhapatnam and Vizianagaram. Flyovers, road expansions, and commercial developments are driving growth in this area. Very close to international highway, Bhogapuram International Airport, schools, hospitals, and market.",
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Tagarapuvalasa",
-      "residential plots Tagarapuvalasa Vizag",
-      "gated community plots Tagarapuvalasa"
+      "Tagarapuvalasa plots for sale",
+      "Land for sale in Tagarapuvalasa, Vizag",
+      "Residential plots in Tagarapuvalasa",
+      "Tagarapuvalasa real estate",
+      "Buy plots in Tagarapuvalasa",
+      "Open plots Tagarapuvalasa Vizag",
+      "VMRDA approved plots in Tagarapuvalasa",
+      "Affordable plots near Bhogapuram Airport",
+      "Tagarapuvalasa gated community plots",
+      "Plots for sale near me",
+      "Real estate agent Tagarapuvalasa",
+      "VMRDA plot dealers near Visakhapatnam"
     ]
   },
   {
@@ -128,16 +195,22 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Airport Corridor",
     demand: "Very High",
-    avgPrice: "₹6,500-10,000/sq.yd",
+    avgPrice: "₹15,000-30,000/sq.yd",
     growth: "25% annually",
     bestFor: "High ROI Investment",
-    description: "Bhogapuram is the hottest investment destination due to the upcoming international airport. VMRDA-approved plots here promise exceptional returns with strategic location advantages.",
+    description: "Bhogapuram is the site of the proposed Greenfield International Airport, which is a major driver of real estate growth. Airport-led development is expected to significantly increase land values in the coming years. Well-connected to Visakhapatnam, Vizianagaram, Srikakulam, and NH-16. Roads, commercial zones, and supporting infrastructure are developing fast around the airport region. Very close to schools, hospitals, market, and highway.",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale near Bhogapuram Airport",
-      "residential plots near Bhogapuram",
-      "VMRDA approved plots Bhogapuram",
-      "airport corridor plots Vizag"
+      "Bhogapuram plots for sale",
+      "Land for sale in Bhogapuram Vizag",
+      "Residential plots near Bhogapuram Airport",
+      "Bhogapuram real estate",
+      "Open plots in Bhogapuram Vizag",
+      "Affordable plots near Bhogapuram airport",
+      "VMRDA approved plots in Bhogapuram",
+      "Bhogapuram gated community plots",
+      "Best Bhogapuram plots for investment 2026",
+      "Plots for sale near me"
     ]
   },
   {
@@ -146,14 +219,24 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Suburban Area",
     demand: "Low",
-    avgPrice: "₹3,000-4,500/sq.yd",
+    avgPrice: "₹25,000-45,000/sq.yd",
     growth: "7% annually",
     bestFor: "Affordable Housing",
-    description: "Boyapalem offers the most affordable plots in Vizag, perfect for first-time home buyers and those looking for budget-friendly residential options.",
+    description: "Boyapalem is located near the proposed Bhogapuram International Airport, giving it strong future growth potential. Easy access to NH-16 and good road links to Visakhapatnam and Vizianagaram. Entry prices are lower compared to city areas, making it ideal for early-stage investors.",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Boyapalem",
-      "residential plots Boyapalem Vizag"
+      "Boyapalem plots for sale",
+      "Land for sale in Boyapalem Vizag",
+      "Residential plots in Boyapalem",
+      "Buy plots in Boyapalem Andhra Pradesh",
+      "Open plots Boyapalem Near Visakhapatnam",
+      "Affordable plots in Boyapalem",
+      "VMRDA approved plots in Boyapalem",
+      "Gated community plots Boyapalem",
+      "Best Boyapalem plots for investment 2026",
+      "Plots for sale near me",
+      "Buy residential plots in Boyapalem",
+      "VMRDA plot dealers near Visakhapatnam"
     ]
   },
   {
@@ -162,14 +245,22 @@ const areaData = [
     location: "Visakhapatnam, Andhra Pradesh",
     areaType: "Developing Suburb",
     demand: "Medium",
-    avgPrice: "₹4,000-6,000/sq.yd",
+    avgPrice: "₹22,000-35,000/sq.yd",
     growth: "11% annually",
     bestFor: "Long-term Investment",
-    description: "Polipalli is an emerging suburb with good growth potential. The area offers VMRDA-approved plots at reasonable prices, suitable for long-term investment strategies.",
+    description: "Polipalli offers airport proximity which boosts future growth potential. Lower entry cost compared to city plots makes it ideal for early investors. Close to NH-16 with easy road access to Visakhapatnam & Vizianagaram. Best for investors holding plots for future returns. Very close to highway, schools, hospitals, market etc.",
     image: "https://images.unsplash.com/photo-1570125909517-53cb21c89ff2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     keywords: [
-      "plots for sale in Polipalli Vizag",
-      "residential plots near Polipalli"
+      "Polipalli plots for sale",
+      "Polipalli land for sale Vizag",
+      "Residential plots in Polipalli Bhogapuram",
+      "Open land Polipalli Vizianagaram",
+      "Polipalli village plots Vizag",
+      "Affordable plots near Polipalli",
+      "VMRDA approved plots in Polipalli",
+      "Polipalli plots near Bhogapuram Airport",
+      "Best Polipalli plots for investment 2026",
+      "Plots for sale near me"
     ]
   }
 ];

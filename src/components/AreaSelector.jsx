@@ -41,7 +41,7 @@ const AreaSelector = () => {
             <span className="mx-4 text-[#001F3F] font-semibold text-sm uppercase tracking-wider">Explore Areas</span>
             <div className="w-12 h-1 bg-[#001F3F] rounded-full"></div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-[#001F3F] mb-6 opacity-0 animate-fadeInDown animation-delay-100">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#001F3F] mb-6 opacity-0 animate-fadeInDown animation-delay-100">
             Discover Vizag's Prime Locations
           </h1>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed opacity-0 animate-fadeInDown animation-delay-200">
@@ -106,9 +106,6 @@ const AreaSelector = () => {
 
                   {/* Area Details */}
                   <div className="p-4 pt-3">
-                    {/* Additional Info */}
-                  
-
                     {/* View Details Button */}
                     <div className="relative overflow-hidden rounded-lg group-hover:shadow-md transition-all duration-300">
                       <div className="flex items-center justify-between p-2 bg-gradient-to-r from-[#001F3F]/5 to-[#001F3F]/10 group-hover:from-[#001F3F]/10 group-hover:to-[#001F3F]/15 transition-all duration-500">
@@ -125,8 +122,6 @@ const AreaSelector = () => {
             </div>
           ))}
         </div>
-
-      
       </div>
 
       {/* Add CSS for animations */}
@@ -184,10 +179,6 @@ const AreaSelector = () => {
         
         .animation-delay-300 {
           animation-delay: 300ms;
-        }
-        
-        .animation-delay-500 {
-          animation-delay: 500ms;
         }
         
         .line-clamp-1 {
