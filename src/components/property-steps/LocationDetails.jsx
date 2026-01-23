@@ -94,20 +94,6 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
     fetchCities();
   }, []);
 
-  // ✅ Populate localities when city changes
-  // useEffect(() => {
-  //   if (city && cities.length > 0) {
-  //     const selectedCity = cities.find(
-  //       (c) => c.city.toLowerCase() === city.toLowerCase()
-  //     );
-  //     setLocalities(selectedCity ? selectedCity.locality : []);
-  //     // Keep locality if it exists in selected city's locality list
-  //     if (!selectedCity?.locality.includes(locality)) {
-  //       setLocality("");
-  //     }
-  //   }
-  // }, [city, cities]);
-
   useEffect(() => {
     if (city && cities.length > 0) {
       const selectedCity = cities.find(
