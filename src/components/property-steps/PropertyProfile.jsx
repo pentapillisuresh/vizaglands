@@ -327,9 +327,9 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     const missing = [];
   
     // 🏠 Required core fields
-    if (!bedrooms) missing.push("bedrooms");
-    if (!bathrooms) missing.push("bathrooms");
-    if (!balconies) missing.push("balconies");
+    // if (!bedrooms) missing.push("bedrooms");
+    // if (!bathrooms) missing.push("bathrooms");
+    // if (!balconies) missing.push("balconies");
     if (!areaUnit) missing.push("areaUnit");
     if (!totalFloors) missing.push("totalFloors");
     if (!status) missing.push("status");

@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Home, Heart, Share2, Bed, Bath, Maximize,
-  Building, MapPin, CheckCircle, Phone, Mail, Calendar
+  Building, MapPin, CheckCircle, Phone, Mail, Calendar,
+  Monitor,
+  DoorClosed,
+  Presentation
 } from "lucide-react";
 import { propertiesData } from "../data/propertiesData";
 import ApiService from "../hooks/ApiService";
@@ -372,6 +375,28 @@ function ClientPropertyDetail() {
                     value={`${profile?.carpetArea} ${profile?.areaUnit || "sqft"}`}
                   />
                 )}
+                                    {safeShow(profile?.workstations) && (
+                      <FeatureCard
+                        icon={<Monitor size={24} />}
+                        label="Work Station"
+                        value={`${profile?.workstations}`}
+                      />
+                    )}
+                    {safeShow(profile?.cabins) && (
+                      <FeatureCard
+                        icon={<DoorClosed size={24} />}
+                        label="Cabin"
+                        value={`${profile?.cabins}`}
+                      />
+                    )}
+                    {safeShow(profile?.conferenceRooms) && (
+                      <FeatureCard
+                        icon={<Presentation size={24} />}
+                        label="Meeting Rooms"
+                        value={`${profile?.conferenceRooms}`}
+                      />
+                    )}
+
                 {safeShow(profile?.status) && (
                   <FeatureCard icon={<Building size={24} />} label="Status" value={profile?.status} />
                 )}
