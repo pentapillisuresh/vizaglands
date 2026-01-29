@@ -2,19 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import ApiService from "../hooks/ApiService";
 import DOMPurify from "dompurify";
-import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  Share2,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Link as LinkIcon,
-  Copy,
-  Check,
-  Eye,
-} from "lucide-react";
+import {ArrowLeft,Calendar,Clock,Share2,Link as LinkIcon,Copy,Check,Eye, FacebookIcon} from "lucide-react";
+import { FaFacebook } from "react-icons/fa";
+import { BsTwitter } from "react-icons/bs";
+import { LiaLinkedin } from "react-icons/lia";
 
 export default function BlogDetail() {
   const { id } = useParams();
@@ -290,7 +281,7 @@ export default function BlogDetail() {
                   className="p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   title="Share on Facebook"
                 >
-                  <Facebook className="w-5 h-5" />
+                  <FaFacebook className="w-5 h-5" />
                 </button>
                 
                 <button
@@ -298,7 +289,7 @@ export default function BlogDetail() {
                   className="p-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-colors"
                   title="Share on Twitter"
                 >
-                  <Twitter className="w-5 h-5" />
+                  <BsTwitter className="w-5 h-5" />
                 </button>
                 
                 <button
@@ -306,7 +297,7 @@ export default function BlogDetail() {
                   className="p-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition-colors"
                   title="Share on LinkedIn"
                 >
-                  <Linkedin className="w-5 h-5" />
+                  <LiaLinkedin className="w-5 h-5" />
                 </button>
                 
                 <button

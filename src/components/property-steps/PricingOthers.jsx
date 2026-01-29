@@ -21,7 +21,6 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     height: window.innerHeight,
   });
 
-  console.log("rrr::", data);
   const navigate = useNavigate();
   const { user } = useAuth();
 
