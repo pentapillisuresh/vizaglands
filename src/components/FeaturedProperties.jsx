@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight, Compass } from "lucide-react";
+import {
+  MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight, Compass, LandPlot, Monitor,
+  DoorClosed,
+  Presentation,
+} from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
@@ -298,7 +302,7 @@ const FeaturedProperties = () => {
                           )}
                           {property.profile.carpetArea > 0 && (
                             <div className="flex items-center gap-1">
-                              <Bath size={16} className="text-[#003366]" />
+                              <LandPlot size={16} className="text-[#003366]" />
                               <span>{property.profile.carpetArea}{property.profile.areaUnit}</span>
                             </div>
                           )}
@@ -310,6 +314,33 @@ const FeaturedProperties = () => {
                               </span>
                             </div>
                           )}
+                          {property.profile.workstations > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Monitor size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.workstations}
+                              </span>
+                            </div>
+                          )}
+
+                          {property.profile.cabins > 0 && (
+                            <div className="flex items-center gap-1">
+                              <DoorClosed size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.cabins}
+                              </span>
+                            </div>
+                          )}
+
+                          {property.profile.conferenceRooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Presentation size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.conferenceRooms}
+                              </span>
+                            </div>
+                          )}
+
                           {property.profile.facing && (
                             <div className="flex items-center gap-1">
                               <Compass size={16} className="text-[#003366]" />

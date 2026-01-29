@@ -2,7 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Home, Compass, Share2, Bed, Bath, Maximize,
-  Building, MapPin, CheckCircle, Phone, Mail, Calendar, ChevronDown, ChevronUp
+  Building, MapPin, CheckCircle, Phone, Mail, Calendar, ChevronDown, ChevronUp,
+  Monitor,
+  DoorClosed,
+  Presentation
 } from "lucide-react";
 import { propertiesData } from "../data/propertiesData";
 import ApiService from "../hooks/ApiService";
@@ -609,6 +612,27 @@ function PropertyDetail() {
                         icon={<Maximize size={24} />}
                         label="Carpet Area"
                         value={`${profile?.carpetArea} ${profile?.areaUnit || "sqft"}`}
+                      />
+                    )}
+                    {safeShow(profile?.workstations) && (
+                      <FeatureCard
+                        icon={<Monitor size={24} />}
+                        label="Work Station"
+                        value={`${profile?.workstations}`}
+                      />
+                    )}
+                    {safeShow(profile?.cabins) && (
+                      <FeatureCard
+                        icon={<DoorClosed size={24} />}
+                        label="Cabin"
+                        value={`${profile?.cabins}`}
+                      />
+                    )}
+                    {safeShow(profile?.conferenceRooms) && (
+                      <FeatureCard
+                        icon={<Presentation size={24} />}
+                        label="Meeting Rooms"
+                        value={`${profile?.conferenceRooms}`}
                       />
                     )}
 

@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Eye, Bed, Bath, MapPin, IndianRupee, Compass } from 'lucide-react';
+import {
+  Eye, Bed, Bath, MapPin, IndianRupee, Compass, Monitor,
+  DoorClosed,
+  Presentation,
+} from 'lucide-react';
 import { useViewedProperties } from '../hooks/useViewedProperties';
 import { propertiesData } from '../data/propertiesData';
 
@@ -82,39 +86,65 @@ const ViewedProperties = () => {
                       <span>{property.bathrooms} Bath</span>
                     </div>
                   )}
-                                              {property.profile.carpetArea > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.carpetArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
-                            )}
-                            {property.profile.plotArea > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.plotArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
-                            )}
-                            {property.profile.facing  && (
-                          <div className="flex items-center gap-1">
-                            <Compass size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.facing}
-                            </span>
-                          </div>
-                            )}
+                  {property.profile.carpetArea > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Maximize size={16} className="text-[#003366]" />
+                      <span>
+                        {property.profile.carpetArea} {property.profile.areaUnit}
+                      </span>
+                    </div>
+                  )}
+                  {property.profile.plotArea > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Maximize size={16} className="text-[#003366]" />
+                      <span>
+                        {property.profile.plotArea} {property.profile.areaUnit}
+                      </span>
+                    </div>
+                  )}
+                  {property.profile.facing && (
+                    <div className="flex items-center gap-1">
+                      <Compass size={16} className="text-[#003366]" />
+                      <span>
+                        {property.profile.facing}
+                      </span>
+                    </div>
+                  )}
 
+                  {property.profile.workstations > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Monitor size={16} className="text-[#003366]" />
+                      <span>
+                        {property.profile.workstations}
+                      </span>
+                    </div>
+                  )}
+
+                  {property.profile.cabins > 0 && (
+                    <div className="flex items-center gap-1">
+                      <DoorClosed size={16} className="text-[#003366]" />
+                      <span>
+                        {property.profile.cabins}
+                      </span>
+                    </div>
+                  )}
+
+                  {property.profile.conferenceRooms > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Presentation size={16} className="text-[#003366]" />
+                      <span>
+                        {property.profile.conferenceRooms}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between">
-                {property?.price ? (
-                  <div className="flex items-center text-orange-600 font-bold text-lg">
-                    <IndianRupee className="w-5 h-5" />
-                    <span>{formatPrice(property.price)}</span>
-                  </div>
+                  {property?.price ? (
+                    <div className="flex items-center text-orange-600 font-bold text-lg">
+                      <IndianRupee className="w-5 h-5" />
+                      <span>{formatPrice(property.price)}</span>
+                    </div>
                   ) : (
                     <button
                       className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-md transition-all"
@@ -123,7 +153,7 @@ const ViewedProperties = () => {
                       Contact Us for Price
                     </button>
                   )}
-                  
+
                 </div>
               </div>
             </div>

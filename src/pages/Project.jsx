@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Home, MapPin, Bath, Bed, Maximize,
-  ChevronLeft, ChevronRight, PlayCircle,
+  ChevronLeft, ChevronRight, Monitor,
+  DoorClosed,
+  Presentation,
   Compass,
 } from "lucide-react";
 import ApiService from "../hooks/ApiService";
@@ -151,7 +153,7 @@ function Projects() {
         if (city) params.append("city", city);
         if (locality) params.append("locality", locality);
         if (clientId) params.append("clientId", clientId);
- 
+
         // Price Range
         if (priceRange !== "all") {
           const [min, max] = priceRange.split("-").map(Number);
@@ -521,30 +523,56 @@ function PropertyCard({ property, formatPrice }) {
                   <span>{property.profile.bathrooms}</span>
                 </div>
               )}
-                                         {property.profile.carpetArea > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.carpetArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
-                            )}
-                            {property.profile.plotArea > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.plotArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
-                            )}
-                            {property.profile.facing  && (
-                          <div className="flex items-center gap-1">
-                            <Compass size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.facing}
-                            </span>
-                          </div>
-                            )}
+              {property.profile.carpetArea > 0 && (
+                <div className="flex items-center gap-1">
+                  <Maximize size={16} className="text-[#003366]" />
+                  <span>
+                    {property.profile.carpetArea} {property.profile.areaUnit}
+                  </span>
+                </div>
+              )}
+              {property.profile.plotArea > 0 && (
+                <div className="flex items-center gap-1">
+                  <Maximize size={16} className="text-[#003366]" />
+                  <span>
+                    {property.profile.plotArea} {property.profile.areaUnit}
+                  </span>
+                </div>
+              )}
+              {property.profile.facing && (
+                <div className="flex items-center gap-1">
+                  <Compass size={16} className="text-[#003366]" />
+                  <span>
+                    {property.profile.facing}
+                  </span>
+                </div>
+              )}
+              {property.profile.workstations > 0 && (
+                <div className="flex items-center gap-1">
+                  <Monitor size={16} className="text-[#003366]" />
+                  <span>
+                    {property.profile.workstations}
+                  </span>
+                </div>
+              )}
+
+              {property.profile.cabins > 0 && (
+                <div className="flex items-center gap-1">
+                  <DoorClosed size={16} className="text-[#003366]" />
+                  <span>
+                    {property.profile.cabins}
+                  </span>
+                </div>
+              )}
+
+              {property.profile.conferenceRooms > 0 && (
+                <div className="flex items-center gap-1">
+                  <Presentation size={16} className="text-[#003366]" />
+                  <span>
+                    {property.profile.conferenceRooms}
+                  </span>
+                </div>
+              )}
 
             </div>
           )}

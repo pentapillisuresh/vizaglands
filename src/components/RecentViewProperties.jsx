@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Bed, Bath, Maximize, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  MapPin, Bed, Bath, Maximize, ChevronLeft, ChevronRight, Monitor,
+  DoorClosed,
+  Presentation,
+} from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -165,6 +169,33 @@ const RecentViewProperties = () => {
                               <span>{property.profile.bathrooms}</span>
                             </div>
                           )}
+                          {property.profile.workstations > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Monitor size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.workstations}
+                              </span>
+                            </div>
+                          )}
+
+                          {property.profile.cabins > 0 && (
+                            <div className="flex items-center gap-1">
+                              <DoorClosed size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.cabins}
+                              </span>
+                            </div>
+                          )}
+
+                          {property.profile.conferenceRooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Presentation size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.conferenceRooms}
+                              </span>
+                            </div>
+                          )}
+
                           <div className="flex items-center gap-1">
                             <Maximize size={16} className="text-[#003366]" />
                             <span>

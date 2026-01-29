@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight, AreaChart, Compass } from "lucide-react";
+import {
+  MapPin, Bed, Bath, Maximize, ChevronLeft, Heart, ChevronRight, Monitor,
+  DoorClosed,
+  Presentation,
+  Compass
+} from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ApiService from "../hooks/ApiService";
@@ -296,30 +301,56 @@ const FeaturedProjects = () => {
                               <span>{property.profile.bathrooms}</span>
                             </div>
                           )}
-                            {property.profile.carpetArea > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.carpetArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
-                            )}
-                            {property.profile.plotArea > 0 && (
-                          <div className="flex items-center gap-1">
-                            <Maximize size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.plotArea} {property.profile.areaUnit}
-                            </span>
-                          </div>
-                            )}
-                            {property.profile.facing  && (
-                          <div className="flex items-center gap-1">
-                            <Compass size={16} className="text-[#003366]" />
-                            <span>
-                              {property.profile.facing}
-                            </span>
-                          </div>
-                            )}
+                          {property.profile.carpetArea > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Maximize size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.carpetArea} {property.profile.areaUnit}
+                              </span>
+                            </div>
+                          )}
+                          {property.profile.plotArea > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Maximize size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.plotArea} {property.profile.areaUnit}
+                              </span>
+                            </div>
+                          )}
+                          {property.profile.facing && (
+                            <div className="flex items-center gap-1">
+                              <Compass size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.facing}
+                              </span>
+                            </div>
+                          )}
+                          {property.profile.workstations > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Monitor size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.workstations}
+                              </span>
+                            </div>
+                          )}
+
+                          {property.profile.cabins > 0 && (
+                            <div className="flex items-center gap-1">
+                              <DoorClosed size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.cabins}
+                              </span>
+                            </div>
+                          )}
+
+                          {property.profile.conferenceRooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Presentation size={16} className="text-[#003366]" />
+                              <span>
+                                {property.profile.conferenceRooms}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 
