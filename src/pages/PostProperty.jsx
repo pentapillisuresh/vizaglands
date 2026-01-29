@@ -128,9 +128,20 @@ const PostProperty = () => {
 
   // ✅ Handle step navigation from StepIndicator
   const handleStepClick = (stepNumber) => {
-    // Only allow navigation to visited steps (prevents skipping ahead)
-    if (visitedSteps.includes(stepNumber)) {
+    // Allow navigation to any previous or current step
+    // Also allow navigation to next step if current step is completed
+    const isStepClickable = (
+      stepNumber <= currentStep || // Allow going back to any previous step
+      visitedSteps.includes(stepNumber) || // Allow going to any visited step
+      stepNumber === currentStep + 1 // Allow going to next step from current
+    );
+
+    if (isStepClickable) {
       setCurrentStep(stepNumber);
+      // Add the step to visited steps if not already visited
+      if (!visitedSteps.includes(stepNumber)) {
+        setVisitedSteps([...visitedSteps, stepNumber]);
+      }
     }
   };
 
@@ -152,7 +163,12 @@ const PostProperty = () => {
 
   const handleNext = () => {
     if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      // Add next step to visited steps when moving forward
+      if (!visitedSteps.includes(nextStep)) {
+        setVisitedSteps([...visitedSteps, nextStep]);
+      }
     }
   };
 
@@ -192,6 +208,7 @@ const PostProperty = () => {
               steps={steps} 
               currentStep={currentStep} 
               onStepClick={handleStepClick}
+              visitedSteps={visitedSteps}
             />
 
             {/* Property Score */}
