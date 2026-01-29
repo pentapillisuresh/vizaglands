@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import StepIndicator from '../components/StepIndicator';
 import BasicDetails from '../components/property-steps/BasicDetails';
@@ -16,6 +16,18 @@ const PostProperty = () => {
   // ✅ Detect edit mode and get listing data
   const listing = location.state?.listing || null;
   const isEditMode = Boolean(listing);
+  
+  // ✅ State to track visited steps (for allowing navigation to previous steps)
+  const [visitedSteps, setVisitedSteps] = useState([1]);
+  
+  const steps = [
+    { number: 1, title: 'Basic Details', subtitle: 'Step 1' },
+    { number: 2, title: 'Location Details', subtitle: 'Step 2' },
+    { number: 3, title: 'Property Profile', subtitle: 'Step 3' },
+    { number: 4, title: 'Photos, Videos & Voice-over', subtitle: 'Step 4' },
+    { number: 5, title: 'Amenities', subtitle: 'Step 5' },
+  ];
+
   // ✅ Updated structure to match backend model
   const [propertyData, setPropertyData] = useState({
     categoryId: '',
@@ -23,8 +35,8 @@ const PostProperty = () => {
     title: '',
     description: '', 
     propertySubtype:'',
-    marketType: 'sale', // sale, rent, lease
-    propertyKind: 'residential', // residential or commercial
+    marketType: 'sale',
+    propertyKind: 'residential',
     catType: 'Residential',
     price: '',
     photos: [],
@@ -35,7 +47,6 @@ const PostProperty = () => {
     youtubeUrl: '',
     approvedBy:'',
     amenities: [],
-    // ✅ Address nested object
     address: {
       city: '',
       locality: '',
@@ -46,7 +57,6 @@ const PostProperty = () => {
       lat: '',
       lon: '',
     },
-    // ✅ Property profile nested object
     propertyProfile: {
       type: "",
       bedrooms: 0,
@@ -88,8 +98,9 @@ const PostProperty = () => {
       liftAvailable: false,
       parkingSpaces: 0,
       securityAvailable: false
-  },
+    },
   });
+
   // ✅ If editing, prefill property data
   useEffect(() => {
     if (isEditMode && listing) {
@@ -108,22 +119,20 @@ const PostProperty = () => {
     }
   }, [isEditMode, listing]);
 
-  const steps = [
-    { number: 1, title: 'Basic Details', subtitle: 'Step 1' },
-    { number: 2, title: 'Location Details', subtitle: 'Step 2' },
-    { number: 3, title: 'Property Profile', subtitle: 'Step 3' },
-    { number: 4, title: 'Photos, Videos & Voice-over', subtitle: 'Step 4' },
-    { number: 5, title: 'Amenities', subtitle: 'Step 5' },
-  ];
+  // ✅ Track visited steps when currentStep changes
+  useEffect(() => {
+    if (!visitedSteps.includes(currentStep)) {
+      setVisitedSteps([...visitedSteps, currentStep]);
+    }
+  }, [currentStep]);
 
-  // ✅ Update function to merge step data
-  // const updatePropertyData = (data) => {
-  //   setPropertyData((prev) => {
-  //     const updated = { ...prev, ...data };
-  //     return updated;
-  //   });
-  //   console.log('Updated propertyData:', { ...propertyData, ...data });
-  // };
+  // ✅ Handle step navigation from StepIndicator
+  const handleStepClick = (stepNumber) => {
+    // Only allow navigation to visited steps (prevents skipping ahead)
+    if (visitedSteps.includes(stepNumber)) {
+      setCurrentStep(stepNumber);
+    }
+  };
 
   // ✅ Merge partial updates from child components
   const updatePropertyData = (data) => {
@@ -178,7 +187,12 @@ const PostProperty = () => {
         <div className="grid lg:grid-cols-[300px_1fr] gap-8">
           {/* Left Sidebar */}
           <div className="bg-white rounded-xl shadow-sm p-6 h-fit">
-            <StepIndicator steps={steps} currentStep={currentStep} />
+            {/* Pass onStepClick handler to StepIndicator */}
+            <StepIndicator 
+              steps={steps} 
+              currentStep={currentStep} 
+              onStepClick={handleStepClick}
+            />
 
             {/* Property Score */}
             <div className="mt-8 pt-8 border-t border-gray-200">
@@ -222,22 +236,48 @@ const PostProperty = () => {
             </button>
 
             {currentStep === 1 && (
-              <BasicDetails data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode} />
+              <BasicDetails 
+                data={propertyData} 
+                updateData={updatePropertyData} 
+                onNext={handleNext} 
+                isEditMode={isEditMode} 
+              />
             )}
             {currentStep === 2 && (
-              <LocationDetails data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode} />
+              <LocationDetails 
+                data={propertyData} 
+                updateData={updatePropertyData} 
+                onNext={handleNext} 
+                isEditMode={isEditMode} 
+              />
             )}
             {currentStep === 3 && (
-              <PropertyProfile data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode} />
+              <PropertyProfile 
+                data={propertyData} 
+                updateData={updatePropertyData} 
+                onNext={handleNext} 
+              />
             )}
             {currentStep === 4 && (
-              <PhotosVideos data={propertyData} updateData={updatePropertyData} onNext={handleNext} isEditMode={isEditMode}/>
+              <PhotosVideos 
+                data={propertyData} 
+                updateData={updatePropertyData} 
+                onNext={handleNext} 
+                isEditMode={isEditMode}
+              />
             )}
-            {currentStep === 5 && <PricingOthers data={propertyData} updateData={updatePropertyData} isEditMode={isEditMode} />}
+            {currentStep === 5 && (
+              <PricingOthers 
+                data={propertyData} 
+                updateData={updatePropertyData} 
+                isEditMode={isEditMode} 
+              />
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default PostProperty;
