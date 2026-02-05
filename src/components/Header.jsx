@@ -171,7 +171,7 @@ const Header = () => {
             {/* Left Section: Logo */}
             <div className="flex items-center flex-shrink-0">
               <img
-                src="/images/vmrdaHeaderLogo.png"
+                src="/images/logo6.png"
                 alt="Vizaglands Logo"
                 className="h-16 sm:h-18 md:h-20 w-auto cursor-pointer transform transition-transform duration-300 hover:scale-105"
                 onClick={() => navigate("/")}
