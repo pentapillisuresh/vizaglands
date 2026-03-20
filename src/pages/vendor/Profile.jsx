@@ -189,27 +189,6 @@ const Profile = () => {
     }
   };
 
-  //   {
-  //     "id": "727dbc4b-204b-4381-a454-d24f44fbfa25",
-  //     "fullName": "ravikumar",
-  //     "phoneNumber": "9494130380",
-  //     "email": "ark.kumar03@gmail.com",
-  //     "role": "owner",
-  //     "kycProofName": "ADHAR",
-  //     "kycProofNumber": "12345678990",
-  //     "kycUploadFile": null,
-  //     "profilePic": null,
-  //     "companyName": null,
-  //     "address": null,
-  //     "website": null,
-  //     "bio": null,
-  //     "postLimit": 2,
-  //     "status": "active",
-  //     "isVerified": true,
-  //     "createdAt": "2025-10-23T05:59:32.000Z",
-  //     "updatedAt": "2025-10-25T18:07:21.000Z"
-  // }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -323,7 +302,7 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Basic Details */}
+                {/* Basic Details - Read-only fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -335,12 +314,8 @@ const Profile = () => {
                         type="text"
                         placeholder='FullName'
                         value={profileData.fullName}
-                        onChange={(e) =>
-                          handleInputChange('fullName', e.target.value)
-                        }
-                        disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                          }`}
+                        disabled={true}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -355,12 +330,8 @@ const Profile = () => {
                         type="email"
                         placeholder='Email'
                         value={profileData.email}
-                        onChange={(e) =>
-                          handleInputChange('email', e.target.value)
-                        }
-                        disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                          }`}
+                        disabled={true}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -375,12 +346,8 @@ const Profile = () => {
                         type="tel"
                         placeholder='Phone Number'
                         value={profileData.phoneNumber}
-                        onChange={(e) =>
-                          handleInputChange('phoneNumber', e.target.value)
-                        }
-                        disabled={!isEditing}
-                        className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                          }`}
+                        disabled={true}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -406,7 +373,7 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Address */}
+                {/* Address - Editable */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Address
@@ -424,7 +391,7 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Aadhaar & ID Verification */}
+                {/* Aadhaar & ID Verification - Read-only */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -435,32 +402,28 @@ const Profile = () => {
                       <input
                         type="text"
                         maxLength={12}
-                        disabled={!isEditing}
+                        disabled={true}
                         value={profileData.kycProofNumber}
-                        onChange={(e) =>
-                          handleInputChange('kycProofNumber', e.target.value)
-                        }
                         placeholder="Enter your Aadhaar number"
-                        className={`w-full px-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                          }`}
+                        className="w-full px-8 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {profileData.kycUploadFile ? "Replace Aadhaar Proof" : "Upload Aadhaar Proof"}
+                      Aadhaar Proof
                     </label>
 
                     <div className="flex items-center gap-3">
-                      {isEditing && (
-                        <input
-                          type="file"
-                          accept="image/*,application/pdf"
-                          onChange={(e) => handleFileUpload('kycUploadFile', e.target.files[0])}
-                          className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        />
-                      )}
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={(e) => handleFileUpload('kycUploadFile', e.target.files[0])}
+                        disabled={!isEditing}
+                        className={`block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:ring-2 focus:ring-orange-500 focus:border-transparent ${!isEditing ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                      />
                     </div>
 
                     {/* ✅ Show preview if Aadhaar already exists */}
@@ -469,7 +432,7 @@ const Profile = () => {
                         <p className="text-sm text-gray-600 mb-1">Current Aadhaar Proof:</p>
 
                         {/* 🖼️ If it's an image */}
-                        {profileData.kycUploadFile ? (
+                        {profileData.kycUploadFile.match(/\.(jpeg|jpg|gif|png)$/) ? (
                           <img
                             src={profileData.kycUploadFile}
                             alt="Aadhaar Proof"
@@ -491,7 +454,7 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Bio */}
+                {/* Deal With Areas - Editable */}
                 <div className="pt-6 border-t border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Deal With Areas
@@ -501,19 +464,19 @@ const Profile = () => {
                     placeholder='Deal with Area'
                     onChange={(e) => handleInputChange('area', e.target.value)}
                     disabled={!isEditing}
-                    rows="4"
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-colors ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
                       }`}
                   />
                 </div>
-                {/* Bio */}
+
+                {/* Bio - Editable */}
                 <div className="pt-6 border-t border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Bio
                   </label>
                   <textarea
                     value={profileData.bio}
-                    placeholder='Tell about your self'
+                    placeholder='Tell about yourself'
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     disabled={!isEditing}
                     rows="4"
@@ -607,7 +570,14 @@ const Profile = () => {
 
             {/* Save/Cancel */}
             <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-              <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+              <button 
+                onClick={() => {
+                  if (activeTab === 'profile' && isEditing) {
+                    handleEditToggle();
+                  }
+                }}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
                 Cancel
               </button>
               <button
@@ -635,7 +605,6 @@ const Profile = () => {
                   </>
                 )}
               </button>
-
             </div>
           </div>
         </div>

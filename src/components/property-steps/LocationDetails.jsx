@@ -484,6 +484,8 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
               <option value="500 m">500 meters</option>
               <option value="1 km">1 km</option>
               <option value="2 km">2 km</option>
+              <option value="2 km">3 km</option>
+              <option value="2 km">4 km</option>
               <option value="5 km">5 km</option>
             </select>
             {advantages.length > 1 && (

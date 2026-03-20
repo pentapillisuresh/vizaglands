@@ -97,11 +97,74 @@ const Leads = () => {
     setShowDetailModal(true);
   };
 
+  const handleUpdateStatus = async (leadId, newStatus) => {
+    try {
+      const clientToken = localStorage.getItem('token');
+      if (!clientToken) {
+        throw new Error('Authentication token not found');
+      }
+
+      const response = await ApiService.put(`/dashboard/client/leads/${leadId}/status`, 
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${clientToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const result = response.data ? response.data : await response.json();
+      
+      if (result.success || response.status === 200) {
+        // Update the lead in the local state
+        const updatedLeads = leads.map(lead => 
+          lead.id === leadId ? { ...lead, status: newStatus, updatedAt: new Date().toISOString() } : lead
+        );
+        setLeads(updatedLeads);
+        setFilteredLeads(prevFiltered => 
+          prevFiltered.map(lead => 
+            lead.id === leadId ? { ...lead, status: newStatus, updatedAt: new Date().toISOString() } : lead
+          )
+        );
+        
+        // Update stats if needed
+        if (selectedLead && selectedLead.id === leadId) {
+          setSelectedLead({ ...selectedLead, status: newStatus, updatedAt: new Date().toISOString() });
+        }
+        
+        // Update stats counts
+        const contactedCount = updatedLeads.filter(lead => lead.status === 'contacted').length;
+        const completedCount = updatedLeads.filter(lead => lead.status === 'closing' || lead.status === 'converted').length;
+        
+        setStats(prev => ({
+          ...prev,
+          contactedLeads: contactedCount,
+          completedLeads: completedCount
+        }));
+        
+        return result;
+      } else {
+        throw new Error(result.message || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error('Error updating lead status:', err);
+      throw new Error(err.message || 'Something went wrong while updating status');
+    }
+  };
+
   const getStatusBadge = (status) => {
     const statusConfig = {
-      new: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'New' },
-      contacted: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Contacted' },
-      completed: { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' }
+      'site visit': { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Site Visit' },
+      'closing': { bg: 'bg-green-100', text: 'text-green-700', label: 'Closing' },
+      'notinterest': { bg: 'bg-red-100', text: 'text-red-700', label: 'Not Interested' },
+      'noResponse': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'No Response' },
+      'pending': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
+      'new': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'New' },
+      'contacted': { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Contacted' },
+      'qualified': { bg: 'bg-indigo-100', text: 'text-indigo-700', label: 'Qualified' },
+      'converted': { bg: 'bg-emerald-100', text: 'text-emerald-700', label: 'Converted' },
+      'closed': { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Closed' }
     };
     const config = statusConfig[status] || statusConfig.new;
     return (
@@ -191,9 +254,11 @@ const Leads = () => {
                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               >
                 <option value="all">All Status</option>
-                <option value="new">New</option>
+                <option value="pending">Pending</option>
+                <option value="site visit">Site Visit</option>
                 <option value="contacted">Contacted</option>
-                <option value="completed">Completed</option>
+                <option value="closing">Closing</option>
+                <option value="notinterest">Not Interested</option>
               </select>
             </div>
           </div>
@@ -211,13 +276,12 @@ const Leads = () => {
             <div className="divide-y divide-gray-200">
               {filteredLeads.map((lead) => (
                 <LeadItem
-                key={lead.id}
-                lead={lead}
-                onViewDetails={() => handleViewDetails(lead)}
-                getStatusBadge={getStatusBadge}
-                getPriorityBadge={getPriorityBadge}
-              />
-              
+                  key={lead.id}
+                  lead={lead}
+                  onViewDetails={() => handleViewDetails(lead)}
+                  getStatusBadge={getStatusBadge}
+                  getPriorityBadge={getPriorityBadge}
+                />
               ))}
             </div>
           ) : (
@@ -237,6 +301,7 @@ const Leads = () => {
           onClose={() => setShowDetailModal(false)}
           getStatusBadge={getStatusBadge}
           getPriorityBadge={getPriorityBadge}
+          onUpdateStatus={handleUpdateStatus}
         />
       )}
     </div>
@@ -264,14 +329,5 @@ const StatCard = ({ label, value, color, icon }) => {
     </div>
   );
 };
-
-// (LeadItem and LeadDetailModal same as before, unchanged)
-
-const User = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-  </svg>
-);
 
 export default Leads;

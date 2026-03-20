@@ -137,12 +137,14 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   // --- Initialize state on edit/add ---
   useEffect(() => {
     if (!data) return;
+     console.log("EDIT DATA:", data?.propertyProfile);
 
-    setPlotArea(data?.propertyProfile?.plotArea || 1);
-    setLandArea(data?.propertyProfile?.landArea || 1);
+    setPlotArea(data?.propertyProfile?.plotArea || 0);
+    setLandArea(data?.propertyProfile?.landArea || 0);
     setPlotAreaUnit(data?.propertyProfile?.plotAreaUnit || (isLand ? "acres" : isPlot ? "sq yards" : "sqft"));
     setLength(data?.propertyProfile?.length || "");
     setBreadth(data?.propertyProfile?.breadth || "");
+
     setFacing(data?.propertyProfile?.facing || "");
     setFrontage(data?.propertyProfile?.frontage || "");
     setPrice(data?.price || null);
@@ -273,7 +275,15 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     // 📏 Plot-only fields (not required for land)
     if (!isLand) {
       if (!length) missing.push("length");
-      if (!breadth) missing.push("breadth");
+      // if (!breadth) missing.push("breadth");
+ if (
+  breadth === null ||
+  breadth === undefined ||
+  breadth === "" ||
+  Number(breadth) <= 0
+) {
+  missing.push("breadth");
+}
     }
   
     // 🧱 Conditional validation
@@ -369,6 +379,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   };
   
   const allApartmentFieldsFilled = validateBaseResidential(formValues);
+
       
   // Final form validation
   const isFormComplete = isPlotOrLand
@@ -391,6 +402,8 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     if (isShopShowroom) setShopNumber(value);
   };
 
+
+  console.log("breadth value:", breadth, typeof breadth);
   return (
     <div className="space-y-8">
       <div>
@@ -505,7 +518,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                   </label>
                   <input
                     type="number"
-                    value={breadth}
+                    value={breadth ?? ""}
                     onChange={(e) => setBreadth(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                   />

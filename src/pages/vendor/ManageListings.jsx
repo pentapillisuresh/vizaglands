@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Eye, MapPin, Bed, Bath, Square, Plus, Search, Filter, Tag } from 'lucide-react';
+import { Edit, Trash2, Eye, MapPin, Bed, Bath, Square, Plus, Search, Filter, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import ApiService from '../../hooks/ApiService';
 import PropertyForm from '../../components/PropertyForm';
 import getPhotoSrc from '../../hooks/getPhotos';
@@ -16,6 +16,12 @@ const ManageListings = () => {
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [clientDetails, setClientDetails] = useState(null);
 
   // ✅ Fixed Sold Out Overlay - No height increase
   const SoldOutOverlay = ({ isSold, children }) => {
@@ -36,32 +42,49 @@ const ManageListings = () => {
     );
   };
 
-  // ✅ Fetch listings from API
+  // ✅ Fetch listings from API (only client's properties)
   const fetchListings = async () => {
     try {
-      const clientData = localStorage.getItem("clientDetails");
-      const clientId = JSON.parse(clientData)?.id;
-      if (!clientData) {
-        console.error('No clientId found in localStorage');
-        setLoading(false);
-        return;
-      }
-      const response = await ApiService.get(`/properties?clientId=${clientId}`,
-        { headers: { 'Content-Type': 'application/json' } },
-      );
-      if (!response) {
-        throw new Error('Failed to fetch properties');
-      }
+      const clientToken = localStorage.getItem("token");
+      
+      // Fetch dashboard data to get client's properties
+      const response = await ApiService.get('/dashboard/client', {
+        headers: {
+          Authorization: `Bearer ${clientToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-      const data = await response.properties;
-      setListings(data);
-      setFilteredListings(data);
+      console.log("Manage Listings API Response:", response);
+
+      // ✅ Access nested response.data.data safely
+      if (response?.data) {
+        const data = response.data;
+        const properties = data.properties || [];
+        
+        // Store client details
+        localStorage.setItem("clientDetails", JSON.stringify(data.clientDetails));
+        setClientDetails(data.clientDetails);
+        
+        setListings(properties);
+        setFilteredListings(properties);
+        setTotalItems(properties.length);
+      } else {
+        console.warn("Unexpected response format:", response);
+        setListings([]);
+        setFilteredListings([]);
+        setTotalItems(0);
+      }
     } catch (error) {
       console.error('Error fetching listings:', error);
+      setListings([]);
+      setFilteredListings([]);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchListings();
   }, []);
@@ -74,16 +97,68 @@ const ManageListings = () => {
       filtered = filtered.filter(
         (listing) =>
           listing?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          listing?.location?.toLowerCase().includes(searchQuery.toLowerCase())
+          listing?.address?.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          listing?.address?.locality?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     if (filterStatus !== 'all') {
-      filtered = filtered.filter((listing) => listing?.status === filterStatus);
+      if (filterStatus === 'sold') {
+        filtered = filtered.filter((listing) => listing?.isSold === true);
+      } else {
+        filtered = filtered.filter((listing) => listing?.status === filterStatus);
+      }
     }
 
     setFilteredListings(filtered);
+    setTotalItems(filtered.length);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [searchQuery, filterStatus, listings]);
+
+  // ✅ Get current page items
+  const getCurrentPageItems = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredListings.slice(startIndex, endIndex);
+  };
+
+  // ✅ Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ✅ Handle items per page change
+  const handleItemsPerPageChange = (value) => {
+    setItemsPerPage(value);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  // ✅ Calculate pagination info
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+  // ✅ Generate page numbers to display
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    const halfMaxPages = Math.floor(maxPagesToShow / 2);
+    
+    let startPage = Math.max(1, currentPage - halfMaxPages);
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    
+    return pageNumbers;
+  };
 
   // ✅ Handle Delete
   const handleDelete = (listing) => {
@@ -110,9 +185,20 @@ const ManageListings = () => {
       }
 
       // Remove deleted property from list
-      setListings((prev) => prev.filter((l) => l.id !== selectedListing?.id));
+      const updatedListings = listings.filter((l) => l.id !== selectedListing?.id);
+      setListings(updatedListings);
+      setFilteredListings(prev => prev.filter((l) => l.id !== selectedListing?.id));
       setShowDeleteModal(false);
       setSelectedListing(null);
+      
+      // Adjust current page if needed
+      const newTotalItems = updatedListings.length;
+      const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
+      
+      alert("Property deleted successfully!");
     } catch (error) {
       console.error('Error deleting listing:', error);
       alert('Failed to delete property. Please try again.');
@@ -127,14 +213,6 @@ const ManageListings = () => {
         mode: 'edit',
       },
     });
-  };
-
-  // ✅ Mark as Sold
-  const handleStatusChange = (id, newStatus) => {
-    const updatedListings = listings.map((listing) =>
-      listing?.id === id ? { ...listing, status: newStatus } : listing
-    );
-    setListings(updatedListings);
   };
 
   const handleUpdateProperty = async (formData) => {
@@ -178,7 +256,7 @@ const ManageListings = () => {
         const res = await ApiService.put(`/properties/${id}`, { isSold: true }, {
           headers: {
             Authorization: `Bearer ${clientToken}`,
-            "Content-Type": "application/json'"
+            "Content-Type": "application/json"
           }
         });
         if (res) {
@@ -191,6 +269,8 @@ const ManageListings = () => {
     }
   };
 
+  const currentItems = getCurrentPageItems();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -202,7 +282,17 @@ const ManageListings = () => {
             </p>
           </div>
           <button
-            onClick={() => navigate('/post-property')}
+            onClick={() => {
+              const clientDetails = JSON.parse(localStorage.getItem("clientDetails"));
+              const postLimit = clientDetails?.postLimit || 0;
+              const propertyCount = listings.length || 0;
+
+              if (propertyCount < postLimit) {
+                navigate('/post-property');
+              } else {
+                alert("Sorry, your post limit is over");
+              }
+            }}
             className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transition-colors flex items-center gap-2 font-semibold"
           >
             <Plus className="w-5 h-5" />
@@ -233,6 +323,7 @@ const ManageListings = () => {
                 <option value="active">Active</option>
                 <option value="pending">Pending</option>
                 <option value="inactive">Inactive</option>
+                <option value="verified">Verified</option>
                 <option value="sold">Sold</option>
               </select>
             </div>
@@ -247,17 +338,37 @@ const ManageListings = () => {
         ) : (
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <p className="text-gray-600">
-                Showing{' '}
-                <span className="font-semibold text-gray-900">
-                  {filteredListings.length}
-                </span>{' '}
-                of {listings.length} listings
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <p className="text-gray-600">
+                  Showing{' '}
+                  <span className="font-semibold text-gray-900">
+                    {startItem} - {endItem}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-semibold text-gray-900">
+                    {totalItems}
+                  </span>{' '}
+                  listings
+                </p>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm text-gray-600">Show:</label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-sm"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                  <span className="text-sm text-gray-600">per page</span>
+                </div>
+              </div>
             </div>
 
             <div className="divide-y divide-gray-200">
-              {filteredListings?.map((listing) => (
+              {currentItems?.map((listing) => (
                 <div key={listing?.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Image with Fixed Sold Out Overlay */}
@@ -282,23 +393,26 @@ const ManageListings = () => {
                           </h3>
                           <div className="flex items-center text-gray-600 mb-2">
                             <MapPin className="w-4 h-4 mr-1" />
-                            <span className="text-sm">{listing?.address?.city}-{listing?.address?.locality}</span>
+                            <span className="text-sm">
+                              {listing?.address?.city}-{listing?.address?.locality}
+                            </span>
                           </div>
                           <p className="text-2xl font-bold text-orange-600">
                             ₹{listing?.price ? listing.price.toLocaleString('en-IN') : "Contact For Price"}
                           </p>
                         </div>
                         <span
-                          className={`px-4 py-1 rounded-full text-sm font-medium ${listing?.isSold
+                          className={`px-4 py-1 rounded-full text-sm font-medium ${
+                            listing?.isSold
                               ? 'bg-red-100 text-red-700'
-                              : listing?.status === 'active'
+                              : listing?.status === 'verified'
                                 ? 'bg-green-100 text-green-700'
-                                : listing?.status === 'pending'
-                                  ? 'bg-yellow-100 text-yellow-700'
-                                  : listing?.status === 'verified'
-                                    ? 'bg-blue-100 text-blue-700'
+                                : listing?.status === 'active'
+                                  ? 'bg-green-100 text-green-700'
+                                  : listing?.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-700'
                                     : 'bg-gray-100 text-gray-700'
-                            }`}
+                          }`}
                         >
                           {listing?.isSold ? 'Sold' : listing?.status?.charAt(0).toUpperCase() + listing?.status?.slice(1) || 'Unknown'}
                         </span>
@@ -359,7 +473,7 @@ const ManageListings = () => {
                         <button 
                           className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
                           onClick={() => {
-                            navigate(`/property/${listing.id}`, { state: { property:listing } });
+                            navigate(`/property/${listing.id}`, { state: { property: listing } });
                           }}
                         >
                           <Eye className="w-4 h-4" />
@@ -391,6 +505,60 @@ const ManageListings = () => {
                   No listings found
                 </h3>
                 <p className="text-gray-600">Try adjusting your search or filters</p>
+              </div>
+            )}
+
+            {/* ✅ Pagination Component */}
+            {totalItems > 0 && (
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-sm text-gray-600">
+                    Showing {startItem} to {endItem} of {totalItems} listings
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {/* Previous Button */}
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`p-2 rounded-lg border transition-colors ${
+                        currentPage === 1
+                          ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'border-gray-300 text-gray-700 hover:bg-orange-50 hover:border-orange-300'
+                      }`}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    
+                    {/* Page Numbers */}
+                    {getPageNumbers().map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          currentPage === pageNum
+                            ? 'bg-orange-500 text-white'
+                            : 'border border-gray-300 text-gray-700 hover:bg-orange-50 hover:border-orange-300'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                    
+                    {/* Next Button */}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`p-2 rounded-lg border transition-colors ${
+                        currentPage === totalPages
+                          ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'border-gray-300 text-gray-700 hover:bg-orange-50 hover:border-orange-300'
+                      }`}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

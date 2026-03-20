@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ApiService from '../../hooks/ApiService';
@@ -23,6 +23,13 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // ✅ Add refs to track initial data loading and prevent loops
+  const isInitialMount = useRef(true);
+  const isUpdatingFromParent = useRef(false);
+  const previousDataRef = useRef(data);
+  const updateTimeoutRef = useRef(null);
+  const isUpdating = useRef(false); // ✅ Add this to prevent recursive updates
 
   const approvedOptions = ['VMRDA', 'VUDA', 'DTCP', 'LRS', 'GVMC', 'RERA', 'Bank Loan'];
   const amenitiesOptions = [
@@ -50,50 +57,111 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Populate state from data - this runs whenever data changes
+  // ✅ Populate state from data - this runs only when data actually changes
   useEffect(() => {
-    // Only initialize if we have data
-    if (data) {
-      setProjectName(data.projectName || '');
-      setDescription(data.description || '');
-      setPrivateNotes(data.privateNotes || '');
+    // Skip the first mount to avoid unnecessary updates
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      // Initialize from data on mount
+      if (data) {
+        setProjectName(data.projectName || '');
+        setDescription(data.description || '');
+        setPrivateNotes(data.privateNotes || '');
 
-      // Handle approvedBy
-      if (data.approvedBy) {
-        if (typeof data.approvedBy === 'string') {
-          setApprovedBy(data.approvedBy.split(',').map(item => item.trim()).filter(item => item !== ''));
-        } else if (Array.isArray(data.approvedBy)) {
-          setApprovedBy(data.approvedBy);
+        // Handle approvedBy
+        if (data.approvedBy) {
+          if (typeof data.approvedBy === 'string') {
+            setApprovedBy(data.approvedBy.split(',').map(item => item.trim()).filter(item => item !== '' && item !== 'null'));
+          } else if (Array.isArray(data.approvedBy)) {
+            setApprovedBy(data.approvedBy);
+          }
+        }
+
+        // Handle amenities
+        if (data.amenities) {
+          if (Array.isArray(data.amenities)) {
+            setAmenities(data.amenities);
+          } else if (typeof data.amenities === 'string') {
+            setAmenities(data.amenities.split(',').map(item => item.trim()).filter(item => item !== ''));
+          }
         }
       }
+      previousDataRef.current = data;
+      return;
+    }
 
-      // Handle amenities
-      if (data.amenities) {
-        if (Array.isArray(data.amenities)) {
-          setAmenities(data.amenities);
-        } else if (typeof data.amenities === 'string') {
-          setAmenities(data.amenities.split(',').map(item => item.trim()).filter(item => item !== ''));
+    // ✅ Check if data has actually changed from parent and prevent infinite loops
+    const dataChanged = JSON.stringify(data) !== JSON.stringify(previousDataRef.current);
+    
+    if (dataChanged && !isUpdating.current) {
+      previousDataRef.current = data;
+      
+      // Update local state from parent data (for edit mode)
+      if (data) {
+        setProjectName(data.projectName || '');
+        setDescription(data.description || '');
+        setPrivateNotes(data.privateNotes || '');
+
+        if (data.approvedBy) {
+          if (typeof data.approvedBy === 'string') {
+            setApprovedBy(data.approvedBy.split(',').map(item => item.trim()).filter(item => item !== '' && item !== 'null'));
+          } else if (Array.isArray(data.approvedBy)) {
+            setApprovedBy(data.approvedBy);
+          }
+        }
+
+        if (data.amenities) {
+          if (Array.isArray(data.amenities)) {
+            setAmenities(data.amenities);
+          } else if (typeof data.amenities === 'string') {
+            setAmenities(data.amenities.split(',').map(item => item.trim()).filter(item => item !== ''));
+          }
         }
       }
     }
-  }, [data]);
+  }, [data]); // Only depends on data
 
-  // Update parent data whenever local state changes
+  // ✅ Update parent data when local state changes - with proper debouncing and loop prevention
   useEffect(() => {
-    const updatedData = {
-      ...data,
-      projectName: projectName || null,
-      description: description || null,
-      privateNotes: privateNotes || null,
-      approvedBy: approvedBy.length ? approvedBy.join(',') : null,
-      amenities: amenities.length ? amenities : null,
+    // Skip update during initial mount
+    if (isInitialMount.current) return;
+    
+    // Clear previous timeout
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    
+    // Debounce the update to prevent rapid updates
+    updateTimeoutRef.current = setTimeout(() => {
+      // ✅ Prevent recursive updates
+      isUpdating.current = true;
+      
+      const updatedData = {
+        ...data,
+        projectName: projectName || null,
+        description: description || null,
+        privateNotes: privateNotes || null,
+        approvedBy: approvedBy.length ? approvedBy.join(',') : null,
+        amenities: amenities.length ? amenities : null,
+      };
+
+      // Only update if there are actual changes
+      if (JSON.stringify(updatedData) !== JSON.stringify(data)) {
+        updateData(updatedData);
+      }
+      
+      // Reset the updating flag after a short delay
+      setTimeout(() => {
+        isUpdating.current = false;
+      }, 100);
+    }, 500); // Increased debounce to 500ms
+    
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
     };
-
-    // Only update if there are actual changes to avoid infinite loops
-    if (JSON.stringify(updatedData) !== JSON.stringify(data)) {
-      updateData(updatedData);
-    }
-  }, [projectName, description, privateNotes, approvedBy, amenities, data, updateData]);
+  }, [projectName, description, privateNotes, JSON.stringify(approvedBy), JSON.stringify(amenities)]); // ✅ Use stringified versions to prevent unnecessary updates
 
   const handleApprovedChange = (value) => {
     setApprovedBy(prev =>
@@ -131,23 +199,25 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       errors.description = 'Description must be at least 10 characters';
     }
     
-    // Private notes validation removed - no longer mandatory
-    
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
+  // ✅ FIXED: Enhanced calculateScore function
   const calculateScore = () => {
     let score = 0;
     if (data.catType) score += 10;
     if (data.marketType) score += 10;
-    if (data.address) score += 10;
-    if (data.amenities) score += 10;
-    if (data.propertyProfile) score += 20;
+    if (data.address && (data.address.city || data.city)) score += 10;
+    if (data.amenities && data.amenities.length > 0) score += 10;
+    if (data.propertyProfile && Object.keys(data.propertyProfile).length > 0) score += 20;
     if (data.price) score += 10;
     if (data.propertySubtype) score += 10;
     if (description && description.trim().length >= 10) score += 10;
-    return score;
+    if (approvedBy && approvedBy.length > 0) score += 5;
+    if (privateNotes && privateNotes.trim().length > 0) score += 3;
+    if (projectName && projectName.trim().length > 0) score += 2;
+    return Math.min(score, 100);
   };
 
   // Enhanced success popup with confetti
@@ -164,7 +234,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
           <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
             <p class="text-sm text-gray-700"><span class="font-semibold">Property Score:</span> ${calculateScore()}%</p>
             <p class="text-sm text-gray-700"><span class="font-semibold">Type:</span> ${data.propertySubtype || 'N/A'}</p>
-            <p class="text-sm text-gray-700"><span class="font-semibold">Location:</span> ${data.city || 'N/A'}</p>
+            <p class="text-sm text-gray-700"><span class="font-semibold">Location:</span> ${data.address?.city || data.city || 'N/A'}</p>
           </div>
         </div>
       `,
@@ -183,7 +253,6 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       }
     });
 
-    // Auto-hide confetti after 5 seconds
     setTimeout(() => {
       setShowConfetti(false);
     }, 5000);
@@ -226,7 +295,6 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
     setLoading(true);
     setError('');
-    setValidationErrors({});
 
     try {
       const propertyDataToSave = {
@@ -238,7 +306,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         amenities,
       };
 
-      console.log('Property saved (mock):', propertyDataToSave);
+      console.log('Property saved:', propertyDataToSave);
       updateData(propertyDataToSave);
 
       const clientToken = localStorage.getItem('token');
@@ -277,7 +345,6 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     }
   };
 
-  // Updated: Removed private notes validation from publish disabled condition
   const isPublishDisabled = loading || !description || description.trim().length < 10;
 
   return (
@@ -296,7 +363,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       )}
 
       {/* Header */}
-      <div className="text-center animate-fade-in">
+      <div className="text-center">
         <h2 className="font-serif text-3xl font-bold text-blue-900 mb-2">
           Amenities and Other Details
         </h2>
@@ -305,7 +372,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         </p>
         
         {/* Progress Score */}
-        <div className="mt-6 inline-flex items-center gap-3 bg-blue-50 px-6 py-3 rounded-full border border-blue-200 animate-pulse">
+        <div className="mt-6 inline-flex items-center gap-3 bg-blue-50 px-6 py-3 rounded-full border border-blue-200">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
               <span className="text-blue-600 font-bold text-sm">{calculateScore()}%</span>
@@ -317,7 +384,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-roboto text-sm animate-shake">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-roboto text-sm">
           {error}
         </div>
       )}
@@ -325,7 +392,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       {/* Form Fields */}
       <div className="space-y-6">
         {/* Description */}
-        <div className="animate-slide-up">
+        <div>
           <div className="flex justify-between items-center mb-2">
             <label className="block font-roboto text-sm font-medium text-gray-700">
               Property Description <span className="text-red-500">*</span>
@@ -342,27 +409,27 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
             onChange={handleDescriptionChange}
             placeholder="Describe your property (minimum 10 characters)..."
             rows="5"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none transition-all duration-300 ${
-              validationErrors.description ? 'border-red-500 animate-shake' : 'border-gray-300'
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none font-roboto resize-none ${
+              validationErrors.description ? 'border-red-500' : 'border-gray-300'
             }`}
           />
           {validationErrors.description && (
-            <p className="text-red-500 text-xs mt-1 animate-fade-in">{validationErrors.description}</p>
+            <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>
           )}
           {description.length > 0 && description.length < 10 && (
-            <p className="text-orange-500 text-xs mt-1 animate-fade-in">
+            <p className="text-orange-500 text-xs mt-1">
               Minimum 10 characters required ({10 - description.length} more needed)
             </p>
           )}
           {description.length >= 10 && (
-            <p className="text-green-500 text-xs mt-1 animate-fade-in">
+            <p className="text-green-500 text-xs mt-1">
               ✓ Description meets requirements
             </p>
           )}
         </div>
 
-        {/* Private Notes - Updated: No longer mandatory */}
-        <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        {/* Private Notes */}
+        <div>
           <div className="flex justify-between items-center mb-2">
             <label className="block font-roboto text-sm font-medium text-gray-700">
               Private Notes
@@ -376,7 +443,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
             onChange={handlePrivateNotesChange}
             placeholder="Enter private notes (visible only to owner) - Optional"
             rows="3"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none transition-all duration-300"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-roboto resize-none"
             maxLength={100}
           />
           <p className="text-xs text-gray-500 mt-1">
@@ -389,9 +456,9 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       {((data.propertySubtype === 'Flat/Apartment' ||
         data.propertySubtype === 'Plot' ||
         data.propertySubtype === 'Independent House / Villa') &&
-        data.marketType.toLowerCase() === "sale")
+        data.marketType?.toLowerCase() === "sale")
         && (
-          <div className="space-y-6 mt-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="space-y-6 mt-8">
             {/* Approved By */}
             <div>
               <h3 className="font-serif text-xl font-semibold text-blue-900 mb-3">Approved By</h3>
@@ -401,9 +468,9 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
                     key={opt}
                     type="button"
                     onClick={() => handleApprovedChange(opt)}
-                    className={`px-4 py-2.5 rounded-full border-2 transition-all duration-300 transform hover:scale-105 ${
+                    className={`px-4 py-2.5 rounded-full border-2 transition-all ${
                       approvedBy.includes(opt)
-                        ? 'bg-blue-900 border-blue-900 text-white animate-pulse'
+                        ? 'bg-blue-900 border-blue-900 text-white'
                         : 'bg-white border-gray-300 text-gray-700 hover:border-orange-300'
                     }`}
                   >
@@ -420,15 +487,15 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
                 {amenitiesOptions.map((amenity) => (
                   <label
                     key={amenity}
-                    className="flex items-center gap-2 text-gray-700 cursor-pointer transition-all duration-300 hover:bg-gray-50 p-2 rounded-lg"
+                    className="flex items-center gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg"
                   >
                     <input
                       type="checkbox"
                       checked={amenities.includes(amenity)}
                       onChange={() => handleAmenitiesChange(amenity)}
-                      className="text-orange-500 focus:ring-orange-500 transition-all duration-300"
+                      className="text-orange-500 focus:ring-orange-500"
                     />
-                    <span className="transition-all duration-300 hover:text-blue-700">
+                    <span className="hover:text-blue-700">
                       {amenity}
                     </span>
                   </label>
@@ -439,16 +506,16 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         )}
 
       {/* Property Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-10 animate-fade-in">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-10">
         <h3 className="font-serif text-lg font-bold text-blue-900 mb-4">Property Summary</h3>
         <div className="grid grid-cols-2 gap-4 font-roboto text-sm">
           <div>
             <span className="text-gray-600">Type:</span>
-            <span className="ml-2 font-medium text-gray-900">{data.propertySubtype}</span>
+            <span className="ml-2 font-medium text-gray-900">{data.propertySubtype || 'N/A'}</span>
           </div>
           <div>
             <span className="text-gray-600">Location:</span>
-            <span className="ml-2 font-medium text-gray-900">{data.city}</span>
+            <span className="ml-2 font-medium text-gray-900">{data.address?.city || data.city || 'N/A'}</span>
           </div>
 
           {(data.propertySubtype === 'Plot' || data.propertySubtype === 'Flat/Apartment') && (
@@ -468,17 +535,17 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
 
           <div>
             <span className="text-gray-600">Property Score:</span>
-            <span className="ml-2 font-medium text-orange-500 animate-pulse">{calculateScore()}%</span>
+            <span className="ml-2 font-medium text-orange-500">{calculateScore()}%</span>
           </div>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+      <div className="flex gap-4">
         <button
           onClick={() => handleSubmit('published')}
           disabled={isPublishDisabled}
-          className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100 shadow-lg hover:shadow-xl"
+          className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-roboto font-medium px-8 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
         >
           {loading ? (
             <span className="flex items-center justify-center">
@@ -495,41 +562,9 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
       </div>
 
       {/* Mandatory fields note */}
-      <div className="text-xs text-gray-500 text-center mt-4 animate-fade-in">
+      <div className="text-xs text-gray-500 text-center mt-4">
         <span className="text-red-500">*</span> indicates mandatory fields
       </div>
-
-      {/* Add CSS animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { 
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to { 
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.6s ease-out;
-        }
-        .animate-slide-up {
-          animation: slideUp 0.6s ease-out;
-        }
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 };
