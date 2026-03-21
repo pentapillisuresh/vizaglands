@@ -65,14 +65,14 @@ const CommercialAdSection = () => {
       </video>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+      <div className="absolute inset-0"></div>
 
       {/* Content */}
       <div
         className="relative z-10 text-center text-white px-4"
         data-aos="fade-up"
       >
-        <h1
+        {/* <h1
           className="text-4xl md:text-6xl font-extrabold tracking-widest mb-4"
           data-aos="fade-up"
           data-aos-delay="100"
@@ -85,15 +85,15 @@ const CommercialAdSection = () => {
           data-aos-delay="300"
         >
           Explore exclusive real estate opportunities with us
-        </p>
+        </p> */}
 
-        <button
+        {/* <button
           className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
           data-aos="zoom-in"
           data-aos-delay="500"
         >
           Get Started
-        </button>
+        </button> */}
       </div>
 
       {/* Bottom Gradient Overlay */}

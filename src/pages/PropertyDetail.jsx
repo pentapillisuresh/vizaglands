@@ -3,9 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, Home, Compass, Share2, Bed, Bath, Maximize,
   Building, MapPin, CheckCircle, Phone, Mail, Calendar, ChevronDown, ChevronUp,
-  Monitor,
-  DoorClosed,
-  Presentation
+  Monitor, DoorClosed, Presentation, Heart
 } from "lucide-react";
 import { propertiesData } from "../data/propertiesData";
 import ApiService from "../hooks/ApiService";
@@ -33,7 +31,7 @@ const SocialIcons = {
 
 function PropertyDetail() {
   const swiperRef = useRef(null);
-  const { id } = useParams();
+  const { title } = useParams(); // Changed from id to title
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -52,6 +50,40 @@ function PropertyDetail() {
   const [status, setStatus] = useState("");
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+
+  // Favorites functionality
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem("favorites");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const isFavorite = (id) => favorites.some(item => item.id === id);
+
+  const toggleFavorite = (listing) => {
+    let updatedFavs = [...favorites];
+
+    const exists = updatedFavs.find(item => item.id === listing.id);
+
+    if (exists) {
+      updatedFavs = updatedFavs.filter(item => item.id !== listing.id);
+    } else {
+      updatedFavs.push(listing);
+    }
+
+    setFavorites(updatedFavs);
+    localStorage.setItem("favorites", JSON.stringify(updatedFavs));
+  };
+
+  // Helper function to create URL-friendly title
+  const createSlug = (title) => {
+    if (!title) return "";
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/--+/g, '-') // Replace multiple hyphens with single hyphen
+      .trim();
+  };
 
   // ✅ Swiper configuration
   const swiperConfig = {
@@ -85,7 +117,10 @@ function PropertyDetail() {
 
   // Share functionality
   const getShareUrl = () => {
-    return `${window.location.origin}/property/${id}`;
+    if (property?.title) {
+      return `${window.location.origin}/property/${createSlug(property.title)}`;
+    }
+    return `${window.location.origin}/property/${title}`;
   };
 
   const getShareMessage = () => {
@@ -201,18 +236,51 @@ function PropertyDetail() {
     AOS.init({ duration: 800, once: true });
   }, []);
 
-  // ✅ Get property from navigation state
+  // ✅ Get property from navigation state or fetch by title
   useEffect(() => {
     const prop = location.state?.property;
     if (prop) {
       setProperty(prop);
       window.scrollTo(0, 0);
+      // Update URL to use title instead of ID if needed
+      if (prop.title && window.location.pathname !== `/property/${createSlug(prop.title)}`) {
+        navigate(`/property/${createSlug(prop.title)}`, { state: { property: prop, from: fromUser }, replace: true });
+      }
+    } else if (title) {
+      fetchPropertyByTitle();
     }
-  }, [location.state, id]);
+  }, [location.state, title]);
 
-  useEffect(() => {
-    fetchPropertyDetails()
-  }, [location.state, id]);
+  const fetchPropertyByTitle = async () => {
+    try {
+      setLoading(true);
+      // Decode the title from URL
+      const decodedTitle = decodeURIComponent(title).replace(/-/g, ' ');
+      
+      // Fetch all properties and find by title
+      const response = await ApiService.get(`/properties?limit=100`);
+      
+      if (response?.properties) {
+        const foundProperty = response.properties.find(
+          prop => createSlug(prop.title) === title || 
+                   prop.title.toLowerCase() === decodedTitle.toLowerCase()
+        );
+        
+        if (foundProperty) {
+          setProperty(foundProperty);
+          window.scrollTo(0, 0);
+        } else {
+          console.error("Property not found with title:", title);
+          navigate('/properties-list');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching property by title:', error);
+      navigate('/properties-list');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchPropertyDetails = async () => {
     try {
@@ -274,7 +342,7 @@ function PropertyDetail() {
       const clientToken = localStorage.getItem("token");
       const response = await ApiService.post(
         `/propertyView`,
-        { propertyId: id },
+        { propertyId: property?.id },
         {
           headers: {
             Authorization: `Bearer ${clientToken}`,
@@ -291,7 +359,7 @@ function PropertyDetail() {
   const updateViewCount = async () => {
     try {
       const clientToken = localStorage.getItem("token");
-      const response = await ApiService.put(`/properties/updateView/${id}`,
+      const response = await ApiService.put(`/properties/updateView/${property?.id}`,
         {
           headers: {
             Authorization: `Bearer ${clientToken}`,
@@ -299,11 +367,11 @@ function PropertyDetail() {
           }
         },
       )
-      if (response) {
-        navigate('./')
-      } else {
-        console.log("rrr::", response?.message)
-      }
+      // if (response) {
+      //   navigate('./')
+      // } else {
+      //   console.log("rrr::", response?.message)
+      // }
     } catch (err) {
       alert(err.message);
     }
@@ -312,13 +380,15 @@ function PropertyDetail() {
   useEffect(() => {
     const userDetails = localStorage.getItem("clientDetails");
     const isLogin = localStorage.getItem("isLogin");
-    if (isLogin) {
+    if (isLogin && property?.id) {
       addViewProperty()
     }
-    setTimeout(() => {
-      updateViewCount()
-    }, 5000);
-  }, [id])
+    if (property?.id) {
+      setTimeout(() => {
+        updateViewCount()
+      }, 5000);
+    }
+  }, [property?.id])
 
   useEffect(() => {
     if (property) {
@@ -379,15 +449,43 @@ function PropertyDetail() {
     navigate('/properties-list');
   };
 
-  // ✅ Handle similar property click
+  // ✅ Handle similar property click with title-based URL
   const handleSimilarPropertyClick = (property) => {
-    navigate(`/property/${property.id}`, {
+    const slug = createSlug(property.title);
+    navigate(`/property/${slug}`, {
       state: {
         property,
         from: fromUser
       }
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading property details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Property not found</p>
+          <button
+            onClick={handleBackToListings}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+          >
+            Back to Listings
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -419,6 +517,21 @@ function PropertyDetail() {
                   alt={property?.title}
                   className="w-full h-full object-cover"
                 />
+                {/* ❤️ Favorite Button - Added to image gallery */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(property);
+                  }}
+                  className="absolute top-3 right-3 z-20"
+                >
+                  <Heart
+                    className={`w-8 h-8 drop-shadow-md transition ${isFavorite(property?.id)
+                      ? "text-red-600 fill-red-600"
+                      : "text-white hover:text-red-400"
+                    }`}
+                  />
+                </button>
                 {selectedImage > 0 && (
                   <button
                     onClick={() => setSelectedImage(selectedImage - 1)}
@@ -579,22 +692,6 @@ function PropertyDetail() {
                         value={profile?.facing}
                       />
                     )}
-
-                    {/* {safeShow(profile?.plotWidth) && (
-        <FeatureCard
-          icon={<Maximize size={24} />}
-          label="Width"
-          value={`${profile?.plotWidth} ft`}
-        />
-      )}
-
-      {safeShow(profile?.plotDepth) && (
-        <FeatureCard
-          icon={<Maximize size={24} />}
-          label="Depth"
-          value={`${profile?.plotDepth} ft`}
-        />
-      )} */}
                   </>
                 ) : (
                   <>
@@ -785,18 +882,6 @@ function PropertyDetail() {
                   <Phone size={20} /> {!showContact ? "Show Contact Details" : "Hide Contact Details"}
                 </button>
 
-
-                {/* {!showContact ? (
-                  
-                )
-                : (
-                  // <div className="space-y-4 mb-4"> 
-                  //   {client.phoneNumber && (
-                  //     <ContactCard icon={<Phone size={20} />} label="Call Now" value={client.phoneNumber} />
-                  //   )}
-                  //   <ContactCard icon={<Mail size={20} />} label="Email" value="info@vmrdaplots.com" />
-                  // </div>
-                )}*/}
                 <div className="border-t pt-6">
                   <h4 className="font-bold text-[#003366] mb-4">Schedule a Visit</h4>
                   <form className="space-y-4" onSubmit={handleSubmit}>
@@ -846,11 +931,6 @@ function PropertyDetail() {
                     </button>
                   </form>
                 </div>
-
-                {/* <div className="border-t mt-6 pt-6 text-sm text-gray-500">
-                  <Calendar size={16} className="inline text-orange-500 mr-1" />
-                  Posted on: {new Date(property?.createdAt).toLocaleDateString()}
-                </div> */}
               </div>
             </div>
           )}
@@ -905,6 +985,21 @@ function PropertyDetail() {
                             alt={property?.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                           />
+                          {/* Heart icon for similar properties */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(property);
+                            }}
+                            className="absolute top-3 right-3 z-10"
+                          >
+                            <Heart
+                              className={`w-7 h-7 drop-shadow-md transition ${isFavorite(property?.id)
+                                ? "text-red-600 fill-red-600"
+                                : "text-white hover:text-red-400"
+                              }`}
+                            />
+                          </button>
                           {/* Overlay on hover */}
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
                         </div>

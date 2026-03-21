@@ -209,7 +209,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         length,
         breadth,
         price,
-        ...(isLand ? { frontage: frontage ?? "" } : { facing }),
+        ...(isLand ? {} : { facing }),
       };
     } else {
       payload.propertyProfile = {
@@ -261,7 +261,6 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     length,
     breadth,
     isLand,
-    frontage,
     landArea,
     plotArea,
     facing
@@ -288,8 +287,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   
     // 🧱 Conditional validation
     if (isLand) {
-      // Land: frontage & landArea required
-      if (!frontage) missing.push("frontage");
+      // Land: landArea required
       if (!landArea) missing.push("landArea");
     } else {
       // Plot: plotArea & facing required
@@ -310,7 +308,6 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     length,
     breadth,
     isLand,
-    frontage,
     landArea,
     plotArea,
     facing,
@@ -545,20 +542,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                 </div>
               </div>
             </>
-          ) : (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Roadfacing (in ft) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={frontage}
-                onChange={(e) => setFrontage(e.target.value)}
-                placeholder="e.g., 100"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-          )}
+          ) : null}
         </div>
       ) : (
         <div className="space-y-6">
@@ -880,41 +864,44 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
                   </button>
                 </div>
                 {!validateClosedParking(closedParking) && (
-                  <p className="text-red-500 text-xs mt-1">Maximum 10 allowed</p>
+                  <p className="text-red-500 text-xs">Maximum 10 allowed</p>
                 )}
               </div>
 
-              {/* Open Parking */}
-              <div className="flex flex-col">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Open Parking <span className="text-red-500">*</span>
-                </label>
-                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenParkingChange(Math.max(0, openParking - 1))}
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="text"
-                    readOnly
-                    value={openParking}
-                    className="w-12 text-center border-x border-gray-200 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleOpenParkingChange(openParking + 1)}
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
-                  >
-                    +
-                  </button>
-                </div>
-                {!validateOpenParking(openParking) && (
-                  <p className="text-red-500 text-xs mt-1">Maximum 10 allowed</p>
-                )}
-              </div>
+             
+             {/* Open Parking */}
+<div className="flex flex-col relative">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Open Parking <span className="text-red-500">*</span>
+  </label>
+  <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+    <button
+      type="button"
+      onClick={() => handleOpenParkingChange(Math.max(0, openParking - 1))}
+      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+    >
+      −
+    </button>
+    <input
+      type="text"
+      readOnly
+      value={openParking}
+      className="w-12 text-center border-x border-gray-200 focus:outline-none"
+    />
+    <button
+      type="button"
+      onClick={() => handleOpenParkingChange(openParking + 1)}
+      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+    >
+      +
+    </button>
+  </div>
+  {!validateOpenParking(openParking) && (
+    <p className="text-red-500 text-xs mt-1 absolute -bottom-5 left-0 whitespace-nowrap">
+      Maximum 10 allowed
+    </p>
+  )}
+</div>
 
               {/* Total Units - Moved here beside parking */}
               {isFlat && (
