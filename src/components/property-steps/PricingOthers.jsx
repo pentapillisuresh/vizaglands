@@ -119,7 +119,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         }
       }
     }
-  }, [data]); // Only depends on data
+  }, []);
 
   // ✅ Update parent data when local state changes - with proper debouncing and loop prevention
   useEffect(() => {
@@ -212,7 +212,7 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
     if (data.amenities && data.amenities.length > 0) score += 10;
     if (data.propertyProfile && Object.keys(data.propertyProfile).length > 0) score += 20;
     if (data.price) score += 10;
-    if (data.propertySubtype) score += 10;
+    if (data.propertySubtype) score += 20;
     if (description && description.trim().length >= 10) score += 10;
     if (approvedBy && approvedBy.length > 0) score += 5;
     if (privateNotes && privateNotes.trim().length > 0) score += 3;
@@ -306,7 +306,6 @@ const PricingOthers = ({ data, updateData, isEditMode }) => {
         amenities,
       };
 
-      console.log('Property saved:', propertyDataToSave);
       updateData(propertyDataToSave);
 
       const clientToken = localStorage.getItem('token');

@@ -198,140 +198,17 @@ const PostProperty = () => {
   const calculateScore = () => {
     const p = propertyData;
     let score = 0;
-    
-    // ========== STEP 1: Basic Details (20 points) ==========
-    // Property title (5 points)
-    if (p.title && p.title.trim().length >= 5) score += 5;
-    else if (p.title && p.title.trim().length > 0) score += 2;
-    
-    // Market type (5 points)
-    if (p.marketType && p.marketType !== '') score += 5;
-    
-    // Property kind (5 points)
-    if (p.propertyKind && p.propertyKind !== '') score += 5;
-    
-    // Property subtype (5 points)
-    if (p.propertySubtype && p.propertySubtype !== '') score += 5;
-    
-    // ========== STEP 2: Location Details (20 points) ==========
-    // City (8 points)
-    if (p.address.city && p.address.city.trim() !== '') score += 8;
-    
-    // Locality (8 points)
-    if (p.address.locality && p.address.locality.trim() !== '') score += 8;
-    
-    // Road facing (4 points)
-    if (p.address.road_facing && p.address.road_facing !== '' && parseInt(p.address.road_facing) > 0) score += 4;
-    
-    // ========== STEP 3: Property Profile (25 points) ==========
-    const isPlotOrLand = p.propertySubtype === 'Plot' || p.propertySubtype === 'Land';
-    
-    if (isPlotOrLand) {
-      // Price (8 points)
-      if (p.price && p.price !== '' && parseFloat(p.price) > 0) score += 8;
-      
-      // Area (Plot Area or Land Area) (7 points)
-      if ((p.propertyProfile.plotArea > 0) || (p.propertyProfile.landArea > 0)) score += 7;
-      
-      // Facing or Frontage (5 points)
-      if (p.propertyProfile.facing && p.propertyProfile.facing !== '') score += 5;
-      else if (p.propertyProfile.frontage && p.propertyProfile.frontage !== '') score += 5;
-      
-      // Length & Breadth (5 points)
-      if (p.propertyProfile.length > 0 && p.propertyProfile.breath > 0) score += 5;
-    } else {
-      // Price (6 points)
-      if (p.price && p.price !== '' && parseFloat(p.price) > 0) score += 6;
-      
-      // Bedrooms (4 points)
-      if (p.propertyProfile.bedrooms > 0) score += 4;
-      
-      // Bathrooms (4 points)
-      if (p.propertyProfile.bathrooms > 0) score += 4;
-      
-      // Area (Carpet/Built/Super Built) (6 points)
-      if (p.propertyProfile.carpetArea > 0 || p.propertyProfile.buildArea > 0 || p.propertyProfile.superBuildArea > 0) score += 6;
-      
-      // Parking (3 points)
-      if (p.propertyProfile.closedParking > 0 || p.propertyProfile.openParking > 0) score += 3;
-      
-      // Status (2 points)
-      if (p.availableStatus && p.availableStatus !== '') score += 2;
-    }
-    
-    // ========== STEP 4: Photos & Videos (15 points) ==========
-    // Photos (10 points)
-    if (p.photos && p.photos.length > 0) {
-      score += 8;
-      // Bonus for multiple photos
-      if (p.photos.length >= 3) score += 2;
-    }
-    
-    // Videos (3 points)
-    if (p.videos && p.videos.trim() !== '') score += 3;
-    
-    // Audio (2 points)
-    if (p.audio && p.audio.trim() !== '') score += 2;
-    
-    // ========== STEP 5: Amenities & Other Details (20 points) ==========
-    // Description (8 points)
-    if (p.description && p.description.trim().length >= 10) {
-      score += 8;
-    } else if (p.description && p.description.trim().length > 0) {
-      score += 3;
-    }
-    
-    // Amenities (6 points)
-    if (p.amenities && p.amenities.length > 0) {
-      score += 4;
-      // Bonus for multiple amenities
-      if (p.amenities.length >= 3) score += 2;
-    }
-    
-    // Approved By (3 points)
-    if (p.approvedBy && p.approvedBy.trim() !== '' && p.approvedBy !== 'null') {
-      score += 3;
-    }
-    
-    // Private Notes (2 points)
-    if (p.privateNotes && p.privateNotes.trim().length > 0) {
-      score += 1;
-    }
-    
-    // Project Name (1 point)
-    if (p.projectName && p.projectName.trim().length > 0) {
-      score += 1;
-    }
-    
-    // Ensure score doesn't exceed 100 and round to nearest integer
-    const finalScore = Math.min(Math.round(score), 100);
-    
-    // Debug log to see what's missing
-    if (finalScore < 100) {
-      console.log('=== SCORE BREAKDOWN ===');
-      console.log('Step 1 - Title:', p.title?.length >= 5 ? 5 : (p.title?.length > 0 ? 2 : 0));
-      console.log('Step 1 - Market Type:', p.marketType ? 5 : 0);
-      console.log('Step 1 - Property Kind:', p.propertyKind ? 5 : 0);
-      console.log('Step 1 - Subtype:', p.propertySubtype ? 5 : 0);
-      console.log('Step 2 - City:', p.address.city ? 8 : 0);
-      console.log('Step 2 - Locality:', p.address.locality ? 8 : 0);
-      console.log('Step 2 - Road Facing:', p.address.road_facing ? 4 : 0);
-      console.log('Step 3 - Price:', p.price ? (isPlotOrLand ? 8 : 6) : 0);
-      console.log('Step 3 - Area:', isPlotOrLand ? 
-        ((p.propertyProfile.plotArea > 0 || p.propertyProfile.landArea > 0) ? 7 : 0) :
-        ((p.propertyProfile.carpetArea > 0 || p.propertyProfile.buildArea > 0 || p.propertyProfile.superBuildArea > 0) ? 6 : 0));
-      console.log('Step 4 - Photos:', p.photos?.length > 0 ? (p.photos.length >= 3 ? 10 : 8) : 0);
-      console.log('Step 4 - Videos:', p.videos ? 3 : 0);
-      console.log('Step 5 - Description:', p.description?.length >= 10 ? 8 : (p.description?.length > 0 ? 3 : 0));
-      console.log('Step 5 - Amenities:', p.amenities?.length > 0 ? (p.amenities.length >= 3 ? 6 : 4) : 0);
-      console.log('Step 5 - Approved By:', p.approvedBy && p.approvedBy !== 'null' && p.approvedBy !== '' ? 3 : 0);
-      console.log('Step 5 - Private Notes:', p.privateNotes ? 1 : 0);
-      console.log('Step 5 - Project Name:', p.projectName ? 1 : 0);
-      console.log('Total Score:', finalScore);
-      console.log('Missing fields to reach 100%');
-    }
-    
-    return finalScore;
+    if (p.propertyName) score += 10;
+    if (p.title) score += 10;
+    if (p.description) score += 20;
+    if (p.marketType) score += 10;
+    // if (p.propertyKind) score += 10;
+    if (p.price) score += 30;
+    if (p.address.city) score += 10;
+    if (p.address.locality) score += 10;
+    // if (p.propertyProfile.type) score += 10;
+    // if (p.photos) score += 10;
+    return Math.min(score, 100);
   };
 
   // ✅ Add effect to auto-mark step 5 as visited when description is complete
@@ -372,7 +249,7 @@ const PostProperty = () => {
                       stroke="#f97316"
                       strokeWidth="8"
                       fill="none"
-                      strokeDasharray={`${(calculateScore() / 100) * 226} 226`}
+                      strokeDasharray={`${(calculateScore() / 100) * 250} 250`}
                       strokeLinecap="round"
                     />
                   </svg>

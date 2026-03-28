@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Eye, MapPin, Bed, Bath, Square, Plus, Search, Filter, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import {MapPin, Bed, Bath, Maximize,  Edit, Trash2, Eye,  Plus, Search, Filter, Tag, ChevronRight, Compass, LandPlot, Monitor,DoorClosed,Presentation} from "lucide-react";
 import ApiService from '../../hooks/ApiService';
 import PropertyForm from '../../components/PropertyForm';
 import getPhotoSrc from '../../hooks/getPhotos';
@@ -419,38 +419,72 @@ const ManageListings = () => {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-4 mb-4">
-                        {listing?.profile?.bedrooms && (
-                          <div className="flex items-center text-gray-700">
-                            <Bed className="w-5 h-5 mr-2 text-orange-500" />
-                            <span className="text-sm font-medium">
-                              {listing?.profile.bedrooms} Beds
-                            </span>
-                          </div>
-                        )}
-                        {listing?.profile?.bathrooms && (
-                          <div className="flex items-center text-gray-700">
-                            <Bath className="w-5 h-5 mr-2 text-orange-500" />
-                            <span className="text-sm font-medium">
-                              {listing?.profile.bathrooms} Baths
-                            </span>
-                          </div>
-                        )}
-                        {listing?.profile?.carpetArea && (
-                          <div className="flex items-center text-gray-700">
-                            <Square className="w-5 h-5 mr-2 text-orange-500" />
-                            <span className="text-sm font-medium">
-                              {listing?.profile.carpetArea} sq.ft
-                            </span>
-                          </div>
-                        )}
-                        {listing?.viewCount && (
-                          <div className="flex items-center text-gray-700">
-                            <Eye className="w-5 h-5 mr-2 text-blue-500" />
-                            <span className="text-sm font-medium">
-                              {listing?.viewCount} views
-                            </span>
-                          </div>
-                        )}
+                      {listing?.profile && (
+                        <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
+                          {listing.profile.bedrooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Bed size={16} className="text-[#003366]" />
+                              <span>{listing.profile.bedrooms}</span>
+                            </div>
+                          )}
+                          {listing.profile.bathrooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Bath size={16} className="text-[#003366]" />
+                              <span>{listing.profile.bathrooms}</span>
+                            </div>
+                          )}
+                          {listing.profile.carpetArea > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Maximize size={16} className="text-[#003366]" />
+                              <span>
+                                {listing.profile.carpetArea} {listing.profile.areaUnit}
+                              </span>
+                            </div>
+                          )}
+                          {listing.profile.plotArea > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Maximize size={16} className="text-[#003366]" />
+                              <span>
+                                {listing.profile.plotArea} {listing.profile.areaUnit}
+                              </span>
+                            </div>
+                          )}
+                          {listing.profile.facing && (
+                            <div className="flex items-center gap-1">
+                              <Compass size={16} className="text-[#003366]" />
+                              <span>
+                                {listing.profile.facing}
+                              </span>
+                            </div>
+                          )}
+                          {listing.profile.workstations > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Monitor size={16} className="text-[#003366]" />
+                              <span>
+                                {listing.profile.workstations}
+                              </span>
+                            </div>
+                          )}
+
+                          {listing.profile.cabins > 0 && (
+                            <div className="flex items-center gap-1">
+                              <DoorClosed size={16} className="text-[#003366]" />
+                              <span>
+                                {listing.profile.cabins}
+                              </span>
+                            </div>
+                          )}
+
+                          {listing.profile.conferenceRooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Presentation size={16} className="text-[#003366]" />
+                              <span>
+                                {listing.profile.conferenceRooms}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       </div>
 
                       <div className="flex flex-wrap gap-3">

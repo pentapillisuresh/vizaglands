@@ -9,7 +9,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
   const [propertyName, setPropertyName] = useState(data.propertyName || '');
   const [city, setCity] = useState(data.address?.city || "");
   const [locality, setLocality] = useState(data.address?.locality || "");
-  const [subLocality, setSubLocality] = useState(data.address?.sublocality || "");
+  const [subLocality, setSubLocality] = useState(data.address?.subLocality || "");
   const [apartmentDoorNo, setApartmentDoorNo] = useState(data.address?.apartmentDoorNo || "");
   const [roadFacing, setRoadFacing] = useState(data.address?.road_facing || "");
   const [pincode, setPincode] = useState(data.address?.pincode || "");
@@ -118,9 +118,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
     if (isEditMode && data.address && cities.length > 0) {
       setCity(data.address.city || "");
       setLocality(data.address.locality || "");
-      console.log("locality::", data.address.locality)
       setSubLocality(data.address.subLocality || "");
-      console.log("subLocality::", data.address.subLocality)
       setApartmentDoorNo(data.address.apartmentDoorNo || "");
       setRoadFacing(data.address.road_facing || "");
       setPincode(data.address.pincode || "");
@@ -147,6 +145,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
         ...data.address,
         city,
         locality,
+        subLocality
       },
     });
   }, [city, locality]);
@@ -190,7 +189,7 @@ const LocationDetails = ({ data, updateData, onNext, isEditMode }) => {
       address: {
         city,
         locality,
-        sublocality: subLocality,
+        subLocality: subLocality,
         apartmentDoorNo: isLand ? "" : apartmentDoorNo,
         road_facing: roadFacing,
         pincode,
