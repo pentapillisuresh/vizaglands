@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {MapPin, Bed, Bath, Maximize,  Edit, Trash2, Eye,  Plus, Search, Filter, Tag, ChevronRight, Compass, LandPlot, Monitor,DoorClosed,Presentation} from "lucide-react";
+import {MapPin, Bed, Bath,ChevronLeft, Maximize,  Edit, Trash2, Eye,  Plus, Search, Filter, Tag, ChevronRight, Compass, LandPlot, Monitor,DoorClosed,Presentation} from "lucide-react";
 import ApiService from '../../hooks/ApiService';
 import PropertyForm from '../../components/PropertyForm';
 import getPhotoSrc from '../../hooks/getPhotos';

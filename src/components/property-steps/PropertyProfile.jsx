@@ -137,8 +137,6 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
   // --- Initialize state on edit/add ---
   useEffect(() => {
     if (!data) return;
-     console.log("EDIT DATA:", data?.propertyProfile);
-
     setPlotArea(data?.propertyProfile?.plotArea || 0);
     setLandArea(data?.propertyProfile?.landArea || 0);
     setPlotAreaUnit(data?.propertyProfile?.plotAreaUnit || (isLand ? "acres" : isPlot ? "sq yards" : "sqft"));
@@ -151,7 +149,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     setBedrooms(data?.propertyProfile?.bedrooms || null);
     setBathrooms(data?.propertyProfile?.bathrooms || null);
     setBalconies(data?.propertyProfile?.balconies || null);
-    setPoojaRoom(data?.propertyProfile?.poojaRoom ?? true);
+    setPoojaRoom(data?.propertyProfile?.poojaRooms ?? true);
     setCarpetArea(data?.propertyProfile?.carpetArea || null);
     setBuiltArea(data?.propertyProfile?.buildArea || null);
     if (data?.propertyProfile?.buildArea) {
@@ -223,7 +221,7 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
         bedrooms,
         bathrooms,
         balconies,
-        poojaRoom,
+        poojaRooms:poojaRoom,
         carpetArea,
         buildArea: builtArea,
         superBuildArea: superBuiltArea,
@@ -397,8 +395,6 @@ const PropertyProfile = ({ data = {}, onNext, updateData }) => {
     if (isShopShowroom) setShopNumber(value);
   };
 
-
-  console.log("breadth value:", breadth, typeof breadth);
   return (
     <div className="space-y-8">
       <div>
