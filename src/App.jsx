@@ -23,6 +23,9 @@ import Project from './pages/Project';
 import ClientPropertyDetail from './pages/ClientPropertyDetail';
 import Favorites from './pages/vendor/Favorites';
 import AreaDetail from './pages/AreaDetail';
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
+import DeleteAccount from "./pages/DeleteAccount";
 
 function App() {
   return (
@@ -50,6 +53,20 @@ function App() {
           <Route path="/vendor/profile" element={<Profile />} />
           <Route path="/vendor/leads" element={<Leads />} />
           <Route path="/area/:areaName" element={<AreaDetail />} />
+          <Route
+            path="/privacy-policy"
+            element={<PrivacyPolicy />}
+          />
+
+          <Route
+            path="/terms-conditions"
+            element={<TermsConditions />}
+          />
+
+          <Route
+            path="/delete-account"
+            element={<DeleteAccount />}
+          />
         </Routes>
         <Footer />
       </Router>
